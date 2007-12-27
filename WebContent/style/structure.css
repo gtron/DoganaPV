@@ -1,0 +1,104 @@
+#container { margin: 0 auto; padding:0; width:990px; 
+border: 1px solid #000; border-top: 0 none;
+text-align:left;background: #FFF none;}
+#corpo {	width: 982px ; margin : 0 4px ; padding:2em 0 4px 0 ; background: #FFF none; border-top:0 none;text-align:left;position: relative;}
+#containTestata {position:relative;margin:0;padding:0; background: #FFF url(../images/header-background.png) repeat-x bottom;}
+#testata {color:#000;position:relative; height:80px; width:900px; margin:0 auto;}
+
+#testata H1 { font: bold 22px Arial ; font-variant:small-caps; margin:0; padding:0; position:absolute; bottom:20px ; left:10px;}
+
+
+/* MENU */
+.mainMenu {
+font: bold 11px Arial ;
+position:absolute;
+border: 1px solid #000;
+border-bottom: 0 none;
+bottom:0;right:0px;
+text-align :right;
+background: #EEEEFF none;
+padding: 0 ;
+margin:0;
+height:58px;
+}
+.mainMenu UL {
+margin:0 ;padding: 0;
+}
+.mainMenu LI {
+position: relative;
+margin:0;
+list-style: none;
+display: inline;
+}
+
+.mainMenu li div {
+float:left;
+padding:4px 6px 10px 6px;
+margin:4px 2px;
+border: 1px solid #AAA;
+}
+.mainMenu li a {
+text-decoration: none;
+color: black;
+border-bottom : 4px solid #AAA;
+}
+.mainMenu li.set a {
+border-bottom : 4px solid #000;
+}
+.mainMenu LI.set div {
+border-bottom: 2px solid #FFF;
+background: #FFF none;
+} 
+.mainMenu li a:hover { text-decoration: none ; }
+
+/*
+.mainMenu li.sp  {margin:0; width:4px; overflow:hidden; background: trasparent none; height: 100%}
+.mainMenu li IMG { border: 1px solid red;}
+
+.mainMenu li a { 
+text-decoration: none;
+border: 1px solid red;
+color: black;
+margin:0; padding:22px 4px 2px 4px;
+background-color:#FFF;
+}
+
+.buttonList li a:hover {
+color: black;
+background-color: #FFE271;
+border-style: outset;
+}
+
+*/
+
+A.stallo  { display: block ; padding: 2px; margin:0; position:relative; color:#000; height:100%; }
+A.stallo SPAN { position:absolute; top:2px; left:0;width:24px; text-align:center;height:100%;font-weight:bold; cursor:pointer;}
+A.stallo P { padding:0 4px; margin:0; margin-left: 24px; background-color: #CCC;height:100%; cursor:pointer;}
+A.stallo:hover { b ackground-color : #F5F5B3; text-decoration:none; }
+TD.stallo { border: 1px solid #B3B5F5; background-color: #AAA;}
+
+
+.commands { 
+border: 1px solid #AAA;
+font: bold 11px Arial ;
+text-align :right;
+margin: 2px 0 ;
+padding:4px 0;
+position:absolute;
+top: 0; left:0;
+width: 100% ;
+}
+.commands UL {
+padding:0; margin:0;
+}
+.commands LI {
+position: relative;
+padding: 0 ; margin: 2px 5px;
+display: inline;
+list-style-type:none;
+}
+.commands LI IMG { margin-right: 5px;}
+
+#dettaglio { border: 1px solid #036; text-align:center;margin: 0 0 6px 0; background-color: #EEE; }
+
+#result { border: 2px solid #A00; background-color:#FFF5F5; text-align:center; margin:4px 0; padding:4px; font-weight:bold;}

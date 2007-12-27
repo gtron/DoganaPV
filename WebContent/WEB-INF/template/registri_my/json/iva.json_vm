@@ -1,0 +1,43 @@
+{total:100,page:190,records:199,rows[
+#foreach( $m in $list )
+#if($velocityCount > 1),#end
+{numero:"$m.NumRegistro",data:"$tools.Date.format($dateFormat, $m.Data)",documento:"$!m.Documento",
+consegna:"$!m.Consegna.Numero",merce:"$!m.Consegna.Merce",
+#if($m.getIsScarico() ||  $m.Umido.intValue() < 0 ) #if( $m.Umido.intValue() < 0 )
+umido_in:" ",umido_out:"$!tools.Number.format($tools.Math.mul( -1 , $m.Umido))",
+#else umido_in:" ",umido_out:"$tools.Number.format($m.Umido)", #end
+#else umido_in:"$tools.Number.format($m.Umido)",umido_out:"",#end
+#if($m.getIsScarico() ||  $m.Secco.intValue() < 0 ) #if( $m.Secco.intValue() < 0 )
+secco_in:"",secco_out:"$!tools.Number.format($tools.Math.mul( -1 , $m.Secco))",
+#else secco_in:" ",secco_out:"$tools.Number.format($m.Secco)",#end
+#else secco_in:"$tools.Number.format($m.Secco)",secco_out:"",#end
+val_euro:"$!tools.Number.format($m.ValoreEuro )",
+val_dollari:"$!tools.Number.format($m.ValoreDollari)",n_Partitario:"$!m.Consegna.NumeroPartitario"
+}#end
+]}
+#*
+#if( $m.getIsScarico() )
+#set($sumSecco = $tools.Math.sub( $sumSecco , $m.Secco ) )
+#set($sumUmido = $tools.Math.sub( $sumUmido , $m.Umido ) )
+#else
+#set($sumSecco = $tools.Math.add( $sumSecco , $m.Secco ) )
+#set($sumUmido = $tools.Math.add( $sumUmido , $m.Umido ) )
+#end
+#if ( "$sumUmido" == '0.0' )
+<tr class="sep"><td colspan="10" align="center">Svuotamento Stallo</td></tr>
+#end
+#end
+</tbody>
+<tfoot></tfoot>
+</table>
+<table><tbody>
+<tr class="sep"><td colspan="3"><br /><b>Giacenza Attuale:</b></td>
+<td><br /><b>$tools.Number.format($sumUmido)</b></td>
+<td>&nbsp;</td>
+<td><br /><b>$tools.Number.format($sumSecco)</b></td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+<table>
+<br><br>
+*#

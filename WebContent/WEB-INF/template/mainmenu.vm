@@ -1,0 +1,19 @@
+<div class="mainMenu">
+<ul>
+<li #if($activeMenu=='PRINCIPALE')class="set"#end><div><a href=".main" #if($selectedButton == 1)class="hi"#end><img src="$!images/tab-ico-principale.png" />&nbsp;PRINCIPALE</a></div></li>
+##<li class="sp">&nbsp;</li>
+<li #if($activeMenu=='PARTITARI')class="set"#end><div><a href=".consegne?cmd=list"><img src="$!images/tab-ico-consegne.png" />&nbsp;PARTITARI</span></a></div></li>
+##<li class="sp">&nbsp;</li>
+##<li></li>
+##<li><a href="#">Agenda...</a></div></li>
+<li #if($activeMenu=='DOGANALE')class="set"#end><div><a href=".registri"><img src="$!images/tab-ico-registrodoganale.png" />&nbsp;REGISTRO DOGANALE</a></div></li>
+##<li class="sp">&nbsp;</li>
+<li #if($activeMenu=='IVA')class="set"#end><div><a href=".registri?iva=true"><img src="$!images/tab-ico-registroiva.png" />&nbsp;REGISTRO IVA</a></div></li>
+##<li><img src="$!images/importa.gif" /><a href=".main?cmd=import" onclick="return confirm('Effettuare l\'importazione per tutte le consegne?');">Importazione Globale</a></div></li>
+</ul>
+
+#*
+<h3>Clouds</h3>
+*#
+
+</div>

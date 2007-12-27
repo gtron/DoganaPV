@@ -1,0 +1,138 @@
+#set($dateFormat = 'dd/MM/yy')
+#set($oldStallo = '')
+#foreach( $m in $obj.Partitario )
+#if($oldStallo == '' || $oldStallo.Id != $m.Stallo.Id)
+#if( $oldStallo.Id)
+<tr><td colspan="10" align="center">&nbsp;</td></tr>
+<tr class="sepNoHi">
+<th colspan="2">
+&nbsp;
+</th>
+<th colspan="2"><br /><b>Giacenza Attuale:</b></th>
+<th colspan="2"><br /><b>$tools.Number.format($sumUmido)</b></th>
+<th>&nbsp;</th>
+#set( $sumSeccoCalcolato = $obj.calcolaSecco($sumUmido) )
+<th colspan="2"><br /><b>$tools.Number.format($sumSecco)</b>
+#if( $sumSeccoCalcolato != $sumSecco)<br><small>($tools.Number.format( $sumSeccoCalcolato ))</small>#end</th>
+<th >&nbsp;</th>
+</tr>
+</tbody></table></div>
+#end
+
+#set($sumSecco = 0)
+#set($sumUmido = 0)
+#set($oldStallo = $m.Stallo)
+<div id="partitario_$oldStallo.Id">
+<table border="0" class="movimenti" cellpadding="2" cellspacing="0" id="tablemovimenti">
+<caption>Stallo $oldStallo.Nome<br /><br /></caption>
+<tr>
+<th rowspan="2">Registro</th>
+<th rowspan="2">Num.Reg.</th>
+##<th  rowspan="2" width="6%">Tipo&nbsp;&nbsp;</th>
+<th rowspan="2">Data</th>
+<th rowspan="2">Documento</th>
+<th width="10%" colspan="2">Umido</th>
+<th rowspan="2" width="20">&nbsp;</th>
+<th width="10%" colspan="2">Secco</th>
+
+##<th width="20">Stallo</th>
+##<th><input type="checkbox" onchange="selectDOG(this);" /></th>
+</tr>
+<tr>
+<th>Entrata</th>
+<th>Uscita</th>
+<th>Entrata</th>
+<th>Uscita</th>
+</tr>
+<tbody>
+
+#end
+
+<tr#if($velocityCount%2  == 0) class="odd"#end>
+<td>#if( $!m.ValoreEuro )IVA#else DOG#end</td>
+<td>
+#if ( $m.NumRegistro )
+$!m.NumRegistro
+#else
+#set($registraDOG = true)
+<input type="checkbox" name="registraDOG" value="$m.Data" id="registraDOG_$velocityCount" />
+##<label for="registraDOG_$velocityCount">Registra</label>
+##<a href="?cmd=editmovimento&id=$m.Id&assegnaRegDoganale=1&exec=1">Registra</a>
+#end
+</td>
+###NON SERVE + il TIPO
+###<td>#if($m.getIsScarico()) S#else C#end #if($m.getIsRettifica())(R)
+##<a  href=".consegne?cmd=editmovimento&id=$m.Id">Modifica</a></td>
+####else&nbsp;&nbsp;&nbsp;&nbsp;#end</td>
+
+
+<td>$tools.Date.format($dateFormat, $m.Data)</td>
+<td>&nbsp;$!m.Documento</td>
+
+#if($m.getIsScarico() ||  $m.Umido.intValue() < 0 )
+#if( $m.Umido.intValue() < 0 )
+<td>&nbsp;</td>
+<td class="r">$!tools.Number.format($tools.Math.mul( -1 , $m.Umido))</td>
+#else
+<td>&nbsp;</td>
+<td class="r">$tools.Number.format($m.Umido)</td>
+#end
+#else
+<td class="r">$tools.Number.format($m.Umido)</td>
+<td>&nbsp;</td>
+#end
+
+<td>&nbsp;</td>
+
+#if($m.getIsScarico() ||  $m.Secco.intValue() < 0 )
+#if( $m.Secco.intValue() < 0 )
+<td>&nbsp;</td>
+<td class="r">$!tools.Number.format($tools.Math.mul( -1 , $m.Secco))</td>
+#else
+<td>&nbsp;</td>
+<td class="r">$tools.Number.format($m.Secco)</td>
+#end
+#else
+<td class="r">$tools.Number.format($m.Secco)</td>
+<td>&nbsp;</td>
+#end
+
+
+
+##<td>$m.Stallo.Parco&nbsp;$m.Stallo.Numero</td>
+
+#*<td>
+<a #if($velocityCount%25  == 0) id="lnk$m.Id"#end href=".consegne?cmd=editmovimento&id=$m.Id">Modifica</a></td>
+</tr>*#
+
+
+#if( $m.getIsScarico() )
+#set($sumSecco = $tools.Math.sub( $sumSecco , $m.Secco ) )
+#set($sumUmido = $tools.Math.sub( $sumUmido , $m.Umido ) )
+#else
+#set($sumSecco = $tools.Math.add( $sumSecco , $m.Secco ) )
+#set($sumUmido = $tools.Math.add( $sumUmido , $m.Umido ) )
+#end
+
+#if ( "$sumUmido" == '0.0' )
+##<tr class="sep"><td colspan="10" align="center">Svuotamento Stallo</td></tr>
+#end
+
+#end
+
+#if( $oldStallo.Id)
+<tr><td colspan="10" align="center">&nbsp;</td></tr>
+<tr class="sepNoHi">
+<th colspan="2">
+&nbsp;
+</th>
+<th colspan="2"><br /><b>Giacenza Attuale:</b></th>
+<th colspan="2"><br /><b>$tools.Number.format($sumUmido)</b></th>
+<th>&nbsp;</th>
+#set( $sumSeccoCalcolato = $obj.calcolaSecco($sumUmido) )
+<th colspan="2"><br /><b>$tools.Number.format($sumSecco)</b>
+#if( $sumSeccoCalcolato != $sumSecco)<br><small>($tools.Number.format( $sumSeccoCalcolato ))</small>#end</th>
+<th >&nbsp;</th>
+</tr>
+</tbody></table></div>
+#end

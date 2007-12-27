@@ -1,0 +1,37 @@
+#set($oldParco = "")
+#foreach( $s in $stalli ) 
+#if($oldParco != $s.Parco)
+#set($oldParco = $s.Parco)
+#if ( $velocityCount > 1)</tr></table><br>#end
+<table border="0" width="100%">
+<tr>
+<td colspan="4" align="center"><strong>Parco $s.Parco</strong></td>
+#set($count = 0 )
+#end
+#set($count = $count + 1 )
+#if( $velocityCount % 4 == 1)</tr><tr>#end
+<td width="25%" class="stallo">
+#if ( true || $s.Consegna.Numero > 0 )
+<a href=".consegne?id=$!s.Consegna.Id#if (! $s.IdConsegnaAttuale)&cmd=edit#end" class="stallo" #if ( $s.IdConsegnaAttuale ) style="background-color:$!s.Consegna.Merce.Colore"#end >
+#else
+<a href=".main?id=$!s.Id&cmd=viewstallo" class="stallo" #if ( $s.IdConsegnaAttuale ) style="background-color:$!s.Consegna.Merce.Colore"#end >
+#end
+<span>$count</span>
+<p>
+#if( $s.IdConsegnaAttuale )
+- Consegna n. <strong>$!s.Consegna.Numero</strong><br>
+Merce: <strong>$!s.Consegna.Merce.Nome</strong><br>
+N. Partitario: <strong>$!s.Consegna.NumeroPartitario</strong>
+<br>
+##G.Attuale : $tools.Number.format( $s.Attuale )<br>
+##G.Registro: $tools.Number.format( $s.Caricato )<br>
+#else
+<br>
+Vuoto<br><br>
+#end
+</p>
+</a>
+</td>
+
+#end
+</tr></table><br>

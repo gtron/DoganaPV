@@ -1,0 +1,236 @@
+#set($activeMenu='PARTITARI')
+#set( $addJs = ['/js/jquery.ui/ui.tabs.js','/js/jquery.ui/ui.calendar.js','/js/jquery.ui/ui.dialog.js','/js/jquery.ui/ui.dimensions.js','/js/jquery.ui/ui.resizable.js','/js/jquery.ui/ui.mouse.js','/js/jquery.ui/ui.draggable.js'])
+#set( $addCss = ['/js/jquery.ui/themes/dogana/tabs.css','/js/jquery.ui/themes/flora/flora.calendar.css','/js/jquery.ui/themes/flora/flora.dialog.css','/js/jquery.ui/themes/flora/flora.resizable.css'] )
+#parse('costanti.vm')
+#parse('header.vm')
+
+#set( $regIVA = $!obj.Iter.Regiva )
+#set( $regDog = $!obj.Iter.Regdoganale )
+
+
+<div id="dettaglio">
+Consegna Num.: <strong>$!obj.Numero</strong> - Partitario : <strong>$!obj.NumeroPartitario</strong><br />
+Merce : <strong>$!obj.Merce.Nome</strong> - 
+Iter : <strong>$!obj.Iter.Nome</strong><br>
+
+#if( $!obj.Pesopolizza > 0 )Peso Polizza: <strong>$tools.Number.format($!obj.Pesopolizza) Kg #if($!obj.PesoFinalePortoCarico) (P.Finale Porto di Carico)#end</strong> -#end
+Tasso di Umidit&agrave;: <strong>$!tools.Number.format('##0.00000', $!obj.TassoUmidita)%</strong>
+</div>
+
+<ul id="menuConsegna">
+#if( $regDog ) <li><a href="#doganale">Registro<br />Doganale</a></li>#end
+#if( $regIVA ) <li><a href="#iva">Registro<br />IVA</a></li> #end
+
+
+#set($hasPartitario = false)
+#foreach( $s in $!obj.StalliRegistrati )
+#set($hasPartitario = true)
+<li><a href="#partitario_$s.Id">Partitario<br />$s.Parco $s.Numero</a></li>
+#end
+
+##<li><a href="#partitario">Partitario</a></li>
+##<li><a href="#dettaglio">Dettaglio</a></li>
+</ul>
+
+#if ( $regDog ) 
+<div id="doganale">
+#parse('consegne/registro_doganale.vm')
+</div>
+#end
+
+
+
+#if ( $regIVA ) 
+<div id="iva">
+#parse('consegne/registro_iva.vm')
+</div>
+#end
+
+#if($hasPartitario)
+#parse('consegne/partitario.vm')
+#end
+
+
+<script>
+function initRowHighlighting(){
+var table = document.getElementById('tablemovimenti');
+attachRowMouseEvents(table.getElementsByTagName('tr'));
+}
+function attachRowMouseEvents(rows){
+for(var i = 0;i < rows.length;i++){
+var row = rows[i];
+row.onmouseover = function(){ highlightRow(this, true);}
+row.onmouseout = function() { highlightRow(this, false);}
+// row.style.cursor = 'pointer';
+}}
+
+function highlightRow( row, isover) { 
+if ( row.getAttribute('origClass') == null )
+	row.setAttribute('origClass' , row.className) ;
+
+if ( row.className.search(/nohi/i) < 0 )
+	row.className = isover ? 'hi' : row.getAttribute('origClass');
+}
+
+window.onload = initRowHighlighting;
+
+ $(document).ready(function(){
+    $("#menuConsegna").tabs();
+	
+## #if(!$immissioneLP && $regIVA )$("#menuConsegna").tabsClick( 2 )#end
+  });
+</script>
+
+#set($immissioneLP=false)
+#if ( $regIVA)
+#foreach( $s in $obj.Stalli ) 
+#if( ! $s.HasLiberaPratica )#set($immissioneLP=true)#end
+#end
+#end
+
+
+<div class="commands">
+<ul>
+
+#if($obj.isChiusa())
+
+#elseif($obj.isAperta()) 
+##<li><a href=".consegne?cmd=edit&id=$obj.Id"><img src="$!images/action-ico-immetti.png" /> Modifica</a></li>
+##<li><a href=".consegne?cmd=chiudi&id=$c.Id&exec=1" onclick="return confirm('Chiudi la consegna selezionata?');"><img src="$!images/action-ico-elimina.png" />Chiudi</a></li>
+#else 
+##<a href="?cmd=apri&id=$c.Id&exec=1" onclick="return openDialog($c.Id,'#dlg_OpenC');">[ Apri ]</a>
+
+##<li><a href=".consegne?cmd=apri&id=$c.Id&exec=1" onclick="return confirm('Aprire la consegna?');"><img src="$!images/action-ico-apri.png" />Apri</a></li>
+
+#end
+
+#if( ! $rettificaDone && $obj.isAperta() )
+<li><a href="?id=$obj.Id&amp;cmd=popola"><img src="$!images/action-ico-immetti.png" /> Popola Stalli</a></li>
+#end
+
+#if($rettificaDone && $immissioneLP && $obj.isAperta() )
+<li><a href="#" onclick="$('#dlg_LiberaPratica').dialogOpen();"><img src="$!images/action-ico-registra.png" />Immetti in L.P.</a></li>
+#end
+
+#if( $rettificaDone && ! $immissioneLP )
+<li><a href="#" id="import_$obj.Id" onclick="openDialog($obj.Id,'#dlg_ImportTo');"><img src="$!images/action-ico-immetti.png" />Importa Scarichi</a></li>
+#if ($obj.isPesoFinalePortoCarico() && ! $registraIVA )
+<li><a href="?id=$obj.Id&amp;cmd=chiudiPFPC&exec=1" onclick="return confirm('Chiudere la consegna?');"><img src="$!images/action-ico-registra.png" />Chiudi PFPC</a></li>
+#end
+#end
+
+<li><a href=".consegne?cmd=edit&id=$obj.Id"><img src="$!images/action-ico-modifica.png" /> Modifica</a></li>
+##<li><a href=".consegne?cmd=edit"><img src="$!images/action-ico-nuovo.png" /> Nuova consegna</a></li>
+</ul>
+</div>
+
+<div id="dlg_ImportTo" class="flora" style="text-align:center;">
+Inserire la data fino alla quale si desidera importare (compresa):
+<input type="text" size="10" maxlength="10" id="dataImport" />
+</div>
+
+<div id="dlg_LiberaPratica" class="flora" style="text-align:center;">
+<form action=".consegne" id="openC">
+Data : <input type="text" name="dataLP" size="10" id="dataLP" /><br>
+##
+
+#foreach( $s in $obj.Stalli )
+#if(! $s.HasLiberaPratica )
+<input type="checkbox" name="immettiLP" value="$s.Id" id="libPrat_$velocityCount" />
+<label for="libPrat_$velocityCount">$s.Nome</label><br />
+#end#end
+
+<input type="hidden" name="cmd" value="apri" />
+<input type="hidden" name="exec" value="1" />
+<input type="hidden" name="id" value="" />
+
+<fieldset><legend>Documento di Ingresso</legend>
+Tipo: <select name="doc"><option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option></select>
+Numero: <input type="text" name="doc_num" size="4"/>
+Data:  <input type="text" name="doc_data" id="doc_data" size="7"/></fieldset>
+<fieldset><legend>Documento di Ingresso (Portovesme)</legend>
+Tipo: <select name="docPV"><option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option></select>
+Numero: <input type="text" name="docPV_num" size="4"/>
+Data:  <input type="text" id="docPV_data" name="docPV_data" size="7"/></fieldset>
+<br />
+Note :<br />
+<textarea name="note" cols="40" rows="2"></textarea>
+<br />
+##<input type="button" value="Immetti in L.P." onclick="immettiLP();">
+</form>
+</div>
+
+<script type="text/javascript">
+
+$('document').ready( function() {
+
+popUpCal.regional['it'] = {clearText: 'Svuota', closeText: 'Chiudi',
+prevText: '&lt;Prec', nextText: 'Succ&gt;', currentText: 'Oggi',
+dayNames: ['Do','Lu','Ma','Me','Gio','Ve','Sa'],
+monthNames: ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
+'Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre']};
+
+popUpCal.setDefaults(popUpCal.regional['it']);
+
+jQuery('#dataLP').calendar();
+
+$("#dlg_LiberaPratica").dialog({ width:500,
+height:420,buttons:{'Immetti in L.P.': function(){immettiLP(true);} ,Annulla : function() { $("#dlg_LiberaPratica").dialogClose(); } } 
+});
+$("#dlg_LiberaPratica").dialogClose();
+
+$("#dlg_ImportTo").dialog({ width:360,
+height:140,buttons:{Importa: function(){importTo(true);} , Annulla : function() { importTo(); } } 
+});
+jQuery('#dataImport').calendar();
+
+$("#dlg_ImportTo").dialogClose();
+
+} ) ;
+
+function openDialog( id , dialogId) {
+idConsegna = id ;
+$(dialogId).dialogOpen();
+return false ;
+}
+function importTo( exec ) {
+
+$("#dlg_ImportTo").dialogClose();
+var data = jQuery('#dataImport').attr('value') ;
+
+// var lnk = 
+if( data && data != '' ) {
+window.location.href = '.main?cmd=import&exec=1&idConsegna=' + idConsegna + '&to=' +  data ;
+}
+
+idConsegna = -1 ;
+return false ;
+}
+
+
+function immettiLP() {
+	var list = document.getElementsByTagName('input');
+	var data = document.getElementById('dataLP').value;
+	
+	if ( ! data || data == '' ) {
+		alert ( 'Inserire la data di immissione.') ; 
+		return false ;
+	}
+	
+	var ids = '' ;
+	for( var el = 0; el < list.length ; el++ ) {
+		if ( list[el].name && list[el].name == 'immettiLP' && list[el].checked ) {
+			ids += '&list=' + list[el].value ;
+		}
+	}
+	
+	if ( ids == '' )  {
+		alert ( 'Selezionare almeno uno stallo per effettuare l\'immissione in Libera Pratica.') ; 
+		return false ;
+	}
+	
+	location.href='?cmd=immettiLP&exec=1&c=$obj.Id&dataLP=' + data + ids ;
+}
+</script>
+
+#parse('footer.vm')

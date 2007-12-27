@@ -1,0 +1,97 @@
+#parse('costanti.vm')
+#parse('header.vm')
+
+<script>
+function initRowHighlighting(){
+var table = document.getElementById('tablemovimenti');
+attachRowMouseEvents(table.getElementsByTagName('tr'));
+}
+function attachRowMouseEvents(rows){
+for(var i = 0;i < rows.length;i++){
+var row = rows[i];
+row.onmouseover = function(){ highlightRow(this, true);}
+row.onmouseout = function() { highlightRow(this, false);}
+// row.style.cursor = 'pointer';
+}}
+
+function highlightRow( row, isover) { 
+if ( row.getAttribute('origClass') == null )
+	row.setAttribute('origClass' , row.className) ;
+	
+row.className = isover ? 'hi' : row.getAttribute('origClass');
+}
+
+window.onload = initRowHighlighting;
+</script>
+<h2>
+$obj.Nome <small>[id:$obj.Id]</small>
+</h2>
+Consegna numero : $!obj.Consegna.Numero<br>
+Merce : $!obj.Consegna.Merce.Nome <br>
+Iter : $!obj.Consegna.Iter.Nome<br>
+
+pesopolizza: $!obj.Consegna.Pesopolizza #if($!obj.Consegna.PesoFinalePortoCarico) (P.Finale Porto di Carico)#end<br>
+provenienza: $!obj.Consegna.Provenienza<br>
+origine: $!obj.Consegna.Origine<br>
+mezzo: $!obj.Consegna.Mezzo<br>
+regimedoganale: $!obj.Consegna.Regimedoganale<br>
+codicenc: $!obj.Consegna.Codicenc<br>
+posizione: $!obj.Consegna.Posizione<br>
+TassoCambio: $!obj.Consegna.TassoCambio<br>
+TassoUmidita: $!obj.Consegna.TassoUmidita<br>
+<br>
+<a href=".consegne?cmd=edit&id=$obj.Consegna.Id">Modifica Consegna</a>
+<br><br>
+#set( $regIVA = $!obj.Consegna.Iter.Regiva )
+#set( $regDog = $!obj.Consegna.Iter.Regdoganale )
+<table border="0" class="movimenti" cellpadding="2" cellspacing="0" id="tablemovimenti">
+<tr>
+<th width="10%">Movimenti</th>
+<th width="6%">Tipo</th>
+<th>Data</th>
+<th width="10%">Umido</th>
+<th width="20">&nbsp;</th>
+<th width="10%">Secco</th>
+#if($regDog)<th>Reg. Doganale</th>#end
+#if($regIVA)<th>Reg. IVA</th>#end
+</tr>
+<tbody>
+#set($dateFormat = 'dd/MM/yy')
+#set($sumSecco = 0)
+#set($sumUmido = 0)
+#foreach( $m in $obj.getMovimenti('data', '') )
+<tr#if($velocityCount%2  == 0) class="odd"#end>
+<td><a #if($velocityCount%25  == 0) id="lnk$m.Id"#end href=".consegne?cmd=editmovimento&id=$m.Id">$velocityCount</a></td>
+<td>#if($m.getIsScarico()) S#else C#end</td>
+<td>$tools.Date.format($dateFormat, $m.Data)</td>
+<td class="r">$tools.Number.format($m.Umido)</td>
+<td>&nbsp;</td>
+<td class="r">$!tools.Number.format($m.Secco)</td>
+#if($regDog)<td>#if($m.NumRegistroDoganale)
+$!m.NumRegistroDoganale#else<a href="?cmd=editmovimento&id=$m.Id&assegnaRegDoganale=1">Registra</a>#end</td>#end
+#if($regIVA)<td>#if($m.NumRegistroIVA)
+$!m.NumRegistroIVA#else<a href="?cmd=editmovimento&id=$m.Id&assegnaRegIVA=1">Registra</a>#end</td>#end
+</tr>
+#if( $m.getIsScarico() )
+#set($sumSecco = $tools.Math.sub( $sumSecco , $m.Secco ) )
+#set($sumUmido = $tools.Math.sub( $sumUmido , $m.Umido ) )
+#else
+#set($sumSecco = $tools.Math.add( $sumSecco , $m.Secco ) )
+#set($sumUmido = $tools.Math.add( $sumUmido , $m.Umido ) )
+#end
+#if ( "$sumUmido" == '0.0' )
+<tr class="sep"><td colspan="10" align="center">Svuotamento Stallo</td></tr>
+#end
+#end
+<tr><td colspan="10" align="center">&nbsp;</td></tr>
+<tr class="sep"><td colspan="3"><br /><b>Giacenza Attuale:</b></td>
+<td><br /><b>$tools.Number.format($sumUmido)</b></td>
+<td>&nbsp;</td>
+<td><br /><b>$tools.Number.format($sumSecco)</b></td>
+<td>&nbsp;</td>
+</tr>
+</tbody></table>
+<br><br>
+
+#parse('footer.vm')
+

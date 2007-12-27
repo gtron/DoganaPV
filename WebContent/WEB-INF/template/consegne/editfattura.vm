@@ -1,0 +1,158 @@
+#parse('costanti.vm')
+#parse('header.vm')
+
+<h2>
+#if ( $obj )
+Modifica Consegna <small>[id:$obj.Id]</small>
+#else
+Nuova Consegna 
+#end
+</h2>
+<form action="?" method="post">
+
+<table border="1" width="100%" cellspacing="0" cellpadding="3">
+<thead><tr>
+<th>Dettagli</th>
+<th colspan="2">Stalli: </th>
+</tr></thead>
+<tbody>
+<td>
+<input type="hidden" name="cmd" value="edit" />
+<input type="hidden" name="exec" value="1" />
+<input type="hidden" name="id" value="$!obj.Id" />
+<input type="hidden" name="idConsegna" value="$!obj.Id" />
+
+Numero <input name="numero" value="$!obj.Numero"><br>
+Merce : <select name="idmerce">
+<option value="-">- Seleziona -</option>
+#foreach( $i in $merci )<option value="$i.Id" #if($obj.Idmerce == $i.Id) selected #end>$i.Nome</option>#end
+</select><br>
+con Iter : <select name="iter">
+<option value="-">- Seleziona -</option>
+#foreach( $i in $iters )<option value="$i.Id" #if($obj.IdIter == $i.Id) selected #end>$i.Nome</option>#end
+</select><br>
+Peso Polizza : <input name="pesopolizza" value="$tools.Number.format( $!obj.Pesopolizza)"> <br>
+
+<label for="pesofinaleportocarico">Peso Finale Porto di Carico</label><input type="checkbox" #if($!obj.PesoFinalePortoCarico) checked #end name="pesofinaleportocarico" id="pesofinaleportocarico" value="true" /><br>
+<br>
+Provenienza : <input name="provenienza" value="$!obj.Provenienza"><br>
+Origine : <input name="origine" value="$!obj.Origine"><br>
+Mezzo : <input name="mezzo" value="$!obj.Mezzo"><br>
+<br>
+Posizione Doganale : <select name="posizione">
+<option value="">- Seleziona -</option>
+<option value="NAZ" #if($!obj.Posizione.equals('NAZ')) selected #end >Nazionale</option>
+<option value="COM" #if($!obj.Posizione.equals('COM')) selected #end >Comunitaria</option>
+<option value="EXT" #if($!obj.Posizione.equals('EXT')) selected #end >Extra Comunitaria</option>
+<option value="XNZ" #if($!obj.Posizione.equals('XNZ')) selected #end >Nazionalizzata</option>
+<option value="ALT" #if($!obj.Posizione.equals('ALT')) selected #end >altro</option>
+</select>
+<br>
+Regime Doganale : <select name="regimedoganale">
+<option value="">- Seleziona -</option>
+<option value="7100" #if($!obj.Regimedoganale.equals('7100')) selected #end >7100</option>
+<option value="4500" #if($!obj.Regimedoganale.equals('4500')) selected #end >4500</option>
+<option value="4571" #if($!obj.Regimedoganale.equals('4571')) selected #end >4571</option>
+<option value="altro" #if($!obj.Regimedoganale.equals('altro')) selected #end >altro</option>
+</select>
+<br>
+Codice Doganale : <select name="codicenc">
+<option value="">- Seleziona -</option>
+<option value="26080000" #if($!obj.Codicenc.equals('26080000')) selected #end >26080000</option>
+<option value="26070000" #if($!obj.Codicenc.equals('26070000')) selected #end >26070000</option>
+<option value="altro" #if($!obj.Codicenc.equals('altro')) selected #end >altro</option>
+</select><br>
+<br>
+Tasso di Cambio : <input name="tassocambio" value="$!obj.TassoCambio"><br>
+% di Umidità : <input name="tassoumidita" value="$!obj.TassoUmidita"> <br>
+Aggiorna Peso secco dei Movimenti: <input type="checkbox"><br>
+<br><br>
+
+</td><td>
+#set($parco = "")
+#foreach( $s in $stalli ) 
+#if($parco != $s.Parco)
+#set($parco = $s.Parco)
+#if ( $velocityCount > 1)</td><td valign="top">#end
+#set($count = 0 )
+#end
+#set($count = $count + 1 )
+<input type="checkbox" value="$s.Id" name="stalli" #if($s.IdConsegnaAttuale == $obj.Id || $s.IdConsegnaPrenotata == $obj.Id) checked #end id="stallo$velocityCount">
+<label for="stallo$velocityCount">$parco $count</label>
+#if($s.IdConsegnaAttuale == $obj.Id)<a href=".consegne?id=$s.Id">[Movimenti]</a>#end
+<br>
+
+#end
+</tr>
+</table><br>
+#if( $result ) <div id="result">Modifica effettuata</div> #end
+
+#if( $param_error ) 
+$param_error.ParamName
+<script type="text/javascript">
+
+</script>
+#end
+
+<div align="center">
+
+<br>
+
+<input type="submit" value="Salva"><br>
+</div>
+
+#set( $regIVA = $!obj.Iter.Regiva )
+#set( $regDog = $!obj.Iter.Regdoganale )
+Registro Doganale
+<table border="0" class="movimenti" cellpadding="2" cellspacing="0" id="tablemovimenti">
+<tr>
+<th width="10%">Movimenti</th>
+<th width="6%">Tipo</th>
+<th>Data</th>
+<th width="10%">Umido</th>
+<th width="20">&nbsp;</th>
+<th width="10%">Secco</th>
+#if($regDog)<th>Reg. Doganale</th>#end
+#if($regIVA)<th>Reg. IVA</th>#end
+</tr>
+<tbody>
+#set($dateFormat = 'dd/MM/yy')
+#set($sumSecco = 0)
+#set($sumUmido = 0)
+#foreach( $m in $obj.getRegistro(false) )
+<tr#if($velocityCount%2  == 0) class="odd"#end>
+<td><a #if($velocityCount%25  == 0) id="lnk$m.Id"#end href=".consegne?cmd=editmovimento&id=$m.Id">$velocityCount</a></td>
+<td>#if($m.getIsScarico()) S#else C#end</td>
+<td>$tools.Date.format($dateFormat, $m.Data)</td>
+<td class="r">$tools.Number.format($m.Umido)</td>
+<td>$m.getIsRettifica()&nbsp;</td>
+<td class="r">$!tools.Number.format($m.Secco)</td>
+#if($regDog)<td>#if($m.NumRegistroDoganale)
+$!m.NumRegistroDoganale#else<a href="?cmd=editmovimento&id=$m.Id&assegnaRegDoganale=1">Registra</a>#end</td>#end
+#if($regIVA)<td>#if($m.NumRegistroIVA)
+$!m.NumRegistroIVA#else<a href="?cmd=editmovimento&id=$m.Id&assegnaRegIVA=1">Registra</a>#end</td>#end
+</tr>
+#if( $m.getIsScarico() )
+#set($sumSecco = $tools.Math.sub( $sumSecco , $m.Secco ) )
+#set($sumUmido = $tools.Math.sub( $sumUmido , $m.Umido ) )
+#else
+#set($sumSecco = $tools.Math.add( $sumSecco , $m.Secco ) )
+#set($sumUmido = $tools.Math.add( $sumUmido , $m.Umido ) )
+#end
+#if ( "$sumUmido" == '0.0' )
+<tr class="sep"><td colspan="10" align="center">Svuotamento Stallo</td></tr>
+#end
+#end
+<tr><td colspan="10" align="center">&nbsp;</td></tr>
+<tr class="sep"><td colspan="3"><br /><b>Giacenza Attuale:</b></td>
+<td><br /><b>$tools.Number.format($sumUmido)</b></td>
+<td>&nbsp;</td>
+<td><br /><b>$tools.Number.format($sumSecco)</b></td>
+<td>&nbsp;</td>
+</tr>
+</tbody></table>
+
+
+
+
+#parse('footer.vm')

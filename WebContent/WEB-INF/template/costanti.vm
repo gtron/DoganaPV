@@ -1,0 +1,7 @@
+#set( $versione = '0.1' )
+#set( $wwwRoot = '/DoganaPV')
+#set($images = "$wwwRoot/images")
+#set( $dateFormat = 'dd/MM/yyyy')
+#set( $siteTitle = 'Gestione Magazzini Doganali' )
+#set( $subTitle = 'Gestione Magazzini Doganali Portovesme s.r.l.' )
+#set( $htmlTitle = "$siteTitle v.$versione - $subTitle"  )

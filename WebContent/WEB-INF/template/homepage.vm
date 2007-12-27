@@ -1,0 +1,15 @@
+#set($activeMenu='PRINCIPALE')
+#parse('costanti.vm')
+#parse('header.vm')
+
+#parse('stalli/table.vm')
+
+<iframe name="stp" src=".main?p=1" width="10" height="10" style="visibility:hidden;position:absolute;"></iframe>
+
+<div class="commands">
+<ul>
+<li><a href="#" onclick="stp.print(); return false;"><img src="$!images/action-ico-registra.png" />Stampa</a></li>
+</ul>
+</div>
+
+#parse('footer.vm')

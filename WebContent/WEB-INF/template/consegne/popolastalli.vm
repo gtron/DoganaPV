@@ -1,0 +1,336 @@
+<style>
+INPUT { text-align : right;}
+</style>
+#set($activeMenu='PARTITARI')
+#set($addJs=['/js/gt_forms.js','/js/jquery.ui/ui.calendar.js','/js/jquery.ui/ui.dialog.js','/js/jquery.ui/ui.dimensions.js','/js/jquery.ui/ui.resizable.js','/js/jquery.ui/ui.mouse.js','/js/jquery.ui/ui.draggable.js'])
+#set($addCss=['/js/jquery.ui/themes/flora/flora.all.css'])
+#parse('costanti.vm')
+#parse('header.vm')
+#set($sommaUmido=0)
+#set($totUmido=0)
+#set($totSecco=0)
+<form action="?" name="rettifica" method="POST" id="mainForm">
+<input type="hidden" name="cmd" value="popola" />
+<input type="hidden" name="id" value="$obj.Id" />
+<input type="hidden" name="exec" value="1" />
+<table border="1">
+<tr>
+<th colspan="2">Merce introdotta nel:</th>
+<th rowspan="2">Peso Umido<br />Accertato (Kg)</th>
+<th width="10%" colspan="2">Rettifica Umido(Kg)</th>
+##<th rowspan="2">Peso Secco<br />Provvisorio(Kg)</th>
+<th width="10%" colspan="2">Rettifica Secco(Kg)</th>
+<th rowspan="2" width="10%">Netto Risultante</th>
+##<th width="20">Stallo</th>
+##<th><input type="checkbox" onchange="selectDOG(this);" /></th>
+</tr>
+<tr>
+<th>Parco</th>
+<th>Stallo</th>
+<th>Entrata</th>
+<th>Uscita</th>
+<th>Entrata</th>
+<th>Uscita</th>
+</tr>
+<tbody>
+#foreach($row in $list)
+<tr>
+#set($stallo=$row.get(0))
+#set($umido=$row.get(1))
+#if($velocityCount < 2)
+#set($sommaUmido=$rUmido)
+#set($secco= $obj.calcolaSecco($rUmido))
+#else
+#set($sommaUmido =0)
+#set($secco=0)
+#end
+<td align="center">
+<input type="hidden" name="stalli" value="$stallo.Id" />
+<input type="hidden" name="umido_$stallo.Id" id="umido_$stallo.Id" value="$!tools.Number.format($umido)" />
+$stallo.Parco</td><td align="center">$stallo.Numero</td>
+<td align="center">$!tools.Number.format($umido)</td>
+<td><input type="text" size="10" onchange="if(this.value=='')this.value=0;" name="u0_$stallo.Id" id="u0_$stallo.Id"value=#if($sommaUmido.intValue() >= 0)"$!tools.Number.format($sommaUmido).replaceAll('\.','')"#else"0"#end onfocus="this.select()" /></td>
+<td><input type="text" size="10" onchange="if(this.value=='')this.value=0;" name="u1_$stallo.Id" id="u1_$stallo.Id"value=#if($sommaUmido.intValue() >= 0)"0"#else"$!tools.Number.format( $!tools.Math.mul($sommaUmido, -1)).replaceAll('\.','')"#end onfocus="this.select()" /></td>
+<td align="center" id="secco_$stallo.Id" style="display:none;">$!tools.Number.format($obj.calcolaSecco($umido))</td>
+<td><input type="text" size="10" onchange="if(this.value=='')this.value=0;" name="s0_$stallo.Id" id="s0_$stallo.Id"value=#if($secco >= 0)"$secco"#else"0"#end onfocus="this.select()" /></td>
+<td><input type="text" size="10" onchange="if(this.value=='')this.value=0;" name="s1_$stallo.Id" id="s1_$stallo.Id"value=#if($secco >= 0)"0"#else"$!tools.Number.format($tools.Math.mul($secco, -1)).replaceAll('\.','')"#end onfocus="this.select()" /></td>
+<td align="right" id="res_$stallo.Id">&nbsp;</td>
+</tr>                           
+#end
+<tr><td colspan="2" align="right">Tot.</td>
+
+<td align="center" id="sumUmido">$!tools.Number.format($totaleUmido)</td>
+<td><div id="u0_tot">&nbsp;</div></td>
+<td><div id="u1_tot">&nbsp;</div></td>
+##<td align="center">$!tools.Number.format($obj.calcolaSecco($totaleUmido))</td>
+<td><div id="s0_tot">&nbsp;</div></td>
+<td><div id="s1_tot">&nbsp;</div></td>
+<td align="right"><div id="secco_tot">&nbsp;</div></td>
+</tr>
+</tbody>
+</table>
+
+<div align="center"><br />
+Peso Polizza: <input type="text" value="$!tools.Number.format($obj.Pesopolizza)" id="pesopolizza" onchange="ricalcolaUmido(true, this);calcola(this);" onblur="return gtfNotNull(this);alert(this);" /><br />
+<br />
+#if ( ! $obj.PesoFinalePortoCarico )
+
+Tasso di Umidit&agrave; attuale : <b>$obj.TassoUmidita</b> - 
+Nuovo Tasso : <input type="text" name="umidita" value="$obj.TassoUmidita" size="6" onblur="this.value=this.value.replace(',','.');" /> <input type="button" value="ricalcola" onclick="calcola(this);" />
+<br />
+
+<br />
+
+##<label for="docImm">Dogana : </label><input type="text" name="docImm" id="docImm" value="" size="16" /> - 
+<fieldset><legend>Movimento di Rettifica :</legend>
+Data: <input type="text" name="data" value="" size="10" id="data" /> 
+<fieldset style="float:left; width:45%;margin-right:2%"><legend>Documento Dogana</legend>
+Tipo: <select name="doc"><option value=""></option><option value="R">R</option><option value="IM7">IM7</option><option value="IM4">IM4</option></select>
+Numero: <input type="text" name="doc_num" size="4"/>
+Data:  <input type="text" name="doc_data" id="doc_data" size="7"/></fieldset>
+<fieldset style="float:left; width:45%;"><legend>Documento Portovesme</legend>
+Tipo: <select name="docPV"><option value=""></option><option value="R">R</option><option value="IM7">IM7</option><option value="IM4">IM4</option></select>
+Numero: <input type="text" name="docPV_num" size="4"/>
+Data:  <input type="text" id="docPV_data" name="docPV_data" size="7"/></fieldset>
+##<label for="docImmPV">Documento Portovesme : </label><input type="text" name="docImmPV" id="docImm" value="" size="16" /><br />
+</fieldset><br /><br />
+#end
+
+</div>
+</form>
+
+#if ( ! $obj.PesoFinalePortoCarico )
+
+<script type="text/javascript">
+
+
+$('document').ready(function(){
+
+popUpCal.regional['it']={clearText: 'Svuota', closeText: 'Chiudi',
+prevText: '&lt;Prec', nextText: 'Succ&gt;', currentText: 'Oggi',
+dayNames: ['Do','Lu','Ma','Me','Gio','Ve','Sa'],
+monthNames: ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
+'Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre']};
+
+popUpCal.setDefaults(popUpCal.regional['it']);
+	
+jQuery('#data').calendar();
+jQuery('#doc_data').calendar();
+jQuery('#docPV_data').calendar();
+});
+
+var stalli=new Array();
+var rettificaUmido=0 ;
+var nRettifica=0;
+
+function getDouble(id){
+
+var field=document.getElementById(id);
+if(! field)return 0 ;
+
+var v=field.value ;
+
+if(field.tagName=='TD')v=field.innerHTML;
+
+while(v.indexOf('.')> 0)v=v.replace('.','');
+
+return 1 * v ;
+}
+
+function ricalcolaUmido(doRicalcola, btn){
+
+var pesoPolizza=getDouble('pesopolizza');
+
+var sommaUmido=getDouble('sumUmido');
+
+var n=0;
+
+if(stalli.length < 1)popolaStalli(btn.form);
+
+for(i in stalli){
+n=stalli[i] ;
+umidoPos=document.getElementById('u0_' + n);
+umidoNeg=document.getElementById('u1_' + n);
+
+
+if(1 * umidoNeg.value + 1 * umidoPos.value > 0){ 
+nRettifica=n;
+}
+
+if(doRicalcola){
+umidoNeg.value=0;
+umidoPos.value=0;
+}
+}
+
+if(nRettifica < 1){ nRettifica=stalli[0];}
+
+umidoPos=document.getElementById('u0_' + nRettifica);
+umidoNeg=document.getElementById('u1_' + nRettifica);
+
+if(doRicalcola){
+rettificaUmido=pesoPolizza - sommaUmido ;
+
+if(rettificaUmido > 0){
+umidoNeg.value=rettificaUmido ;
+umidoPos.value=0;
+}
+else {
+umidoNeg.value=0 ;
+umidoPos.value=-1 * rettificaUmido ;
+}
+}
+else {
+rettificaUmido=1 * umidoPos.value  - 1 * umidoNeg.value ;
+}
+}
+
+function popolaStalli(f){
+for(el in f.elements){
+if(f.elements[el] && f.elements[el].name){
+n=''+f.elements[el].name;
+if(n.substr(0,5)== 'umido')stalli.push(1 * f.elements[el].name.replace('umido_',''));
+}
+}
+}
+
+function calcola(btn){
+var f=btn.form ;
+
+if(stalli.length < 1)popolaStalli(f);
+
+ricalcolaUmido(false);
+
+var umidita=1 * f.umidita.value ;
+var oldUmidita=1 * '$obj.TassoUmidita.doubleValue()' ;
+var diffUmidita=(umidita - oldUmidita)/ 100 ;
+
+var n=0;
+var umidoPos, umidoNeg, seccoPos, seccoNeg, umido , rett ,secco, risultante, secco_tot;
+
+
+var sommaSecco=0;
+
+
+for(i in stalli){
+n=stalli[i] ;
+
+seccoPos=document.getElementById('s0_' + n);
+seccoNeg=document.getElementById('s1_' + n);
+secco=document.getElementById('secco_' + n);
+
+umido=getDouble('umido_' + n);
+
+rett=-1 * Math.round(diffUmidita * umido);
+
+if(n == nRettifica){
+rett=rettificaUmido * 100 - Math.round(umidita *(umido)) + Math.round(oldUmidita *(umido - rettificaUmido));
+rett = Math.floor(rett / 100);
+}
+
+if(rett == 0){
+rett=Math.round(rett -(umidita / 100 * rett));
+}
+
+sommaSecco += aggiornaStallo(n, oldUmidita, umidita, rett );
+continue ;
+
+/*
+if(n == nRettifica){
+var seccoProvvisorio = getDouble('umido_' +n) - rettificaUmido ;
+seccoProvvisorio = Math.floor( seccoProvvisorio - ( seccoProvvisorio *  oldUmidita / 100 ) );
+
+secco.innerHTML = formatDouble( seccoProvvisorio );
+
+risultante.innerHTML = formatDouble( seccoProvvisorio + rett ) ;
+	sommaSecco += seccoProvvisorio + rett;
+
+}
+else {
+risultante.innerHTML = formatDouble( getDouble('secco_' +n) + rett ) ;
+sommaSecco += getDouble('secco_' +n) + rett ;
+}
+
+*/
+sommaSecco +=  aggiornaSeccoStallo(n);
+}
+
+secco_tot = document.getElementById('secco_tot');
+
+if ( secco_tot ) secco_tot.innerHTML = formatDouble(sommaSecco);
+}
+
+function aggiornaStallo(n, oldUmidita, newUmidita, rettificaSecco) {
+var seccoPos=document.getElementById('s0_' + n);
+var seccoNeg=document.getElementById('s1_' + n);
+var umidoPos=document.getElementById('u0_' + n);
+var umidoNeg=document.getElementById('u1_' + n);
+
+var umidoQ =getDouble('umido_' + n);
+
+var umido = umidoQ + ( 1 * umidoNeg.value  ) - ( 1 * umidoPos.value  ) ;
+
+var secco = Math.floor( ( 100 * umido - Math.floor(umido * oldUmidita ) ) / 100 );
+
+var diffUmidita= Math.floor( 10000000 * newUmidita - 10000000 * oldUmidita) / 1000000000 ;
+
+if(rettificaSecco < 0){
+seccoNeg.value=-1 * rettificaSecco ;
+seccoPos.value=0 ;
+} 
+else { 
+seccoNeg.value=0 ;
+seccoPos.value=rettificaSecco ;
+}
+
+var risultante=document.getElementById('res_' + n);
+var res = secco + rettificaSecco;
+risultante.innerHTML = formatDouble( res ) ;
+return res ;
+}
+
+function aggiornaSeccoStallo( n ) {
+
+var umidoPos, umidoNeg, seccoPos, seccoNeg, umido , rett ,secco, risultante, secco_tot;
+
+seccoPos=getDouble('s0_' + n);
+seccoNeg=getDouble('s1_' + n);
+
+secco=getDouble('secco_' + n);
+
+risultante=document.getElementById('res_' + n);
+var res = secco + seccoPos - seccoNeg
+risultante.innerHTML = formatDouble( res ) ;
+return res ;
+}
+
+
+
+function formatDouble(d) {
+
+var s = '' + d;
+var r = '';
+
+for ( var i = 0 ; i < s.length ; i++ ) { r = s.charAt(i) + r; }
+s = r; r ='';
+for ( var i = 0 ; i < s.length ; i++ ) {
+if ( i % 3 == 2 ) 
+r +=s.charAt(i) + '.' ;
+else r += s.charAt(i);
+}
+s = r; r ='';
+for ( var i = 0 ; i < s.length ; i++ ) r = s.charAt(i) + r;
+return r ;
+}
+</script>
+#end
+
+<div class="commands">
+<ul>
+<li><a href="#" onclick="document.getElementById('mainForm').submit();return false;"><img src="$!images/action-ico-immetti.png" /> Procedi</a></li>
+
+<li><a #if($obj.Id)href=".consegne?id=$obj.Id"#else href=".consegne?cmd=list"#end><img src="$!images/action-ico-elimina.png" />Annulla</a></li>
+
+</ul>
+</div>
+#parse('footer.vm')

@@ -1,0 +1,331 @@
+package com.gsoft.pt_movimentazioni.utils;
+
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Vector;
+
+import com.gsoft.doganapt.data.Consegna;
+import com.gsoft.doganapt.data.Documento;
+import com.gsoft.doganapt.data.Movimento;
+import com.gsoft.doganapt.data.MovimentoIVA;
+import com.gsoft.doganapt.data.Stallo;
+import com.gsoft.doganapt.data.adapters.MovimentoAdapter;
+import com.gsoft.doganapt.data.adapters.MovimentoDoganaleAdapter;
+import com.gsoft.doganapt.data.adapters.MovimentoIvaAdapter;
+import com.gsoft.doganapt.data.adapters.StalloAdapter;
+import com.gsoft.pt_movimentazioni.data.MovimentoQuadrelli;
+import com.gsoft.pt_movimentazioni.data.MovimentoQuadrelliAdapter;
+import com.gtsoft.utils.common.FormattedDate;
+
+public abstract class IterImporter {
+
+
+	MovimentoIvaAdapter registroIVA = null ;
+	MovimentoDoganaleAdapter registroDoganale = null ;
+	MovimentoQuadrelliAdapter quadAdp = null ;
+
+	public IterImporter( MovimentoDoganaleAdapter m, MovimentoIvaAdapter i, MovimentoQuadrelliAdapter q ) {
+		registroIVA = i ;
+		registroDoganale = m ;
+		quadAdp = q ;
+	}
+	
+	public void apriConsegna( Consegna c, FormattedDate d , Documento documento, Documento documentoPV, String note ) throws Exception  {
+		
+		MovimentoIVA m = new MovimentoIVA();
+		
+		m.setIdConsegna(c.getId());
+		m.setData(d);
+		m.setUmido(c.getPesopolizza());
+		m.setSecco(c.calcolaSecco(m.getUmido()));
+		
+		m.setDocumento(documento);
+		m.setDocumentoPV(documentoPV);
+		m.setIdMerce(c.getIdmerce());
+		m.setIsLocked(Boolean.FALSE);
+		m.setIsScarico(Boolean.FALSE);
+		m.setIsRettifica(Boolean.FALSE);
+		
+		m.setNote(note);
+		
+		if ( c.getValoreUnitario() != null ) {
+			if ( c.getIsValutaEuro() ) {
+				m.setValoreEuro(c.getValoreUnitario().doubleValue() * m.getSecco().doubleValue() ) ;
+			}
+			else {
+				m.setValoreDollari(c.getValoreUnitario().doubleValue() * m.getSecco().doubleValue() ) ;
+				c.updateValore(m) ;
+			}
+		}
+		
+		registroIVA.create(m);
+		
+	}
+	
+	/* UNUSED
+	public void apriConsegna_old( Consegna c, FormattedDate d ) throws Exception  {
+		
+		Integer id = c.getId() ;
+		
+		c.setDataChiusura(null);
+		
+		HashMap<Integer,Stallo> stalliCoinvolti = new HashMap<Integer,Stallo>(3);
+		
+		Collection stalli = StalloAdapter.getAllCached(true);
+		
+		Stallo s = null ;
+		
+		
+		for ( Iterator i = stalli.iterator() ; i.hasNext() ; ){
+			s = ( Stallo ) i.next() ;
+			if (id.equals( s.getIdConsegnaPrenotata() ) ) {
+				s.setIdConsegnaAttuale(id);
+				s.setIdConsegnaPrenotata(null);	
+				s.setImmessoInLiberaPratica(Boolean.FALSE) ;
+				
+				s.setAttuale( new Double(0) );
+				s.setCaricato( new Double(0) );
+				
+				stalliCoinvolti.put(s.getId(), s);
+			}
+		}
+		
+		if ( stalliCoinvolti.size() < 1 ) {
+			System.out.println("Eccezione da implementare: Nessuno stallo associato alla consegna da aprire.");
+			return ;
+//			throw new Exception ( "STALLI") ;
+		}
+		
+		importaPrimoCarico(c, d) ;
+		
+		StalloAdapter adp = Stallo.newAdapter() ;
+		for ( Iterator<Stallo> i = stalliCoinvolti.values().iterator() ; i.hasNext() ; ){
+			s = i.next() ;
+			adp.update(s);
+		}
+		
+		
+		
+		Consegna.newAdapter().update(c);
+	}
+	
+	*/
+	
+	/* UNUSED 
+	public void importaPrimoCarico( Consegna c , FormattedDate d ) throws Exception {
+		Stallo s ;
+		HashMap<Integer, MovimentoQuadrelli> listStalli = new HashMap<Integer, MovimentoQuadrelli>(5) ;
+		Movimento m ;
+		MovimentoQuadrelli mq ;
+		Movimento rettifica = null ;
+		double sommaPesoUmido = 0 ;
+		double scartoUmido = 0 ;
+		
+		FormattedDate data = quadAdp.getMinDataCarico(c) ;
+		FormattedDate lastData = data ;
+		
+		Vector list = null ;
+		
+		// fetch dei movimenti 
+		for ( Iterator is = c.getStalli().iterator() ; is.hasNext() ; ) {
+
+			s = (Stallo) is.next() ;
+			
+			list = quadAdp.get(false, null , s);
+			
+			if ( list != null && list.size() > 0 ) {
+				// ci dovrebbe essere un solo movimento per stallo
+				mq = (MovimentoQuadrelli) list.firstElement();
+				
+				listStalli.put( s.getId(), mq );
+				
+				sommaPesoUmido += mq.getNetto().doubleValue() ;
+				
+				if ( lastData.before(mq.getData()) ) {
+					lastData = mq.getData() ;
+				}
+			}
+		}
+		
+		boolean primoCarico = true ;
+		// per ogni stallo creo il movimento di carico
+		for ( Iterator<MovimentoQuadrelli> is = listStalli.values().iterator() ; is.hasNext() ; ) {
+			
+			mq = is.next() ;
+			
+			m = getMovimento(false, mq , c, registroIVA ) ;
+			m.setData(data);
+			
+			if ( primoCarico ) {
+				primoCarico = false ;
+				
+				scartoUmido = c.getPesopolizza().doubleValue() - sommaPesoUmido ;
+				
+				m.setUmido( m.getUmido().doubleValue() + scartoUmido ) ;
+				m.setSecco( c.calcolaSecco(m.getUmido()) );
+				
+				registroIVA.create(m);
+
+				/*
+				 * Non faccio + la rettifica, è una fase successiva
+				 
+				// se non è un pesofinaleportodicarico devo fare il movimento di rettifica
+				if ( ! c.isPesoFinalePortoCarico() ) {
+
+					rettifica = getMovimento(false, mq, c, registroDoganale);
+					rettifica.setIsRettifica(true);
+					rettifica.setData(lastData) ;
+					
+					if ( scartoUmido > 0 ) {
+						rettifica.setIsScarico( true ) ;
+						rettifica.setUmido( new Double(scartoUmido) ) ;
+					}
+					else {
+						rettifica.setIsScarico( false ) ;
+						rettifica.setUmido( new Double( -1 * scartoUmido) ) ;
+					}
+					rettifica.setSecco( c.calcolaSecco(rettifica.getUmido()) );
+					
+					registroDoganale.create(rettifica);
+					
+				}
+				* /
+			}
+			else {
+				registroIVA.create(m);
+			}
+		}
+	}
+	*/
+	
+	public void immettiLiberaPratica( ArrayList<Integer> stalli, FormattedDate data,
+			Documento docDogana, Documento docIVA) throws Exception  {
+		// TODO Metodo Vuoto xke l'azione non si applica ( rivedere gerarchia oggetti )
+	}
+	
+	public void importTo( Consegna c , FormattedDate to ) throws Exception {
+		ArrayList<FormattedDate> date = quadAdp.getDateDaImportare(c, getLastData( c ) ) ;
+		FormattedDate giornoCorrente = null ;
+
+		Stallo s ;
+
+		if( date != null ) 
+			for ( Iterator id = date.iterator() ; id.hasNext() ; ) {
+
+				giornoCorrente = (FormattedDate) id.next() ;
+				
+				if ( to != null && to.before(giornoCorrente ) ) 
+					break ;
+				
+				// E tutti gli stalli di ciascuna consegna ...
+				for ( Iterator is = c.getStalli().iterator() ; is.hasNext() ; ) {
+
+					s = (Stallo) is.next() ;
+
+					doImport(c, s, giornoCorrente) ;
+				}
+			}
+	}
+	
+	/**
+	 * Diverso solo per le NOGLEN
+	 * 
+	 * @param c	 
+	 * @param s  
+	 * @param giorno	
+	 * @throws Exception
+	 */
+	protected void doImport( Consegna c, Stallo s, FormattedDate giorno ) throws Exception {
+		
+		innerImport( true, c, s, giorno , registroIVA ) ;
+		
+	}
+	
+	public MovimentoAdapter getRegistroPrimoCarico() {
+		return registroIVA ;
+	}
+
+//	protected abstract double importScarichi( Consegna c, Stallo s, FormattedDate giorno ) throws Exception;
+	
+	protected FormattedDate getLastData( Consegna c )  throws Exception  {
+		return getLastData(c, true); 
+	}
+	/**
+	 * Restituisce la data dell'ultima importazione, se non ho ancora importato
+	 * utilizzo la data di creazione al quale tolgo un giorno per fare in modo 
+	 * che venga importata anche quel giorno 
+	 */
+	protected FormattedDate getLastData( Consegna c , boolean onlyScarichi ) throws Exception {
+		FormattedDate lastData =  registroIVA.getLastDate(c, onlyScarichi);
+		FormattedDate lastData2 = registroDoganale.getLastDate(c, onlyScarichi);
+		
+		if ( lastData == null || 
+				( lastData2 != null && lastData2.after( lastData ) ) )
+			lastData = lastData2 ;
+		
+		return lastData;
+	}
+
+	/**
+	 * Importa i movimenti di carico o di scarico nel giusto registro
+	 * 
+	 * @param isScarichi
+	 * @param c
+	 * @param s
+	 * @param giorno
+	 * @param adp
+	 * @throws Exception
+	 */
+	protected void innerImport( boolean isScarichi , Consegna c, Stallo s , FormattedDate giorno , MovimentoAdapter registro ) throws Exception {
+		Vector listCarichi = quadAdp.get(isScarichi, giorno, s ) ;
+		
+		Movimento m = null ;
+//		double sommaPesoUmido = 0 ;
+
+		if ( listCarichi != null )
+			for ( Iterator i = listCarichi.iterator() ; i.hasNext();) {
+
+				m = getMovimento(isScarichi, (MovimentoQuadrelli) i.next(), c , registro ) ;
+				m.setSecco(c.calcolaSecco(m.getUmido()));
+				m.setIdConsegna(c.getId());
+
+//				if ( forcedData != null )
+//					m.setData(forcedData);
+				
+				registro.create(m);
+				
+				m.getStallo().notifyMovimento(m, ! i.hasNext() );
+
+//				sommaPesoUmido += m.getUmido().doubleValue() ;
+			}
+		
+//		return sommaPesoUmido ;
+	}
+	
+	
+	protected Movimento getMovimento(boolean isScarico , MovimentoQuadrelli q, Consegna c, MovimentoAdapter registro) {
+		Movimento m = registro.newMovimento() ;
+
+		m.setIsLocked(false);
+		m.setIsScarico(isScarico);
+		m.setIsRettifica( MovimentoQuadrelli.DESTINAZIONE_RETTIFICA.equals( q.getDestinazione() ) );
+		m.setUmido(q.getNetto());
+		m.setSecco( c.calcolaSecco(m.getUmido()) );
+		m.setData(q.getData()) ;
+		m.setIdMerce( c.getIdmerce() );
+		m.setIdConsegna( c.getId()) ;
+		
+		Stallo s = null ;
+		if ( isScarico ) {
+			s = StalloAdapter.getByCodice((q.getCodiceFornitore()), false) ;
+		}
+		else {
+			s = StalloAdapter.getByCodice((q.getCodiceCliente()), false) ;
+		}
+		m.setStallo( s );
+
+		return m ;
+	}
+}
+

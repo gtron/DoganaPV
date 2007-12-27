@@ -1,0 +1,35 @@
+#parse('costanti.vm')
+<html>
+<head>
+<title>$htmlTitle</title>
+<link rel="stylesheet" type="text/css" href="$wwwRoot/style/main.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="$wwwRoot/style/structure.css" media="screen" />
+
+#if( $!addCss )#foreach( $j in $addCss )
+<link rel="stylesheet" type="text/css" href="#if(!$j.startsWith('http:'))$wwwRoot#end$j" />
+#end#end
+
+<script type="text/javascript" src="$wwwRoot/js/jquery.js"></script>
+#if( $!addJs )#foreach( $j in $addJs )
+<script type="text/javascript" src="#if(!$j.startsWith('http:'))$wwwRoot#end$j"></script>
+#end#end
+#*
+<link media="screen" href="$wwwRoot/style/main_v2.css" type="text/css" rel="stylesheet" />
+<link media="print" href="$wwwRoot/style/printer.css" type="text/css" rel="stylesheet" />*#
+
+</head>
+
+<body>
+
+<div id="containTestata">
+<div id="testata">
+<h1>$siteTitle</h1>
+##<a id="newEvento" href=".eventi?cmd=edit" onclick="try { newEvento(); }catch( e){alert(e);} ;return false;">Nuovo</a>
+<br /><br />
+#parse('mainmenu.vm')
+</div></div>
+
+<div id="container"><div id="corpo">
+<br />
+#if( $msg )<div id="message">$msg</div>#end
+#if( $error )<div id="message">$error.Message<br /><br /></div>#end

@@ -1,0 +1,34 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="style/registro.css" media="all" />
+<script type="text/javascript">
+function printPages(n,f) {
+var c = document.getElementById('master').innerHTML ;
+var r = '';
+for ( var i = 0 ; i < n -1 ; i++ ) {
+	r += c ;
+}
+document.getElementById('pages').innerHTML = r ;
+
+var arr = document.getElementsByTagName('span') ;
+for ( var i = 0, num = arr.length ; i < num ; i++ ) {
+	arr[i].innerHTML = f + i ;
+}
+window.parent.stp.focus();
+window.parent.stp.print();
+
+}
+</script>
+</head>
+<body>
+<div id="master">
+<div class="page">
+<div class="topsx">Portovesme s.r.l.</div>
+<div class="nomeReg">REGISTRO DI CARICO E SCARICO</div>
+<div class="num"><span></span></div>
+</div>
+</div>
+<div id="pages"></div>
+</body>
+
+</html>

@@ -1,0 +1,243 @@
+#set( $rettificaDone = true )
+<table border="0" class="movimenti" cellpadding="2" cellspacing="0" id="tablemovimenti">
+##<caption>Registro Doganale per la Consegna n. <strong>$obj.Numero</strong><br/>Merce : <strong>$!obj.Merce.Nome</strong><br><br /></caption>
+<tr>
+<th rowspan="2">Num.Registro</th>
+##<th  rowspan="2" width="6%">Tipo&nbsp;&nbsp;</th>
+<th rowspan="2">Data</th>
+<th rowspan="2">Documento</th>
+<th width="10%" colspan="2">Umido</th>
+<th rowspan="2" width="20">&nbsp;</th>
+<th width="10%" colspan="2">Secco</th>
+
+##<th><input type="checkbox" onchange="selectDOG(this);" /></th>
+</tr>
+<tr>
+<th>Entrata</th>
+<th>Uscita</th>
+<th>Entrata</th>
+<th>Uscita</th>
+</tr>
+<tbody>
+#set($dateFormat = 'dd/MM/yy')
+#set($sumSecco = 0)
+#set($sumUmido = 0)
+#set($oldData = '')
+#foreach( $m in $obj.getRegistroDoganale(false) )
+#if( ! $m.getIdStallo() )#set( $rettificaDone = false )#end
+<tr#if($velocityCount%2  == 0) class="odd"#end>
+<td> 
+#if ( $m.NumRegistro )
+$!m.NumRegistro
+#else
+#set($registraDOG = true)
+<input type="checkbox" name="registraDOG" #if($obj.IdIter == 4) value="$m.Id" #else value="$m.Data" #end id="registraDOG_$velocityCount" />
+##<label for="registraDOG_$velocityCount">Registra</label>
+##<a href="?cmd=editmovimento&id=$m.Id&assegnaRegDoganale=1&exec=1">Registra</a>
+#end
+
+</td>
+##<td>#if($m.getIsScarico()) S#else C#end #if($m.getIsRettifica())(R)
+##<a  href=".consegne?cmd=editmovimento&id=$m.Id">Modifica</a></td>
+##else&nbsp;&nbsp;&nbsp;&nbsp;#end</td>
+<td>$tools.Date.format($dateFormat, $m.Data)</td>
+
+<td>&nbsp;$!m.Documento #if($!m.DocumentoPV) <br /><small>($!m.DocumentoPV)</small>#end</td>
+
+
+
+#if($m.getIsScarico() ||  $m.Umido.intValue() < 0 )
+#if( $m.Umido.intValue() < 0 )
+<td>&nbsp;</td>
+<td class="r">$!tools.Number.format($tools.Math.mul( -1 , $m.Umido))</td>
+#else
+<td>&nbsp;</td>
+<td class="r">$tools.Number.format($m.Umido)</td>
+#end
+#else
+<td class="r">$tools.Number.format($m.Umido)</td>
+<td>&nbsp;</td>
+#end
+
+<td>&nbsp;</td>
+
+#if($m.getIsScarico() ||  $m.Secco.intValue() < 0 )
+#if( $m.Secco.intValue() < 0 )
+<td>&nbsp;</td>
+<td class="r">$!tools.Number.format($tools.Math.mul( -1 , $m.Secco))</td>
+#else
+<td>&nbsp;</td>
+<td class="r">$tools.Number.format($m.Secco)</td>
+#end
+#else
+<td class="r">$tools.Number.format($m.Secco)</td>
+<td>&nbsp;</td>
+#end
+
+#*
+#if($m.getIsScarico() || $m.Umido < 0 )
+<td>&nbsp;</td>
+<td class="r">$tools.Number.format($m.Umido)</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td class="r">$!tools.Number.format($m.Secco)</td>
+#else
+<td class="r">$!tools.Number.format($m.Umido)</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td class="r">$tools.Number.format($m.Secco)</td>
+<td>&nbsp;</td>
+#end
+*#
+##<td>$m.Stallo.Parco&nbsp;$m.Stallo.Numero</td>
+
+#*<td>
+<a #if($velocityCount%25  == 0) id="lnk$m.Id"#end href=".consegne?cmd=editmovimento&id=$m.Id">Modifica</a></td>
+</tr>*#
+
+
+#if( $m.getIsScarico() )
+#set($sumSecco = $tools.Math.sub( $sumSecco , $m.Secco ) )
+#set($sumUmido = $tools.Math.sub( $sumUmido , $m.Umido ) )
+#else
+#set($sumSecco = $tools.Math.add( $sumSecco , $m.Secco ) )
+#set($sumUmido = $tools.Math.add( $sumUmido , $m.Umido ) )
+#end
+
+#if ( "$sumUmido" == '0.0' )
+<tr class="sep"><td colspan="10" align="center">Svuotamento Stallo</td></tr>
+#end
+
+#end
+<tr><td colspan="12" align="center">&nbsp;</td></tr>
+<tr class="sepNoHi">
+<th>
+#if($registraDOG)
+<input type="checkbox" onchange="selectDOG(this);" id="selAll" /> <label for="selAll">Tutti</label><br />
+<input type="button" value="Registra" onclick="registraDOG();">#end
+&nbsp;
+</th>
+<th colspan="2"><br /><b>Giacenza Attuale:</b></th>
+<th colspan="2"><br /><b>$tools.Number.format($sumUmido)</b></th>
+<th>&nbsp;</th>
+#set( $sumSeccoCalcolato = $obj.calcolaSecco($sumUmido) )
+<th colspan="2"><br /><b>$tools.Number.format($sumSecco)</b>
+#if( $sumSeccoCalcolato != $sumSecco)<br><small>($tools.Number.format( $sumSeccoCalcolato ))</small>#end</th>
+
+</tr>
+</tbody></table>
+
+
+<br />
+
+#set($immissioneLP=false)
+#if ( $regIVA)
+#foreach( $s in $obj.Stalli ) 
+#if( ! $s.HasLiberaPratica )#set($immissioneLP=true)#end
+#end
+#end
+
+#if( ! $rettificaDone )
+<br /><a href="?id=$obj.Id&amp;cmd=popola">Popola Stalli</a><br /><br />#end
+
+#if($rettificaDone && $immissioneLP)
+
+Immissione in libera pratica  
+<form action=".consegne" id="openC">
+<input type="hidden" name="cmd" value="immettiLP" />
+<input type="hidden" name="exec" value="1" />
+<input type="hidden" name="c" value="$obj.Id" />
+<input name="data" type="text" size="10" id="dataOpenC" /><br />
+con data : <input type="text" name="dataLP" size="10" id="dataLP" /><br>
+##
+
+
+<fieldset><legend>Documento di Ingresso</legend>
+Tipo: <select name="doc"><option value="">-</option><option value="IM4">IM4</option></select>
+Numero: <input type="text" name="doc_num" size="4"/>
+Data:  <input type="text" name="doc_data" id="doc_data" size="7"/></fieldset>
+<fieldset><legend>Documento di Ingresso (Portovesme)</legend>
+Tipo: <select name="docPV"><option value="">-</option><option value="IM4">IM4</option></select>
+Numero: <input type="text" name="docPV_num" size="4"/>
+Data:  <input type="text" id="docPV_data" name="docPV_data" size="7"/></fieldset>
+<br />
+Stalli :<br />
+
+#foreach( $s in $obj.Stalli )
+#if(! $s.HasLiberaPratica )
+<input type="checkbox" name="immettiLP" value="$s.Id" id="libPrat_$velocityCount" />
+<label for="libPrat_$velocityCount">$s.Nome</label><br />
+#end#end
+Note :<br />
+<textarea name="note" cols="40" rows="4"></textarea>
+<input type="button" value="Immetti in L.P." onclick="immettiLP();">
+</form>
+#end
+
+
+
+<script type="text/javascript">
+
+$('document').ready( function() {
+
+popUpCal.regional['it'] = {clearText: 'Svuota', closeText: 'Chiudi',
+prevText: '&lt;Prec', nextText: 'Succ&gt;', currentText: 'Oggi',
+dayNames: ['Do','Lu','Ma','Me','Gio','Ve','Sa'],
+monthNames: ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
+'Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre']};
+
+popUpCal.setDefaults(popUpCal.regional['it']);
+
+jQuery('#dataLP').calendar();
+jQuery('#doc_data').calendar();
+jQuery('#docPV_data').calendar();
+} ) ;
+
+function immettiLP() {
+var list = document.getElementsByTagName('input');
+var data = document.getElementById('dataLP').value;
+
+if ( ! data || data == '' ) {
+	alert ( 'Inserire la data di immissione.') ; 
+	return false ;
+}
+
+
+var ids = '' ;
+for( var el = 0; el < list.length ; el++ ) {
+	if ( list[el].name && list[el].name == 'immettiLP' && list[el].checked ) {
+		ids += '&list=' + list[el].value ;
+	}
+}
+
+if ( ids == '' )  {
+	alert ( 'Selezionare almeno uno stallo per effettuare l\'immissione in Libera Pratica.') ; 
+	return false ;
+}
+
+//location.href='?cmd=immettiLP&exec=1&c=$obj.Id&dataLP=' + data + ids ;
+
+}
+function selectDOG(btn) {
+	
+	var list = document.getElementsByTagName('input');
+	
+	for( var el = 0; el < list.length ; el++ ) {
+		if ( list[el].name && list[el].name == 'registraDOG' ) {
+			list[el].checked = btn.checked ;
+		}
+	}
+}
+function registraDOG() {
+	var list = document.getElementsByTagName('input');
+	
+	var ids = '' ;
+	for( var el = 0; el < list.length ; el++ ) {
+		if ( list[el].name && list[el].name == 'registraDOG' && list[el].checked ) {
+			ids += '&list=' + list[el].value ;
+		}
+	}
+
+	location.href='.registri?cmd=assegnaReg&dog=1&exec=1&c=$obj.Id' + ids ;
+}
+</script>

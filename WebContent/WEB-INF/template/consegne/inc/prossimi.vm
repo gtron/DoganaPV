@@ -1,0 +1,18 @@
+#if ( $listaEventi && $listaEventi.size() > 0) 
+<ul id="list">
+#foreach( $i in $listaEventi )
+<li id="evt_$i.Id">
+<p>#if( $i.Inizio && $i.Fine && $i.Inizio != $i.Fine)dal $tools.Date.format($dateFormat, $i.Inizio ) al $tools.Date.format($dateFormat, $i.Fine )
+#elseif ( $i.Inizio ) $tools.Date.format($dateFormat,  $i.Inizio ) #end<br />
+<a href="#">$i.Titolo</a></p>
+#if( $doJsEventi )
+<script type="text/javascript">
+addEvent($i.Id,'$i.Titolo', '$i.Latitudine', '$i.Longitudine', '$tools.Date.format($dateFormat, $i.Inizio )', '$tools.Date.format($dateFormat, $i.Fine )');
+</script>
+#end
+</li>
+#end
+</ul>
+#else
+Nessun Evento
+#end

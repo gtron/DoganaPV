@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app id="WebApp_ID" version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+	<display-name>
+	GtUbiquos</display-name>
+	<servlet>
+		<servlet-name>main</servlet-name>
+		<servlet-class>com.gsoft.doganapt.MainServlet</servlet-class>
+		<init-param>
+	      <param-name>org.apache.velocity.properties</param-name>
+	      <param-value>WEB-INF/conf/velocity.properties</param-value>
+	    </init-param>
+	</servlet>
+	<servlet-mapping>
+		<url-pattern>*.main</url-pattern>
+		<servlet-name>main</servlet-name>
+	</servlet-mapping>
+	<!-- Gestione Eventi -->
+	<servlet>
+		<servlet-name>consegne</servlet-name>
+		<servlet-class>com.gsoft.doganapt.ConsegneServlet</servlet-class>
+		<init-param>
+	      <param-name>org.apache.velocity.properties</param-name>
+	      <param-value>WEB-INF/conf/velocity.properties</param-value>
+	    </init-param>
+	</servlet>
+	<servlet-mapping>
+		<url-pattern>*.consegne</url-pattern>
+		<servlet-name>consegne</servlet-name>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>registri</servlet-name>
+		<servlet-class>com.gsoft.doganapt.RegistriServlet</servlet-class>
+		<init-param>
+	      <param-name>org.apache.velocity.properties</param-name>
+	      <param-value>WEB-INF/conf/velocity.properties</param-value>
+	    </init-param>
+	</servlet>
+	<servlet-mapping>
+		<url-pattern>*.registri</url-pattern>
+		<servlet-name>registri</servlet-name>
+	</servlet-mapping>
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+		<welcome-file>index.htm</welcome-file>
+		<welcome-file>index.jsp</welcome-file>
+		<welcome-file>default.html</welcome-file>
+		<welcome-file>default.htm</welcome-file>
+		<welcome-file>default.jsp</welcome-file>
+	</welcome-file-list>
+</web-app>

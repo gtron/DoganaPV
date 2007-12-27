@@ -1,0 +1,85 @@
+
+<script>
+$(document).ready(function(){ 
+
+jQuery("#tablemovimenti").jqGrid(
+{ 
+url:'.registri?iva=true&json=true&ndS='+new Date().getTime(),
+datatype: 'local', height: 250, 
+colNames:['N.','Part.','Data',  'Cons.','Merce','Documento','Umido<br>Entrata','Umido<br>Uscita','Secco<br>Entrata','Secco<br>Uscita','&euro;','$'],
+colModel:[{name:'numero',index:'numero',width:50,align:'center',sorttype:'int'},
+{name:'n_partitario',index:'n_partitario',width:60,align:'center',sorttype:'int'},
+{name:'data',index:'data',width:80,align:'center'},
+{name:'consegna',index:'consegna',width:60,align:'center',sorttype:'int'},
+{name:'merce',index:'merce',width:160},
+{name:'documento',index:'documento',width:100,sortable:false,align:'center'},
+{name:'umido_in',index:'umido_in',width:90,sortable:false,align:'right'},
+{name:'umido_out',index:'umido_out',width:90,sortable:false,align:'right'},
+{name:'secco_in',index:'secco_in',width:90,sortable:false,align:'right'}, 
+{name:'secco_out',index:'secco_out',width:90,sortable:false,align:'right'},
+{name:'val_euro',index:'val_euro',width:60,sortable:false,align:'right'},
+{name:'val_dollari',index:'val_dollari',width:60,sortable:false,align:'right'}],
+rowNum:3,
+loadtext:'Caricamento ...',
+//rowList:[10], 
+imgpath: 'images'
+//pager: jQuery('#pager')
+});
+ 
+var mydata=[
+#foreach( $m in $list )
+#if($velocityCount > 1),#end
+{numero:"$m.NumRegistro",n_partitario:"$!m.Consegna.NumeroPartitario"
+,data:"$tools.Date.format($dateFormat, $m.Data)",
+consegna:"$!m.Consegna.Numero",merce:"$!m.Consegna.Merce",documento:"$!m.Documento",
+#if($m.getIsScarico() ||  $m.Umido.intValue() < 0 ) #if( $m.Umido.intValue() < 0 )
+umido_in:" ",umido_out:"$!tools.Number.format($tools.Math.mul( -1 , $m.Umido))"
+#else umido_in:"",umido_out:"$!tools.Number.format($m.Umido)", #end
+#else umido_in:"$!tools.Number.format($m.Umido)",umido_out:"",#end
+#if($m.getIsScarico() ||  $m.Secco.intValue() < 0 ) #if( $m.Secco.intValue() < 0 )
+secco_in:"",secco_out:"$!tools.Number.format($tools.Math.mul( -1 , $m.Secco))",
+#else secco_in:"",secco_out:"$!tools.Number.format($m.Secco)",#end
+#else secco_in:"$tools.Number.format($m.Secco)",secco_out:"",#end
+val_euro:"$!tools.Number.format($m.ValoreEuro )",
+val_dollari:"$!tools.Number.format($m.ValoreDollari)"
+}#end
+];
+for(var ix=0;ix<=mydata.length;ix++) {
+	jQuery("#tablemovimenti").addRowData(ix,mydata[ix]);
+}
+   } 
+);
+</script> 
+
+#*
+<script type="text/javascript">
+$(document).ready(function() { 
+jQuery("#tablemovimenti").jqGrid({ datatype: "local", height: 250, colNames:['Inv No','Date', 'Client', 'Amount','Tax','Total','Notes'], colModel:[ {name:'id',index:'id', width:60, sorttype:"int"}, {name:'invdate',index:'invdate', width:90, sorttype:"date"}, {name:'name',index:'name', width:100}, {name:'amount',index:'amount', width:80, align:"right",sorttype:"float"}, {name:'tax',index:'tax', width:80, align:"right",sorttype:"float"}, {name:'total',index:'total', width:80,align:"right",sorttype:"float"}, {name:'note',index:'note', width:150, sortable:false} ], imgpath: 'images' }); var mydata = [ {id:"1",invdate:"2007-10-01",name:"test",note:"note",amount:"200.00",tax:"10.00",total:"210.00"}, {id:"2",invdate:"2007-10-02",name:"test2",note:"note2",amount:"300.00",tax:"20.00",total:"320.00"}, {id:"3",invdate:"2007-09-01",name:"test3",note:"note3",amount:"400.00",tax:"30.00",total:"430.00"}, {id:"4",invdate:"2007-10-04",name:"test",note:"note",amount:"200.00",tax:"10.00",total:"210.00"}, {id:"5",invdate:"2007-10-05",name:"test2",note:"note2",amount:"300.00",tax:"20.00",total:"320.00"}, {id:"6",invdate:"2007-09-06",name:"test3",note:"note3",amount:"400.00",tax:"30.00",total:"430.00"}, {id:"7",invdate:"2007-10-04",name:"test",note:"note",amount:"200.00",tax:"10.00",total:"210.00"}, {id:"8",invdate:"2007-10-03",name:"test2",note:"note2",amount:"300.00",tax:"20.00",total:"320.00"}, {id:"9",invdate:"2007-09-01",name:"test3",note:"note3",amount:"400.00",tax:"30.00",total:"430.00"} ]; 
+for(var i=0;i<=mydata.length;i++) {
+try {
+jQuery("#tablemovimenti").addRowData(i+1,mydata[i]); } catch(e) { alert(e.message);}
+}
+   } 
+);
+</script>
+
+*#
+
+<h2>Registro IVA</h2>
+<table border="0" id="tablemovimenti" class="scroll" cellpadding="0" cellspacing="0"><tbody></tbody></table>
+<div id="pager"  class="scroll" 	></div>
+
+#*
+
+<table><tbody>
+<tr class="sep"><td colspan="3"><br /><b>Giacenza Attuale:</b></td>
+<td><br /><b>$tools.Number.format($sumUmido)</b></td>
+<td>&nbsp;</td>
+<td><br /><b>$tools.Number.format($sumSecco)</b></td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+*#
+
+<br><br>

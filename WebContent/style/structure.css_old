@@ -1,0 +1,59 @@
+#corpo {
+	margin : 0;
+}
+
+#testata { margin:0;padding:2% 0 0 1em; height:8%; font-size: 2em;}
+#container { position: relative;  margin: 0 ; padding:0; height:80%; width:100%;}
+#spallaSx { width : 15em ; position : absolute; left:0; top:0 ; height: 100%; overflow:hidden;}
+#spallaSx P {padding:2px;margin:0;}
+#spallaSx H3 { line-height: 1.2em; color:#B49C45; font-size:1.2em; margin:0; padding: 0 0 6px 1em; background: url(images/rigasfumata.gif) bottom left repeat-x ;}
+#spallaSx UL { margin : 0; padding : 0 0 10px 1.1em;}
+#spallaSx UL LI { list-style-type : none; margin:0;padding: 0; color:#45B49C; cursor:pointer;}
+#spallaSx UL LI.active { border: 1px dashed #F60; background-color:#F9FEE1;}
+#spallaSx A { padding: 1px; color:#B49C45; font-weight: bold;text-decoration:none;}
+#spallaSx A:hover {text-decoration:underline;}
+#googlemap { position: relative; width:100%; height:90%; border: 1px solid; margin:0 ; padding: 0;}
+
+
+/*
+#menuTestata  { padding: 20px 10px 2px 0 ;  background-color: #BFCCFF; }
+*/
+/* MENU */
+#testata { border-bottom: 4px solid #036; height: 70px;}
+.buttonList { 
+font: bold 13px arial;
+text-align :right;
+line-height:24px;
+margin:0 ;
+padding: 0   ;
+}
+.buttonList li {
+position: relative;
+padding: 0 ;
+list-style: none;
+display: inline;
+}
+.buttonList li a img { position : absolute ; top : -12px; left: 2px ;}
+.buttonList li a {
+padding: 3px 0.5em 0 40px;
+text-decoration: none;
+background-color: #FFF2BF;
+border: 2px solid #FFF2BF;
+color: black;
+}
+.buttonList li a:hover {
+color: black;
+background-color: #FFE271;
+border-style: outset;
+}
+.buttonList li.hi{ 
+border-style: inset;
+}
+html>body .buttonList li a:active{ /* Apply mousedown effect only to NON IE browsers */
+border-style: inset;
+}
+
+
+A.stallo  { display: block ; padding: 10px 8px ; }
+A.stallo:hover { background-color : #F5F5B3; text-decoration:none; padding: 8px 4px ;  border: 2px outset #B3B5F5}
+TD.stallo { border: 1px solid #B3B5F5; }

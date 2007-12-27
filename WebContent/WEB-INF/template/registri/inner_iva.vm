@@ -1,0 +1,15 @@
+<h2>Registro IVA</h2>
+<table border="0" id="tablemovimenti" class="scroll" cellpadding="0" cellspacing="0"></table>
+<div id="pager"  class="scroll"></div>
+#*
+
+<table><tbody>
+<tr class="sep"><td colspan="3"><br /><b>Giacenza Attuale:</b></td>
+<td><br /><b>$tools.Number.format($sumUmido)</b></td>
+<td>&nbsp;</td>
+<td><br /><b>$tools.Number.format($sumSecco)</b></td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+<table>
+*#

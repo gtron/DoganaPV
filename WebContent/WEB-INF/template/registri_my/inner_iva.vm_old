@@ -1,0 +1,97 @@
+<h2>Registro IVA</h2>
+
+<table border="0" class="movimenti" cellpadding="2" cellspacing="0" id="tablemovimenti">
+#*<thead>
+<tr>
+<th width="10%" rowspan="2">Num.</th>
+<th rowspan="2">Data</th>
+<th rowspan="2">Documento</th>
+<th rowspan="2">Consegna</th>
+<th rowspan="2">Merce</th>
+<th width="10%" colspan="2">Umido</th>
+<th width="20" rowspan="2">&nbsp;</th>
+<th width="10%" colspan="2">Secco</th>
+<th width="20" rowspan="2">&nbsp;</th>
+<th width="10%" colspan="2">Valore</th>
+<th rowspan="2">N.Partitario</th>
+</tr>
+<tr>
+<td>Entrata</td>
+<td>Uscita</td>
+<td>Entrata</td>
+<td>Uscita</td>
+<td>&euro;</td>
+<td>$</td>
+</tr></thead>*#
+
+<thead>
+<tr>
+<th width="10%">Num.</th>
+<th >Data</th>
+<th >Documento</th>
+<th >Consegna</th>
+<th >Merce</th>
+<th width="10%">Umido</th>
+<th width="10%">Secco</th>
+<th>Valore (&euro;)</th>
+</tr></thead>
+<tbody>
+#set($sumSecco = 0)
+#set($sumUmido = 0)
+#foreach( $m in $list )
+<tr#if($velocityCount%2  == 0) class="odd"#end>
+<td class="offColor">$m.NumRegistro
+## #if(! $m.IsLocked)<a href=".registri?cmd=deregistra&iva=1&num=$m.NumRegistro&exec=1"><img src="$images/action-ico-elimina.png" /></a>#end
+</td>
+##<td>#if($m.getIsScarico()) S#else C#end</td>
+<td>$tools.Date.format($dateFormat, $m.Data).toUpperCase()</td>
+<td>#if($m.Documento)$m.Documento#else - #end</td>
+<td>$!m.Consegna.Numero ($!m.Consegna.NumeroPartitario)</td>
+<td>$!m.Consegna.Merce.Nome</td>
+
+#if($m.getIsScarico() ||  $m.Umido.intValue() < 0 )
+#if( $m.Umido.intValue() < 0 )
+<td class="r">$tools.Number.format($m.Umido)</td>
+#else
+<td class="r">$!tools.Number.format($tools.Math.mul( -1 , $m.Umido))</td>
+#end
+#else
+<td class="r">$tools.Number.format($m.Umido)</td>
+#end
+
+
+#if($m.getIsScarico() ||  $m.Secco.intValue() < 0 )
+#if( $m.Secco.intValue() < 0 )
+<td class="r">$tools.Number.format($m.Secco)</td>
+#else
+<td class="r">$!tools.Number.format($tools.Math.mul( -1 , $m.Secco))</td>
+#end
+#else
+<td class="r">$tools.Number.format($m.Secco)</td>
+#end
+
+<td class="r">$!tools.Number.format('#,##0',$m.ValoreEuro )</td>
+</tr>
+
+#if( $m.getIsScarico() )
+#set($sumSecco = $tools.Math.sub( $sumSecco , $m.Secco ) )
+#set($sumUmido = $tools.Math.sub( $sumUmido , $m.Umido ) )
+#else
+#set($sumSecco = $tools.Math.add( $sumSecco , $m.Secco ) )
+#set($sumUmido = $tools.Math.add( $sumUmido , $m.Umido ) )
+#end
+#if ( "$sumUmido" == '0.0' )
+##<tr class="sep"><td colspan="10" align="center">Svuotamento Stallo</td></tr>
+#end
+#end
+</tbody></table>
+<table><tbody>
+<tr class="sep"><td colspan="3"><br /><b>Giacenza Attuale:</b></td>
+<td><br /><b>$tools.Number.format('#,##0',$sumUmido)</b></td>
+<td>&nbsp;</td>
+<td><br /><b>$tools.Number.format('#,##0.',$sumSecco)</b></td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+<table>
+<br><br>

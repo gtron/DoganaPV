@@ -1,0 +1,60 @@
+
+<script>
+$(document).ready(function(){ 
+
+jQuery("#tablemovimenti").jqGrid(
+{ 
+url:'.registri?iva=true&json=true&ndS='+new Date().getTime(),
+datatype: 'local', height: 250, 
+colNames:['N.','Part.','Data',  'Cons.','Merce','Documento','Umido<br>Entrata','Umido<br>Uscita','Secco<br>Entrata','Secco<br>Uscita'],
+colModel:[{name:'numero',index:'numero',width:50,align:'center',sorttype:'int'},
+{name:'n_partitario',index:'n_partitario',width:80,align:'center',sorttype:'int'},
+{name:'data',index:'data',width:80,align:'center'},
+{name:'consegna',index:'consegna',width:80,align:'center',sorttype:'int'},
+{name:'merce',index:'merce',width:200},
+{name:'documento',index:'documento',width:160,sortable:false,align:'center'},
+{name:'umido_in',index:'umido_in',width:90,sortable:false,align:'right'},
+{name:'umido_out',index:'umido_out',width:90,sortable:false,align:'right'},
+{name:'secco_in',index:'secco_in',width:90,sortable:false,align:'right'}, 
+{name:'secco_out',index:'secco_out',width:90,sortable:false,align:'right'}],
+rowNum:3,
+loadtext:'Caricamento ...',
+//rowList:[10], 
+imgpath: 'images'
+//pager: jQuery('#pager')
+});
+ 
+var mydata=[
+#foreach( $m in $list )
+#if($velocityCount > 1),#end
+{numero: '$m.NumRegistro',n_partitario:"$!m.Consegna.NumeroPartitario",data:"$tools.Date.format($dateFormat, $m.Data)",
+consegna:"$!m.Consegna.Numero",merce:"$!m.Consegna.Merce",documento:"$!m.Documento",
+#if($m.getIsScarico() ||  $m.Umido.intValue() < 0 ) #if( $m.Umido.intValue() < 0 )
+umido_in:" ",umido_out:"$!tools.Number.format($tools.Math.mul( -1 , $m.Umido))"
+#else umido_in:"",umido_out:"$!tools.Number.format($m.Umido)" #end
+#else umido_in:"$!tools.Number.format($m.Umido)",umido_out:""#end
+,
+#if($m.getIsScarico() ||  $m.Secco.intValue() < 0 ) #if( $m.Secco.intValue() < 0 )
+secco_in:"",secco_out:"$!tools.Number.format($tools.Math.mul( -1 , $m.Secco))"
+#else secco_in:"",secco_out:"$!tools.Number.format($m.Secco)"#end
+#else secco_in:"$tools.Number.format($m.Secco)",secco_out:""#end
+
+}#end
+];
+for(var ix=0;ix<=mydata.length;ix++) {
+	jQuery("#tablemovimenti").addRowData(ix,mydata[ix]);
+}
+   } 
+);
+</script> 
+
+
+<h2>
+Registro Doganale
+</h2>
+
+<table border="0" id="tablemovimenti" class="scroll" cellpadding="0" cellspacing="0"><tbody></tbody></table>
+<div id="pager"  class="scroll" 	></div>
+
+
+<br><br>

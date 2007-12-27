@@ -1,0 +1,12 @@
+HTML {}
+BODY {
+font : 14pt Arial ;
+font-weight: bold ;
+margin:	0;
+padding: 0;
+width:279mm;
+height: 210mm;
+}
+.page { position: relative; width:100%; page-break-after:always; }
+.nomeReg { text-align:center; }
+.num { position: absolute ; top : 0mm; right:10mm;}

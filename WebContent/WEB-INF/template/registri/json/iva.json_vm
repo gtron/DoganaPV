@@ -1,0 +1,24 @@
+#set( $dateFormat = 'dd/MM/yyyy')
+#if($records % $rows == 0)
+#set($totpage=$records/$rows)
+#else #set($totpage=$records/$rows + 1) #end
+{total:$!totpage,page:$!page,records:$!records,rows:[
+{id:"$velocityCount",cell:["<input type=\"text\" id=\"inputNum\" value=\"$!numero\"size=\"4\">","<input type=\"text\" id=\"consegne\" value=\"$!consegne\" size=\"3\">",'',
+"Dal&nbsp;<input type=\"text\" size=\"6\" value=\"$!dal\" id=\"inputDal\" class=\"cal\"><br />Al&nbsp;&nbsp;<input type=\"text\" size=\"6\" value=\"$!al\" id=\"inputAl\" class=\"cal\">"
+,"","<select id=\"idmerce\"><option value=\"\">---Scegli una merce---</option>#foreach($m in $merci)<option value=\"$m.Id\" #if($m.Id==$idMerce) selected #end>$m.Nome</option>#end","","","","","",""]},
+#foreach( $m in $list )
+#if($velocityCount > 1),#end
+{id:"$velocityCount",cell:["$!m.NumRegistro","$!m.Consegna.Numero","$!m.Consegna.NumeroPartitario","$!tools.Date.format($dateFormat, $m.Data)","$!m.Documento",
+"$!m.Consegna.Merce",
+#if($m.getIsScarico() ||  $m.Umido.intValue() < 0 ) #if( $m.Umido.intValue() < 0 )
+"","$!tools.Number.format($tools.Math.mul( -1 , $m.Umido))",
+#else"","$tools.Number.format($m.Umido)", #end
+#else"$!tools.Number.format($m.Umido)","",#end
+#if($m.getIsScarico() ||  $m.Secco.intValue() < 0 ) #if( $m.Secco.intValue() < 0 )
+"","$!tools.Number.format($tools.Math.mul( -1 , $m.Secco))",
+#else"","$!tools.Number.format($m.Secco)",#end
+#else"$!tools.Number.format($m.Secco)","",#end
+"$!tools.Number.format($m.ValoreEuro )",
+"$!tools.Number.format($m.ValoreDollari)"
+]}#end
+]}

@@ -1,0 +1,81 @@
+#parse('costanti.vm')
+#parse('header.vm')
+
+<script type="text/javascript">
+function calcolaSecco(btn) {
+var f = btn.form;
+var umido, secco ;
+var tasso = $obj.Stallo.Consegna.TassoUmidita ;
+
+try {
+umido = 1 * f.umido.value.replace('\.','').replace(',','.') ;
+
+f.secco.value = umido - ( umido * tasso / 100) ;
+
+}
+catch (e) { alert ( 'Errore  : ' + e.message) ; }
+}
+</script>
+<h2>
+#if ( $obj )
+Modifica Movimento <small>[$obj.Id]</small>
+#else
+Errore movimento non selezionato o inesistente
+#end
+</h2>
+<form action="?" method="post">
+<input type="hidden" name="iva" value=#if($isIva)"1"#else"0"#end>
+Tipo : #if($m.getIsScarico()) Scarico #else Carico#end
+#if($m.Stallo.Consegna.getHasRettifica() ) - <label for="isrettifica">Rettifica:</label>
+<select name="isrettifica" id="isrettifica">
+<option value="false">NO</option>
+<option value="true" #if($!obj.getIsRettifica()) selected="selected" #end>SI</option>
+</select>#end
+<br>
+Data: $tools.Date.format($dateFormat, $obj.Data) <br>
+
+Merce : $!obj.Stallo.Consegna.Merce.Nome<br>
+Consegna numero : $!obj.Stallo.Consegna.Numero</a><br>
+Iter : $!obj.Stallo.Consegna.Iter.Nome<br>
+Stallo : <a href=".consegne?id=$!obj.Stallo.Id">$!obj.Stallo.Nome</a><br>
+<br>
+Documento : <input type="text" value="$!m.Documento" name="documento" /><br>
+<br>
+Peso umido : <input type="text" value="$!tools.Number.format('#,##0.0', $!obj.Umido)" name="umido" /><br>
+<br>
+Peso secco : <input type="text" value="$!tools.Number.format('#,##0.0', $!obj.Secco)" name="secco" /><br>
+(% H2O: $obj.Stallo.Consegna.TassoUmidita) <input type="button" value="Calcola Peso Secco" onclick="calcolaSecco(this);" /><br>
+<br>
+Numero Registro :<input type="text" value="$!obj.NumRegistro" name="numregistro" /><br>
+<br>
+#*
+#if( $obj.Stallo.Consegna.Iter.Regiva )
+Numero Registro IVA : <input type="text" value="$!obj.NumRegistroIVA" name="numregiva" /><br>#end
+*#
+<input type="hidden" name="cmd" value="editmovimento" />
+<input type="hidden" name="exec" value="1" />
+<input type="hidden" name="id" value="$!obj.Id" />
+
+
+<br><br>
+
+#if( $result ) <div id="result">Modifica effettuata</div> #end
+
+#if( $param_error ) 
+$param_error.ParamName
+##$param_error.printStackTrace()
+<script type="text/javascript">
+
+</script>
+#end
+
+<div align="center">
+
+<br>
+
+<input type="reset" value="Annulla"> - 
+<input type="submit" value="Salva"></div>
+
+
+#parse('footer.vm')
+
