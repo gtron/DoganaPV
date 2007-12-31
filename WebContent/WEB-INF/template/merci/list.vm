@@ -1,0 +1,8 @@
+#parse('costanti.vm')
+#parse('header.vm')
+
+#foreach( $m in $list ) 
+$m
+#end
+
+#parse('footer.vm')
