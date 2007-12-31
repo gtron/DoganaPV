@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.velocity.Template;
 import org.apache.velocity.context.Context;
 
-import com.gsoft.doganapt.data.Consegna;
 import com.gsoft.doganapt.data.Movimento;
 import com.gsoft.doganapt.data.adapters.MovimentoAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoDoganaleAdapter;
@@ -36,12 +35,12 @@ public class DeregistraMovimento extends VelocityCommand {
 			Vector list = adapter.getByNumeroRegistro(num) ;
 			
 			Movimento m = null ;
-			Consegna c = null ;
+//			Consegna c = null ;
 			
 			for ( Iterator i = list.iterator() ; i.hasNext(); ) {
 				
 				m = (Movimento) i.next() ;
-				c = m.getConsegna();
+//				c = m.getConsegna();
 				
 				if ( ! m.getIsLocked() ) {
 					
@@ -88,19 +87,19 @@ public class DeregistraMovimento extends VelocityCommand {
 		return "consegne/view.vm" ;
 	}
 	
-	static synchronized private Integer registraNuovoNum( Movimento m , MovimentoAdapter adapter ) throws Exception {
-		Integer newNum  ;
-		try {
-			newNum = adapter.getNextNumRegistro();
-			m.setNumRegistro( new Long(newNum ) );
-			adapter.update(m);
-		}
-		catch (Exception e ) {
-			throw e ;
-		}
-		finally {
-			adapter.doneNextNumRegistro();
-		}
-		return newNum ;
-	}
+//	static synchronized private Integer registraNuovoNum( Movimento m , MovimentoAdapter adapter ) throws Exception {
+//		Integer newNum  ;
+//		try {
+//			newNum = adapter.getNextNumRegistro();
+//			m.setNumRegistro( new Long(newNum ) );
+//			adapter.update(m);
+//		}
+//		catch (Exception e ) {
+//			throw e ;
+//		}
+//		finally {
+//			adapter.doneNextNumRegistro();
+//		}
+//		return newNum ;
+//	}
 }

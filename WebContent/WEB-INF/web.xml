@@ -39,6 +39,18 @@
 		<url-pattern>*.registri</url-pattern>
 		<servlet-name>registri</servlet-name>
 	</servlet-mapping>
+	<servlet>
+		<servlet-name>merci</servlet-name>
+		<servlet-class>com.gsoft.doganapt.MerciServlet</servlet-class>
+		<init-param>
+	      <param-name>org.apache.velocity.properties</param-name>
+	      <param-value>WEB-INF/conf/velocity.properties</param-value>
+	    </init-param>
+	</servlet>
+	<servlet-mapping>
+		<url-pattern>*.merci</url-pattern>
+		<servlet-name>merci</servlet-name>
+	</servlet-mapping>
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
 		<welcome-file>index.htm</welcome-file>

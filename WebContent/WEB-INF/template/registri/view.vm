@@ -9,8 +9,33 @@
 #set($activeMenu='DOGANALE')
 #end
 #parse('costanti.vm')
-#* 
-#set( $addJs = ['/js/jquery.tablefilter/daemachTools-packed.js','/js/jquery.tablefilter/jquery.cookies-packed.js','/js/jquery.tablefilter/jquery.tableFilter.columnStyle-packed.js','/js/jquery.tablefilter/jquery.tableFilter.js','/js/jquery.tablefilter/jquery.truemouseout-packed.js','/js/jquery.tablefilter/jquery-packed.js','/js/jquery.tablefilter/json-packed.js','/js/jquery.tablefilter/prototypes-packed.js','/js/jquery.tablefilter/pp.js'] )
+#*
+#set( $addCss = ['/js/jquery.ui/themes/flora/flora.all.css','/style/tablefilter/tableFilter.aggregator.css','/style/tablefilter/tableFilter.css','/style/grid.css'] )
+#set( $addJs = ['/js/jquery.ui/ui.calendar.js','/js/jquery.jqgrid/jquery.jqGrid.js'])
+#parse('header.vm')
+
+<script>
+function initRowHighlighting(){
+var table = document.getElementById('tablemovimenti');
+attachRowMouseEvents(table.getElementsByTagName('tr'));
+}
+function attachRowMouseEvents(rows){
+for(var i = 0;i < rows.length;i++){
+var row = rows[i];
+row.onmouseover = function(){ highlightRow(this, true);}
+row.onmouseout = function() { highlightRow(this, false);}
+// row.style.cursor = 'pointer';
+}}
+
+function highlightRow( row, isover) { 
+if ( row.getAttribute('origClass') == null )
+	row.setAttribute('origClass' , row.className) ;
+	
+row.className = isover ? 'hi' : row.getAttribute('origClass');
+}
+
+window.onload = initRowHighlighting;
+</script>
 *#
 #set( $addCss = ['/style/tablefilter/tableFilter.aggregator.css','/style/tablefilter/tableFilter.css','/style/grid.css','/js/jquery.ui/themes/flora/flora.dialog.css','/js/jquery.ui/themes/flora/flora.resizable.css'] )
 #set( $addJs = ['/js/jquery.jqgrid/jquery.jqGrid.js','/js/jquery.ui/ui.calendar.js','/js/jquery.ui/ui.dimensions.js','/js/jquery.ui/ui.mouse.js','/js/jquery.ui/ui.draggable.js','/js/jquery.ui/ui.resizable.js','/js/jquery.ui/ui.dialog.js'])
@@ -38,14 +63,6 @@ row.className = isover ? 'hi' : row.getAttribute('origClass');
 }
 
 
-$('document').ready( function() {
-
-$("#dlg_Prepara").dialog({ width:400,
-height:120,buttons:{Stampa: function(){preparaPagine();} ,Annulla : function() { $("#dlg_Prepara").dialogClose(); } } 
-});
-$("#dlg_Prepara").dialogClose();
-
-} ) ;
 
 function preparaPagine() {
 //var w = window.open('voidreg.html','x','width=10,height=10,scrollable=no');
@@ -56,7 +73,7 @@ var f = document.getElementById('fromPagina').value ;
 if ( n + 10 == 10 ) return false;
 if ( f + 10 == 10 ) return false;
 
-stp.printPages( 1 * n, 1 * f);;
+stp.printPages( 1 * n, 1 * f);
 
 $("#dlg_Prepara").dialogClose();
 //setTimeout( function() { w.printPages(5,102); } , 1000 ) ;
@@ -68,10 +85,10 @@ $("#dlg_Prepara").dialog({ width:400,
 height:120,buttons:{Stampa: function(){preparaPagine();} ,Annulla : function() { $("#dlg_Prepara").dialogClose(); } } 
 });
 $("#dlg_Prepara").dialogClose();
-dlg_Confirm
+
 
 $("#dlg_Print").dialog({ width:400,
-height:120,buttons:{Stampa: function(){stampaRegistro();} ,Annulla : function() { $("#dlg_Print").dialogClose(); } } 
+height:160,buttons:{Stampa: function(){stampaRegistro();} ,Annulla : function() { $("#dlg_Print").dialogClose(); } } 
 });
 $("#dlg_Print").dialogClose();
 
@@ -80,21 +97,21 @@ height:120,buttons:{Si: function(){confirmedStampa();} , No : function() { $("#d
 });
 $("#dlg_Confirm").dialogClose();
 
-jQuery("#tablemovimenti").jqGrid(
-{ 
+jQuery("#tablemovimenti").jqGrid({
 #if($iva)#set($regiva='iva=true&')#end
 url:'.registri?$!{regiva}json=true&records=$!records&idMerce='+ '' + '&inputNum= ' + $("#inputNum").val() + '&inputDal=' + $("#inputDal").val() + '&inputAl=' + $("#inputAl").val() + '&ndS='+new Date().getTime(),
 datatype: 'json', 
 height: 350, 
 colNames:['N.','Cons.','Part.' ,'Data', 'Documento', 'Merce','umido<br />IN','umido<br />OUT','secco<BR >IN','secco<BR />OUT'
-	#if($iva) ,'&euro;','$'#end ],
+#if($iva) ,'&euro;','$'#end ],
 colModel:[
-{name:'numero',index:'numregistro',width:40,align:'center'},
-{name:'consegna',index:'C.numero',width:60,align:'center'},
+{name:'numero',index:'numregistro',width:50,align:'center',filterType:'text'},
+{name:'consegna',index:'C.numero',width:60,align:'center',filterType:'text'},
 {name:'n_partitario',index:'C.numpartitario',width:40,align:'center'},
-{name:'data',index:'data',width:80,align:'center'},
-{name:'documento',index:'documento',width:80, sortable:false},
-{name:'merce',index:'M.nome',width:120},
+{name:'data',index:'data',width:80,align:'center',filterType:'date'},
+{name:'documento',index:'documento',width:100},
+{name:'merce',index:'M.nome',width:120,filterType:'select'},
+		  ##options:[#foreach($m in $merci)#if($velocityCount  >1),#end {name:'$m.Nome',value:'$m.Id'}#end]},
 {name:'umido_in',index:'umido',width:60,sortable:false},
 {name:'umido_out',index:'umido',width:60,sortable:false},
 {name:'secco_in',index:'secco',width:60,sortable:false}, 
@@ -104,29 +121,55 @@ colModel:[
 {name:'val_dollari',index:'valoreeuro',width:60,sortable:false}
 #end
 ],
-width:890,
-rowNum:100, 
-rowList:[10,25,50], 
+#if($iva)
+width:920
+#else
+width:800
+#end
+,rowNum:100,rowList:[10,25,50], 
 loadtext:'Caricamento dati...',
 imgpath: 'images', 
 pager: jQuery('#pager')
 });
-} 
-   
+
+     popUpCal.regional['it'] = {clearText: 'Svuota', closeText: 'Chiudi',
+		prevText: '&lt;Prec', nextText: 'Succ&gt;', currentText: 'Oggi',
+		dayNames: ['Do','Lu','Ma','Me','Gio','Ve','Sa'],
+	monthNames: ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
+	'Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre']};
+popUpCal.setDefaults(popUpCal.regional['it']);
+   }
+ 
 );
-
-
 function doSearch(){ 
-	var numero = jQuery("#inputNum").val(); 
-	var dal = jQuery("#inputDal").val();
-	var al = jQuery("#inputAl").val();
-	var consegne = jQuery("#consegne").val();
-	var idmerce = jQuery("#idmerce").val();
+try{
+	var active=jQuery("#actNum");
+	var numero='';
+	if(active.attr('checked')==true)
+		numero = jQuery("#inputNum").val(); 
 	
-	jQuery("#tablemovimenti").setUrl(".registri?$!regiva&json=true&consegna=" + consegne + "&inputNum=" + numero + "&inputDal=" + dal + "&inputAl=" + al + '&idMerce='+ idmerce ); 
+	active=jQuery("#actDate");
+	var dal='';
+	var al='';
+	if(active.attr('checked')==true){
+		dal = jQuery("#inputDal").val();
+		al = jQuery("#inputAl").val();
+	}
+	active=jQuery("#actConsegne");
+	var consegne='';
+	if(active.attr('checked')==true)
+		consegne=jQuery("#consegne").val();
 	
+	active=jQuery("#actMerce");
+	var idmerce='';
+	if(active.attr('checked')==true)
+		idmerce = jQuery("#selmerce").val();
+	
+	jQuery("#tablemovimenti").setUrl(".registri?$!regiva&json=true&idMerce="+ idmerce + "&consegna=" + consegne + "&inputNum=" + numero + "&inputDal=" + dal + "&inputAl=" + al); 
 	jQuery("#tablemovimenti").setPage(1);
-	jQuery("#tablemovimenti").trigger("reloadGrid"); 
+	jQuery("#tablemovimenti").trigger("reloadGrid");
+}
+catch(e){alert(e.message);}
 	return false;
 }
 
@@ -135,15 +178,18 @@ var from = 0, to = 0;
 function printIFrame(f, t) {
 stp.print();
 from = f ; to = t ;
-// $('#dlg_Confirm').dialogOpen();
+var iva = #if($isIva)'true'#else'false'#end ;
+$('#dlg_Confirm').dialogOpen();
 }
 function confirmedStampa() {
-location.href='.main?f=' + from + '&t=' + to ;
+var iva = #if($isIva)'true'#else'false'#end ;
+stp.location.href='.registri?iva=' + iva + '&confirm=1&cmd=stampa&f=' + from + '&t=' + to ;
 }
 function stampaRegistro() {
 var numpag = document.getElementById('numPaginePrint').value;
 var from = document.getElementById('fromMovimento').value;
-stp.location.href='.registri?iva=true&cmd=stampa&from=' + from + '&num=' + numpag ;
+var iva = #if($isIva)'true'#else'false'#end ;
+stp.location.href='.registri?iva=' + iva + '&cmd=stampa&f=' + from + '&n=' + numpag ;
 $('#dlg_Print').dialogClose();
 }
 </script> 
@@ -154,11 +200,18 @@ $('#dlg_Print').dialogClose();
 #set($dateFormat = 'dd/MM/yy')
 ##
 #if($iva)
-#parse('registri/inner_iva.vm')
+##parse('registri/inner_iva.vm')
+<h2>Registro IVA</h2>
 #else 
-#parse('registri/inner_doganale.vm')
+<h2>Registro Doganale</h2>
+##parse('registri/inner_doganale.vm')
 #end
-<div align="center"><input type="button" value="Applica Filtri" onclick="return doSearch();"></div>
+
+<table border="0" id="tablemovimenti" class="scroll" cellpadding="0" cellspacing="0"></table>
+<div id="pager"  class="scroll"></div>
+
+
+##<div align="center"><input type="button" value="Applica Filtri" onclick="return doSearch();"></div>
 
 
 <div class="commands">
@@ -172,13 +225,11 @@ $('#dlg_Print').dialogClose();
 Prepara <input type="text" id="numPagine" value="10" size="3" />pagine a partire dal numero  <input type="text" id="fromPagina" value="" size="3"  /> 
 </div>
 <div id="dlg_Print" class="flora" style="text-align:center;">
-Stampa registro
-<span style="display:none;">
-Stampa <input type="text" id="numPaginePrint" value="10" size="3" /> pagine <br />
-a partire dal movimento numero <input type="text" id="fromMovimento" value="" size="3"  /> </span>
+Stampa <input type="text" id="numPaginePrint" value="2" size="3" /> pagine <br />
+a partire dal movimento numero <input type="text" id="fromMovimento" value="$!proxNumDaStampare" size="3"  />
 </div>
 <div id="dlg_Confirm" class="flora" style="text-align:center;">
-La stampa è stata completata correttamente ?
+La stampa &egrave; stata completata correttamente ?
 </div>
 #parse('footer.vm')
 #end

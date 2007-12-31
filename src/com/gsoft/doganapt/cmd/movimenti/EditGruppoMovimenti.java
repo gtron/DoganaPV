@@ -22,6 +22,7 @@ import com.gsoft.doganapt.data.adapters.StalloAdapter;
 import com.gtsoft.utils.common.BeanAdapter2;
 import com.gtsoft.utils.common.BeanEditor;
 import com.gtsoft.utils.common.FormattedDate;
+import com.gtsoft.utils.common.UserException;
 import com.gtsoft.utils.http.VelocityCommand;
 import com.gtsoft.utils.http.servlet.GtServlet;
 
@@ -89,6 +90,9 @@ public class EditGruppoMovimenti extends BeanEditor {
 			for ( Iterator i = movimenti.iterator() ; i.hasNext() ; ) {
 				m = (Movimento) i.next();
 				
+				if( m.getIsLocked() ) {
+					throw new UserException("Il Movimento è stato stampato e non puo' essere modificato!");
+				}
 				adp.updateCommonFields(m);
 				
 				double u = getDoubleParam("u0_" + m.getId() , true ).doubleValue() ;

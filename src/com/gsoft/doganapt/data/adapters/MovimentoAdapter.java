@@ -5,6 +5,8 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -321,10 +323,10 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 	}
 	
 	public Vector getRegistro( boolean soloRegistrati , Consegna c ) throws Exception {
-		return getRegistro( soloRegistrati , c,null,null,null,null,null,null,null,null,null );
+		return getRegistro( soloRegistrati , c,null,null,null,null,null,null,null,null );
 	}
 	public Vector getRegistro( boolean soloRegistrati , Consegna c,
-			Integer page,Integer rows,String nomeColonna,String ascDesc,
+			Integer page,Integer rows,Hashtable<String,String> orderColumn,
 			Integer numero,FormattedDate dal,FormattedDate al,Integer idMerce,Integer numConsegna ) throws Exception {
 
 		StringBuilder sql = new StringBuilder(70)
@@ -334,17 +336,38 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			.append(getTable())
 			.append(" R ");
 		
-		boolean orderForFieldConsegna= nomeColonna!=null && nomeColonna.startsWith("C.");
-		boolean orderForFieldMerce= nomeColonna!=null && nomeColonna.startsWith("M.");
-		if(orderForFieldConsegna || orderForFieldMerce || numConsegna!=null){
+		boolean writeJoinConsegne=true;
+		boolean writeJoinMerce=true;
+		
+		if(numConsegna!=null){
 			sql.append(" INNER JOIN ");
 			sql.append(new ConsegnaAdapter().getTable());
 			sql.append(" C ON C.idConsegna = R.idconsegna ");
+			writeJoinConsegne=false;
 		}
-		if(orderForFieldMerce){
-			sql.append(" INNER JOIN ");
-			sql.append(new MerceAdapter().getTable());
-			sql.append(" M ON M.id = C.idmerce ");
+		Collection<String> nomeColonna = null;
+		if(orderColumn!=null){
+			nomeColonna = orderColumn.keySet();
+			if(nomeColonna!=null){
+				for (Iterator<String> iterator = nomeColonna.iterator(); iterator.hasNext();) {
+					String nc = iterator.next();
+					boolean orderForFieldConsegna= nc!=null && nc.startsWith("C.");
+					boolean orderForFieldMerce= nc!=null && nc.startsWith("M.");
+					if(writeJoinConsegne && (orderForFieldConsegna || orderForFieldMerce)){
+						sql.append(" INNER JOIN ");
+						sql.append(new ConsegnaAdapter().getTable());
+						sql.append(" C ON C.idConsegna = R.idconsegna ");
+						writeJoinConsegne=false;
+					}
+					if(orderForFieldMerce && writeJoinMerce){
+						sql.append(" INNER JOIN ");
+						sql.append(new MerceAdapter().getTable());
+						sql.append(" M ON M.id = C.idmerce ");
+						writeJoinMerce=false;
+					}
+					
+				}
+			}
 		}
 		if ( soloRegistrati || c != null) 
 			sql.append(" WHERE ");
@@ -387,11 +410,18 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		sql.append(" ORDER BY ");
 		
 		
-		if(nomeColonna!=null){
-			sql.append(nomeColonna);
-			if(ascDesc!=null)
-				sql.append(" ").append(ascDesc);
-				
+		if(nomeColonna!=null && nomeColonna.size() > 0){
+			String nc;
+			boolean first=true;
+			for (Iterator<String> iterator = nomeColonna.iterator(); iterator.hasNext();) {
+				 if(!first) sql.append(",");
+				 nc = iterator.next();
+				 sql.append(nc);
+				 String ascDesc= orderColumn.get(nc);
+				 if(ascDesc!=null)
+					sql.append(" ").append(ascDesc);
+				 first=false;
+			}	
 		}
 		else
 			sql.append( " numregistro , data, isrettifica, idstallo " );
@@ -461,16 +491,14 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		return list ;
 	}
 	
-	public Vector confermaStampa( Integer from , Integer to ) throws Exception {
+	public Integer confermaStampa( Integer from , Integer to ) throws Exception {
 
 		StringBuilder sql = new StringBuilder(70)
 			.append(" UPDATE ")
 			.append(getTable())
 			.append( " SET locked = 1 WHERE numregistro >= ? AND numregistro <=  ?");
 		
-		
-		Vector list = null ;
-		
+		Integer ret = null ;
 		Connection conn = db.getConnection() ;
 		try {
 			
@@ -479,7 +507,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			s.setInt(1, from.intValue()) ;
 			s.setInt(2, to.intValue()) ;
 			
-			list = getByStatment(s);
+			ret = new Integer( s.executeUpdate() );
 	
 			
 		}
@@ -487,7 +515,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			db.freeConnection(conn);
 		}
 		
-		return list ;
+		return ret ;
 	}
 	
 	public Vector getDaRegistrare( Integer idConsegna , FormattedDate data ) throws Exception {
@@ -588,7 +616,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		return list ;
 	}
 	 
-	public Vector getGroup( Integer idConsegna , FormattedDate d , boolean scarico, boolean rettifica) throws Exception {
+	public Vector getGroup(  Integer idConsegna , FormattedDate d , boolean scarico, boolean rettifica) throws Exception {
 		
 		return getWithWhere(" idconsegna = " + idConsegna.toString() 
 				+ " AND data = '" + d.ymdString() + "'" 

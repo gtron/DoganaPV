@@ -17,16 +17,25 @@ import com.gtsoft.utils.http.servlet.GtServlet;
 
 
 public class Stampa extends VelocityCommand {
-		
+	
+	private final static Integer ROWS_PER_PAGE = new Integer(20);
+	
 	public Stampa ( GtServlet callerServlet) {
 		super(callerServlet);
 	}
 	public Template exec(HttpServletRequest req, HttpServletResponse resp, Context ctx) throws Exception  {
-		
+
 		ctx.put( "isIva", getBooleanParam("iva", false) );
+		ctx.put( "righePerPagina", ROWS_PER_PAGE );
 		
 		getAdapter();
+
 		Integer num = getIntParam("n", false);
+		if ( num == null )
+			num = ROWS_PER_PAGE ;
+		else
+			num = new Integer( ROWS_PER_PAGE.intValue() * num.intValue() ) ;
+		
 		Integer from = getIntParam("f", false);
 		
 		if ( getBooleanParam("confirm") ) {

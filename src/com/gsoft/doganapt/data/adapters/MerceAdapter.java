@@ -3,17 +3,18 @@ package com.gsoft.doganapt.data.adapters;
 import gnu.trove.THashMap;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Vector;
 
-import com.gsoft.doganapt.data.Iter;
 import com.gsoft.doganapt.data.Merce;
 import com.gtsoft.utils.common.BeanAdapter2;
 import com.gtsoft.utils.data.Field;
 import com.gtsoft.utils.data.FieldSet;
 import com.gtsoft.utils.sql.IDatabase2;
+
 
 public class MerceAdapter extends BeanAdapter2 {
 
@@ -105,6 +106,19 @@ public class MerceAdapter extends BeanAdapter2 {
 		return list;
 	}
 	
+	public void clearTable() throws IOException {
+		Connection c = db.getConnection();
+		
+		db.executeNonQuery("DROP TABLE zbck_" + getTable() , 
+				c );
+		db.executeNonQuery("CREATE TABLE zbck_" + getTable() + 
+				" SELECT * FROM "  + getTable() , 
+				c );
+		db.executeNonQuery("DELETE FROM " + getTable() , 
+				c);
+		
+		clearCache();
+	}
 	
 	public static final THashMap cache = new THashMap(101);
 	public static Merce get(Integer id) {
