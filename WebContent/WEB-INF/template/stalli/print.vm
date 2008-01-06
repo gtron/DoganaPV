@@ -1,46 +1,3 @@
-#parse('costanti.vm')
-<html>
-<head>
-<title>$htmlTitle</title>
-
-
-#if( $!addCss )#foreach( $j in $addCss )
-<link rel="stylesheet" type="text/css" href="#if(!$j.startsWith('http:'))$wwwRoot#end$j" />
-#end#end
-
-<script type="text/javascript" src="$wwwRoot/js/jquery.js"></script>
-#if( $!addJs )#foreach( $j in $addJs )
-<script type="text/javascript" src="#if(!$j.startsWith('http:'))$wwwRoot#end$j"></script>
-#end#end
-#*
-<link media="screen" href="$wwwRoot/style/main_v2.css" type="text/css" rel="stylesheet" />
-<link media="print" href="$wwwRoot/style/printer.css" type="text/css" rel="stylesheet" />*#
-<style>
-
-HTML {}
-BODY {
-font-size : 10pt ;
-font-family : Arial;
-margin:	0;
-padding: 0;
-width:210mm;
-height: 279mm;
-}
-TABLE{ font-size:1em; border : 2px solid #000; border-collapse: collapse }
-TH { border: 1px solid #000 ;  }
-TD { text-align: right; border: 1px solid #000 ; padding: 1pt 2pt;}
-TD.l { text-align: left; }
-TD.c { text-align: center; }
-</style>
-
-</head>
-
-<body>
-
-
-
-<div id="container"><div id="corpo">
-<br />
 
 ##
 ##
@@ -96,4 +53,4 @@ TD.c { text-align: center; }
 </td>
 </tr>
 #end
-</table><br>
+</table>

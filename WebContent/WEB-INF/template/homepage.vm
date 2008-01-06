@@ -2,14 +2,21 @@
 #parse('costanti.vm')
 #parse('header.vm')
 
+<div class="view">
 #parse('stalli/table.vm')
 
-<iframe name="stp" src=".main?p=1" width="10" height="10" style="visibility:hidden;position:absolute;"></iframe>
+##<iframe name="stp" src=".main?p=1" width="10" height="10" style="visibility:hidden;position:absolute;"></iframe>
 
 <div class="commands">
 <ul>
-<li><a href="#" onclick="stp.print(); return false;"><img src="$!images/action-ico-registra.png" />Stampa</a></li>
+<li><a href="#" onclick="window.stp.focus();window.stp.print(); return false;"><img src="$!images/action-ico-registra.png" />Stampa</a></li>
 </ul>
+</div>
+
+</div>
+
+<div class="print">
+#parse('stalli/print.vm')
 </div>
 
 #parse('footer.vm')

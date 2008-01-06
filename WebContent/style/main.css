@@ -17,6 +17,7 @@ height: 100%;
 position : relative ;
 text-align:center;
 }
+.print {display: none ;}
 HR { display:	none }
 FORM {
 	padding : 0px ; margin : 0px ;

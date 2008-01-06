@@ -27,12 +27,12 @@ white-space: nowrap;
 }
 
 table.scroll th  {
-padding: 2px;
-/*	background-color: #ebf3fd; */
+padding: 2px;background-color: #ebf3fd; t
+/*	background-color: #ebf3fd; text-align: left;
+font-weight: normal;*/
 border-bottom: 1px solid #CBC7B8; 
 border-left: 1px solid #D4D0C8; 
-text-align: left;
-font-weight: normal;
+
 overflow: hidden;
 }
 

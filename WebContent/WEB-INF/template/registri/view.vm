@@ -37,7 +37,7 @@ row.className = isover ? 'hi' : row.getAttribute('origClass');
 window.onload = initRowHighlighting;
 </script>
 *#
-#set( $addCss = ['/style/tablefilter/tableFilter.aggregator.css','/style/tablefilter/tableFilter.css','/style/grid.css','/js/jquery.ui/themes/flora/flora.dialog.css','/js/jquery.ui/themes/flora/flora.resizable.css'] )
+#set( $addCss = ['/style/tablefilter/tableFilter.aggregator.css','/style/tablefilter/tableFilter.css','/style/grid.css','/js/jquery.ui/themes/flora/flora.dialog.css','/js/jquery.ui/themes/flora/flora.all.css'] )
 #set( $addJs = ['/js/jquery.jqgrid/jquery.jqGrid.js','/js/jquery.ui/ui.calendar.js','/js/jquery.ui/ui.dimensions.js','/js/jquery.ui/ui.mouse.js','/js/jquery.ui/ui.draggable.js','/js/jquery.ui/ui.resizable.js','/js/jquery.ui/ui.dialog.js'])
 #parse('header.vm')
 
@@ -102,16 +102,16 @@ jQuery("#tablemovimenti").jqGrid({
 url:'.registri?$!{regiva}json=true&records=$!records&idMerce='+ '' + '&inputNum= ' + $("#inputNum").val() + '&inputDal=' + $("#inputDal").val() + '&inputAl=' + $("#inputAl").val() + '&ndS='+new Date().getTime(),
 datatype: 'json', 
 height: 350, 
-colNames:['N.','Cons.','Part.' ,'Data', 'Documento', 'Merce','umido<br />IN','umido<br />OUT','secco<BR >IN','secco<BR />OUT'
+colNames:['N.','Data','Cons.','Part.' , 'Documento', 'Merce','umido<br />IN','umido<br />OUT','secco<BR >IN','secco<BR />OUT'
 #if($iva) ,'&euro;','$'#end ],
 colModel:[
 {name:'numero',index:'numregistro',width:50,align:'center',filterType:'text'},
-{name:'consegna',index:'C.numero',width:60,align:'center',filterType:'text'},
-{name:'n_partitario',index:'C.numpartitario',width:40,align:'center'},
 {name:'data',index:'data',width:80,align:'center',filterType:'date'},
-{name:'documento',index:'documento',width:100},
+{name:'consegna',index:'C.numero',width:60,align:'center',filterType:'text'},
+{name:'n_partitario',index:'C.numpartitario',width:50,align:'center'},
+{name:'documento',index:'documento',width:100,sortable:false},
 {name:'merce',index:'M.nome',width:120,filterType:'select'},
-		  ##options:[#foreach($m in $merci)#if($velocityCount  >1),#end {name:'$m.Nome',value:'$m.Id'}#end]},
+##options:[#foreach($m in $merci)#if($velocityCount  >1),#end {name:'$m.Nome',value:'$m.Id'}#end]},
 {name:'umido_in',index:'umido',width:60,sortable:false},
 {name:'umido_out',index:'umido',width:60,sortable:false},
 {name:'secco_in',index:'secco',width:60,sortable:false}, 
@@ -121,12 +121,9 @@ colModel:[
 {name:'val_dollari',index:'valoreeuro',width:60,sortable:false}
 #end
 ],
-#if($iva)
 width:920
-#else
-width:800
-#end
-,rowNum:100,rowList:[10,25,50], 
+
+,rowNum:15,rowList:[15,30,60], 
 loadtext:'Caricamento dati...',
 imgpath: 'images', 
 pager: jQuery('#pager')
@@ -176,36 +173,40 @@ catch(e){alert(e.message);}
 var from = 0, to = 0;
 
 function printIFrame(f, t) {
-stp.print();
 from = f ; to = t ;
 var iva = #if($isIva)'true'#else'false'#end ;
+window.print();
 $('#dlg_Confirm').dialogOpen();
 }
 function confirmedStampa() {
 var iva = #if($isIva)'true'#else'false'#end ;
-stp.location.href='.registri?iva=' + iva + '&confirm=1&cmd=stampa&f=' + from + '&t=' + to ;
+//stp.location.href='.registri?iva=' + iva + '&confirm=1&cmd=stampa&f=' + from + '&t=' + to ;
+$('#ret').load('.registri?iva=' + iva + '&confirm=1&cmd=stampa&f=' + from + '&t=' + to , 
+		{} , function() {$('#dlg_Confirm').dialogClose();});
+
 }
 function stampaRegistro() {
 var numpag = document.getElementById('numPaginePrint').value;
 var from = document.getElementById('fromMovimento').value;
-var iva = #if($isIva)'true'#else'false'#end ;
-stp.location.href='.registri?iva=' + iva + '&cmd=stampa&f=' + from + '&n=' + numpag ;
+var iva = #if($isIva || $iva)'true'#else'false'#end ;
+
+//stp = window.open( '.registri?iva=' + iva + '&cmd=stampa&f=' + from + '&n=' + numpag , '' , 'width=10,height=10');
+//window.focus();
+##stp.location.href='.registri?iva=' + iva + '&cmd=stampa&f=' + from + '&n=' + numpag ;
+
+$('#ret').load('.registri?iva=' + iva + '&cmd=stampa&f=' + from + '&n=' + numpag ) ;
 $('#dlg_Print').dialogClose();
 }
+var stp ;
 </script> 
 
-
-<iframe name="stp" src="voidreg.html" width="10" height="10" style="visibility:hidden;position:absolute;"></iframe>
+##<iframe name="stp" src="voidreg.html" width="10" height="10" style="visibility:hidden;position:absolute;"></iframe>
 
 #set($dateFormat = 'dd/MM/yy')
-##
-#if($iva)
-##parse('registri/inner_iva.vm')
-<h2>Registro IVA</h2>
-#else 
-<h2>Registro Doganale</h2>
-##parse('registri/inner_doganale.vm')
-#end
+
+<div class="print" id="ret"></div>
+
+<div class="view">
 
 <table border="0" id="tablemovimenti" class="scroll" cellpadding="0" cellspacing="0"></table>
 <div id="pager"  class="scroll"></div>
@@ -232,5 +233,6 @@ a partire dal movimento numero <input type="text" id="fromMovimento" value="$!pr
 La stampa &egrave; stata completata correttamente ?
 </div>
 #parse('footer.vm')
-#end
 
+</div>
+#end

@@ -109,8 +109,10 @@ public class MerceAdapter extends BeanAdapter2 {
 	public void clearTable() throws IOException {
 		Connection c = db.getConnection();
 		
-		db.executeNonQuery("DROP TABLE zbck_" + getTable() , 
-				c );
+		try { 
+			db.executeNonQuery("DROP TABLE zbck_" + getTable(),
+				c );}
+		catch ( Exception e ) {}
 		db.executeNonQuery("CREATE TABLE zbck_" + getTable() + 
 				" SELECT * FROM "  + getTable() , 
 				c );

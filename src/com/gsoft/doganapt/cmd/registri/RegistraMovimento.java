@@ -57,7 +57,7 @@ public class RegistraMovimento extends VelocityCommand {
 	public VelocityCommand clone() {
 		return  new RegistraMovimento(this.callerServlet);
 	}
-	MovimentoAdapter adapter = null ;
+	MovimentoAdapter adapter = null ; 
 	
 	public BeanAdapter2 getAdapter() throws Exception  {
 		if ( adapter == null ) {

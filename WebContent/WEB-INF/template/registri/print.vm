@@ -1,25 +1,10 @@
 #parse('costanti.vm')
-<html>
-<head>
-<title>$htmlTitle</title>
 
-
-#if( $!addCss )#foreach( $j in $addCss )
-<link rel="stylesheet" type="text/css" href="#if(!$j.startsWith('http:'))$wwwRoot#end$j" />
-#end#end
-
-<script type="text/javascript" src="$wwwRoot/js/jquery.js"></script>
-#if( $!addJs )#foreach( $j in $addJs )
-<script type="text/javascript" src="#if(!$j.startsWith('http:'))$wwwRoot#end$j"></script>
-#end#end
-#*
-<link media="screen" href="$wwwRoot/style/main_v2.css" type="text/css" rel="stylesheet" />
-<link media="print" href="$wwwRoot/style/printer.css" type="text/css" rel="stylesheet" />*#
-<style type="text/css">
+<style type="text/css" media="print">
 
 HTML {}
 BODY {
-font-size : 8pt ;
+font-size : 10pt ;
 font-family : Arial;
 margin:	0;
 padding: 15mm 0 0 0;
@@ -40,15 +25,13 @@ TD.c { text-align: center; }
 var from = 0 ;
 var to = 0 ;
 </script>
-</head>
 
-<body>
 #set($sumSecco = 0)
 #set($sumUmido = 0)
 #foreach( $m in $list )
 #if($velocityCount % $righePerPagina == 1 )
 #if($velocityCount > 1 )</table>#end
-#if($velocityCount > 2 )<div id="pb">&nbsp;-</div>#end
+#if($velocityCount > 2 )<div class="pb">&nbsp;</div>#end
 <table border="0" class="movimenti" cellpadding="2" cellspacing="0" id="tablemovimenti">
 <thead>
 <tr>
@@ -82,7 +65,7 @@ Num.</th>
 #end
 #if($velocityCount == $list.size() )<script type="text/javascript">to = $m.NumRegistro</script>#end
 <tr#if($velocityCount%2  == 0) class="odd"#end>
-<td class="c">$velocityCount $m.NumRegistro</td>
+<td class="c">$m.NumRegistro</td>
 <td>$tools.Date.format($dateFormat, $m.Data).toUpperCase()</td>
 <td class="c">#if($m.Documento)$m.Documento#else - #end#if($m.DocumentoPV)<br />($m.DocumentoPV)#end</td>
 <td class="c">$!m.Consegna.Numero</td>
@@ -127,6 +110,5 @@ Num.</th>
 </table>
 ##
 <script type="text/javascript">
-window.parent.printIFrame(from, to);
+printIFrame(from, to);
 </script>
-</body></html>

@@ -28,12 +28,12 @@ public class PtMerciImporter {
 	PtMerciImporter() {
 		
 		String f = ConfigManager.getProperty("anagrafiche.filename") ;
-		
-		adb = new AccessDB(f) ;
-		
-		quadAdp = new MerceQuadrelliAdapter(adb) ;
-		adp = new MerceAdapter() ;
-	
+		if ( f != null ) {
+			adb = new AccessDB(f,"sa", "QuaBil") ;
+			
+			quadAdp = new MerceQuadrelliAdapter(adb) ;
+			adp = new MerceAdapter() ;
+		}
 	}
 	
 	public AccessDB getAccessDB() {
@@ -44,16 +44,16 @@ public class PtMerciImporter {
 		
 		Vector<Object> listQ = quadAdp.getAll();
 		
-		adp.clearTable() ;
+//		adp.clearTable() ;
 		
-//		Merce m  = null ;
+		Merce m  = null ;
 		Merce mQ = null ;
 		
 		for ( Iterator iQ = listQ.iterator() ; iQ.hasNext() ; ) {
 			mQ = (Merce) iQ.next() ;
 			
+//			m = MerceAdapter.get(id)
 			mQ.setId(null);
-
 			adp.create(mQ);
 			
 		}
