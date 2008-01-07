@@ -10,6 +10,7 @@
 <div class="commands">
 <ul>
 <li><a href="#" onclick="window.stp.focus();window.stp.print(); return false;"><img src="$!images/action-ico-registra.png" />Stampa</a></li>
+<li><a href=".main" ><img src="$!images/action-ico-elimina.png" />Esci</a></li>
 </ul>
 </div>
 

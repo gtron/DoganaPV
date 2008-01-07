@@ -1,6 +1,6 @@
 <div class="mainMenu">
 <ul>
-<li #if($activeMenu=='PRINCIPALE')class="set"#end><div><a href=".main" #if($selectedButton == 1)class="hi"#end><img src="$!images/tab-ico-principale.png" />&nbsp;PRINCIPALE</a></div></li>
+<li #if($activeMenu=='PRINCIPALE')class="set"#end><div><a href=".main?cmd=home" #if($selectedButton == 1)class="hi"#end><img src="$!images/tab-ico-principale.png" />&nbsp;PRINCIPALE</a></div></li>
 ##<li class="sp">&nbsp;</li>
 <li #if($activeMenu=='PARTITARI')class="set"#end><div><a href=".consegne?cmd=list"><img src="$!images/tab-ico-consegne.png" />&nbsp;PARTITARI</span></a></div></li>
 ##<li class="sp">&nbsp;</li>

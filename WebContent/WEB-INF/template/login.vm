@@ -1,0 +1,20 @@
+#set($activeMenu='PRINCIPALE')
+#parse('costanti.vm')
+#parse('header.vm')
+
+<br />
+
+<form action="?" method="post" >
+<div style="text-align:center">
+<h1>Autenticazione utente</h1>
+Utente : <select size="1" name="user">
+<option value="user">utente</option>
+</select> <br /><br />
+Password: <input type="password" name="pwd" /><br />
+<br />
+<input type="submit" value="Entra" />
+</div>
+</form>
+<br /><br /><br />
+
+#parse('footer.vm')

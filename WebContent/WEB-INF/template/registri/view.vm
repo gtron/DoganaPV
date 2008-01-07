@@ -73,9 +73,10 @@ var f = document.getElementById('fromPagina').value ;
 if ( n + 10 == 10 ) return false;
 if ( f + 10 == 10 ) return false;
 
-stp.printPages( 1 * n, 1 * f);
-
-$("#dlg_Prepara").dialogClose();
+// stp.printPages( 1 * n, 1 * f);
+//alert( '.registri?cmd=prepara&f=' + f + '&t=' + ( 1 * f + 1 * n ) );
+$('#ret').load('.registri?cmd=prepara&f=' + f + '&t=' + ( ( 1 * f + 1 * n ) - 1 ) , 
+		{} , function() {$('#dlg_Prepara').dialogClose();window.print();});
 //setTimeout( function() { w.printPages(5,102); } , 1000 ) ;
 }
 

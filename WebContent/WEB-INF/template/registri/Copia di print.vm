@@ -1,6 +1,21 @@
 #parse('costanti.vm')
+<html>
+<head>
+<title>$htmlTitle</title>
 
-<style type="text/css" media="print">
+
+#if( $!addCss )#foreach( $j in $addCss )
+<link rel="stylesheet" type="text/css" href="#if(!$j.startsWith('http:'))$wwwRoot#end$j" />
+#end#end
+
+<script type="text/javascript" src="$wwwRoot/js/jquery.js"></script>
+#if( $!addJs )#foreach( $j in $addJs )
+<script type="text/javascript" src="#if(!$j.startsWith('http:'))$wwwRoot#end$j"></script>
+#end#end
+#*
+<link media="screen" href="$wwwRoot/style/main_v2.css" type="text/css" rel="stylesheet" />
+<link media="print" href="$wwwRoot/style/printer.css" type="text/css" rel="stylesheet" />*#
+<style type="text/css">
 
 HTML {}
 BODY {
@@ -25,7 +40,9 @@ TD.c { text-align: center; }
 var from = 0 ;
 var to = 0 ;
 </script>
+</head>
 
+<body>
 #set($sumSecco = 0)
 #set($sumUmido = 0)
 #foreach( $m in $list )
@@ -110,6 +127,11 @@ Num.</th>
 </table>
 ##
 <script type="text/javascript">
-if ( from > 0 )
-printIFrame(from, to);
+try{
+window.print();
+
+// parent.printIFrame(from, to);
+}
+catch( e) { alert( 'Frame:' + e.message); }
 </script>
+</body></html>

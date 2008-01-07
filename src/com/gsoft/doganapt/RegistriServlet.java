@@ -1,6 +1,14 @@
 package com.gsoft.doganapt;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.velocity.Template;
+import org.apache.velocity.context.Context;
+
 import com.gsoft.doganapt.cmd.registri.DeregistraMovimento;
+import com.gsoft.doganapt.cmd.registri.PreparaRegistro;
 import com.gsoft.doganapt.cmd.registri.RegistraMovimento;
 import com.gsoft.doganapt.cmd.registri.Stampa;
 import com.gsoft.doganapt.cmd.registri.ViewRegistro;
@@ -23,6 +31,23 @@ public class RegistriServlet extends TooledServlet {
 		addCommand( Commands.STAMPA,
 				new Stampa( this ) ) ;
 		
+		addCommand( Commands.PREPARA,
+				new PreparaRegistro( this ) ) ;
+		
+	}
+	
+	protected Template handleRequest(HttpServletRequest request, HttpServletResponse response, Context ctx) throws Exception {
+
+		HttpSession s =  request.getSession(false);
+		Boolean logged = null ; 
+		
+		if ( s != null )
+			logged = (Boolean) s.getAttribute("logged") ;
+		
+		if ( logged != Boolean.TRUE ) {
+			response.sendRedirect(".main");
+		}
+		return super.handleRequest(request, response, ctx) ;
 	}
 	
 	
@@ -31,5 +56,6 @@ public class RegistriServlet extends TooledServlet {
 		public static final String STAMPA = "stampa" ;
 		public static final String ASSEGNAREG = "assegnaReg" ;
 		public static final String DEREGISTRA = "deregistra" ;
+		public static final String PREPARA = "prepara" ;
 	}
 }

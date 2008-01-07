@@ -1,0 +1,9 @@
+#parse('costanti.vm')
+<link rel="stylesheet" type="text/css" href="$wwwRoot/style/registro.css" media="print" />
+#foreach( $i in $list )
+<div class="page">
+<div class="topsx">Portovesme s.r.l.</div>
+<div class="nomeReg">REGISTRO DI CARICO E SCARICO</div>
+<div class="num"><span>$i</span></div>
+</div>
+#end

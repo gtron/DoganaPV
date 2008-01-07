@@ -1,5 +1,12 @@
 package com.gsoft.doganapt;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.velocity.Template;
+import org.apache.velocity.context.Context;
+
 import com.gsoft.doganapt.cmd.consegne.ApriConsegna;
 import com.gsoft.doganapt.cmd.consegne.ChiudiConsegna;
 import com.gsoft.doganapt.cmd.consegne.ChiudiPFPC;
@@ -65,5 +72,19 @@ public class ConsegneServlet extends TooledServlet {
 		
 		public static final String POPOLA_STALLI = "popola" ;
 		public static final String IMMETTILP = "immettiLP" ;
+	}
+	
+	protected Template handleRequest(HttpServletRequest request, HttpServletResponse response, Context ctx) throws Exception {
+
+		HttpSession s =  request.getSession(false);
+		Boolean logged = null ; 
+		
+		if ( s != null )
+			logged = (Boolean) s.getAttribute("logged") ;
+		
+		if ( logged != Boolean.TRUE ) {
+			response.sendRedirect(".main");
+		}
+		return super.handleRequest(request, response, ctx) ;
 	}
 }

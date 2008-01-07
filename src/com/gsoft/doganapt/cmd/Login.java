@@ -7,36 +7,42 @@ import javax.servlet.http.HttpSession;
 import org.apache.velocity.Template;
 import org.apache.velocity.context.Context;
 
-import com.gsoft.doganapt.data.Stallo;
 import com.gtsoft.utils.http.VelocityCommand;
 import com.gtsoft.utils.http.servlet.GtServlet;
 
-public class Homepage extends VelocityCommand {
+public class Login extends VelocityCommand {
 
-	protected static final String HOMEPAGE = "homepage.vm" ;
-	protected static String PRINT = "stalli/print.vm";
+	protected static final String T = "login.vm" ;
 	
-//	private static final String ID = "id" ; 
-	
-	public Homepage ( GtServlet callerServlet) {
+	public Login ( GtServlet callerServlet) {
 		super(callerServlet);
 	}
 
 	public VelocityCommand clone() {
-		return  new Homepage(this.callerServlet);
+		return  new Login(this.callerServlet);
 	}
 
 	public Template exec(HttpServletRequest req, HttpServletResponse resp, Context ctx) throws Exception  {
 		
-		HttpSession s =  req.getSession(false);
+		HttpSession s =  req.getSession();
 		
-		Boolean logged = (Boolean) s.getAttribute("logged") ;
-		if ( logged != Boolean.TRUE ) {
-			resp.sendRedirect(".main");
+		String user = getParam("user", false);
+		String pwd  = getParam("pwd", false);
+		if ( "user".equals(user)) {
+			
+			if ( pwd != null && pwd.equals("d0gan4") ) {
+				s.setAttribute("logged", Boolean.TRUE) ;
+				resp.sendRedirect(".main?cmd=home");
+			}
+			else {
+				ctx.put("msg", "Password errata!") ;
+			}
+		}
+		else {
+			s.setAttribute("logged", Boolean.FALSE) ;
 		}
 		
-		
-		ctx.put("stalli", Stallo.newAdapter().getAll("id") );
+		ctx.put("user", user) ;
 		
 //		BeanAdapter2 adp = BeanAdapter2.newAdapter();
 //		ctx.put( ContextKeys.LIST , adp.getAll() ) ;
@@ -51,10 +57,7 @@ public class Homepage extends VelocityCommand {
 
 	
 	public String getTemplateName() {
-		if ( getBooleanParam("p") )
-			return PRINT ;
-		else
-			return HOMEPAGE ;
+		return T ;
 	}
 	
 	

@@ -81,7 +81,7 @@ public class ViewRegistro extends VelocityCommand {
 		Integer rows = getIntParam	(ROWS, false);
 		String nomeColonna = getParam(SIDX, false);
 		String ascDesc = getParam(SORD, false);
-		HttpSession session=request.getSession(true);
+		HttpSession session=request.getSession();
 		Hashtable<String, String> hashOrder=(Hashtable<String, String>)session.getAttribute(HASHORDER);
 		if(hashOrder==null){
 			 hashOrder=new Hashtable<String, String>();
