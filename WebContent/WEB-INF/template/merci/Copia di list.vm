@@ -1,0 +1,12 @@
+#parse('costanti.vm')
+#parse('header.vm')
+
+<table align="center" width="80%">
+#foreach( $m in $merci ) 
+<tr>
+<td>$m.CodiceQuadrelli</td>
+<td><a href="?cmd=edit&id=$m.Id">$m.Nome</a></td>
+</tr>
+#end
+</table>
+#parse('footer.vm')

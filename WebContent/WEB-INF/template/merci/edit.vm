@@ -1,0 +1,52 @@
+#parse('costanti.vm')
+#parse('header.vm')
+
+<h2>
+#if ( $obj )
+Modifica Merce <small>[$obj.Id]</small>
+#else
+Nuova Merce 
+#end
+</h2>
+<form action="?" method="post" id="editForm">
+#if( $result ) <div id="result">Modifica effettuata</div> #end
+<center>
+<br>
+Codice Quadrelli :  <input type="text" value="$!obj.CodiceQuadrelli" name="codquadrelli" /> - 
+Nome :  <input type="text" value="$!obj.Nome" name="nome" /><br>
+
+<input type="hidden" name="cmd" value="edit" />
+<input type="hidden" name="exec" value="1" />
+<input type="hidden" name="id" value="$!obj.Id" />
+</center>
+
+<br><br>
+
+
+
+#if( $param_error ) 
+$param_error.ParamName
+##$param_error.printStackTrace()
+<script type="text/javascript">
+
+</script>
+#end
+
+<div align="center">
+
+<br>
+
+</div>
+
+<div class="commands">
+<ul>
+
+<li><a href="#" onclick="getElementById('editForm').submit();"><img src="$!images/action-ico-registra.png" />Salva</a></li>
+<li><a href="?"><img src="$!images/action-ico-elimina.png" /> Annulla</a></li>
+
+</ul>
+</div>
+
+
+#parse('footer.vm')
+

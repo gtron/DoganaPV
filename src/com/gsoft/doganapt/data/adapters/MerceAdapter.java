@@ -92,9 +92,18 @@ public class MerceAdapter extends BeanAdapter2 {
 		return TABLE ;
 	}
 	
+	public Object create(Object o) throws IOException {
+		Object c = super.create(o);
+		clearCache();
+		return c ;
+	}
 	public void update(Object o) throws IOException {
 		super.update(o);
-		cache.remove(((Merce)o).getId());
+		clearCache();
+	}
+	public void update() throws IOException {
+		super.update();
+		clearCache();
 	}
 	public Vector getAll(String orderby) throws Exception {
 		Vector list = super.getAll(orderby);
@@ -152,6 +161,28 @@ public class MerceAdapter extends BeanAdapter2 {
 		list.addAll(cache.values());
 		
 		Collections.reverse(list);
+		
+		return list; 
+	}
+	
+	public static ArrayList<Object> getAllCachedRegistro(MovimentoAdapter adp ) throws Exception {
+		if ( cache.size() < 1 ) {
+			Merce.newAdapter().getAll("nome");
+		}
+		
+		ArrayList<Object> list = new ArrayList<Object>(cache.size());
+		Merce m = null ;
+		Vector<Integer> ids = adp.getIdMerci();
+		
+		for( Iterator i = cache.values().iterator() ; i.hasNext() ; ) {
+			m = (Merce)i.next();
+			for ( Iterator<Integer> is = ids.iterator() ; is.hasNext() ;  ) {
+				if ( is.next().equals(m.getId())  ) {
+					list.add(m);
+					continue;
+				}
+			}
+		}
 		
 		return list; 
 	}

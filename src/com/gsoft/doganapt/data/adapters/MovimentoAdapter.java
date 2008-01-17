@@ -322,6 +322,32 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		return list ;
 	}
 	
+	public Vector<Integer>  getIdMerci() throws Exception {
+		StringBuilder sql = new StringBuilder(70)
+					.append("SELECT distinct idmerce FROM ")
+					.append(getTable()).append(" WHERE numregistro > 0 ")  
+					;
+		Connection conn = db.getConnection() ;
+		Vector<Integer> list = null ;
+		try {
+			
+			PreparedStatement s = conn.prepareStatement(sql.toString()) ;
+			
+			ResultSet rs = s.executeQuery() ;
+			
+			list = new Vector<Integer>(rs.getFetchSize()) ;
+	
+			if (rs != null )
+				while( rs.next() ) 
+					list.add( (Integer) rs.getObject(1) );
+			
+		}
+		finally {
+			db.freeConnection(conn);
+		}
+		return list ;
+	}
+	
 	public Vector getRegistro( boolean soloRegistrati , Consegna c ) throws Exception {
 		return getRegistro( soloRegistrati , c,null,null,null,null,null,null,null,null );
 	}
@@ -394,7 +420,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		
 		if( dal != null && al!=null){
 			sql.append(" AND '").append(dal.fullString()).
-				append("' < data AND '").append(al.fullString()).append("' > data ");
+				append("' <= data AND '").append(al.fullString()).append("' >= data ");
 		}
 		sql.append(" GROUP BY ");
 		

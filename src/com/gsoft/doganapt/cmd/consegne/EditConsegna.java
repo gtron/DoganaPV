@@ -7,6 +7,7 @@ import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.context.Context;
@@ -32,6 +33,10 @@ public class EditConsegna extends BeanEditor {
 	}
 	public Template exec(HttpServletRequest req, HttpServletResponse resp, Context ctx) throws Exception  {
 		
+		HttpSession s = req.getSession() ;
+		if ( s != null )
+			ctx.put("isAdmin", s.getAttribute("admin") ) ;
+		
 		Collection stalli = StalloAdapter.getAllCached();
 		ctx.put("merci" ,  MerceAdapter.getAllCached());
 		ctx.put("iters" ,  IterAdapter.getAllCached());
@@ -56,7 +61,8 @@ public class EditConsegna extends BeanEditor {
 				
 				//if ( ! c.isAperta() && ! c.isChiusa() ) 
 				
-				aggiornaStalli(c, stalli);
+				if ( Boolean.TRUE.equals( s.getAttribute("admin") ) ) 
+						aggiornaStalli(c, stalli);
 				
 				ctx.put("result", Boolean.TRUE ) ;
 	

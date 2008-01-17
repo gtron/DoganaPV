@@ -13,6 +13,13 @@ public class Merce extends ModelBean2 {
 	Integer idIterDefault;
 	String codiceQuadrelli;
 	
+	Boolean hasRegistroIva = null;
+	Boolean hasRegistroDog = null;
+	
+	public Boolean hasRegistro( Boolean isIva ) {
+		
+		return Boolean.TRUE;
+	}
 	
 	public Integer getId() {
 		return id;

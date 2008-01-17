@@ -18,7 +18,7 @@ import com.gtsoft.utils.http.servlet.GtServlet;
 
 public class Stampa extends VelocityCommand {
 	
-	private final static Integer ROWS_PER_PAGE = new Integer(20);
+	private final static Integer ROWS_PER_PAGE = new Integer(15);
 	
 	public Stampa ( GtServlet callerServlet) {
 		super(callerServlet);
@@ -27,7 +27,7 @@ public class Stampa extends VelocityCommand {
 
 		ctx.put( "isIva", getBooleanParam("iva", false) );
 		ctx.put( "righePerPagina", ROWS_PER_PAGE );
-		
+
 		getAdapter();
 
 		Integer num = getIntParam("n", false);
@@ -61,7 +61,7 @@ public class Stampa extends VelocityCommand {
 		if ( adapter == null ) {
 			if ( getBooleanParam("iva", false) ) 
 				adapter = new MovimentoIvaAdapter();
-			else 
+			else
 				adapter = new MovimentoDoganaleAdapter();
 		}
 		

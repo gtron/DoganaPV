@@ -11,7 +11,8 @@
 <td colspan="8" class="c"><strong>Parco $s.Parco</strong></td>
 </tr>
 <tr>
-<th>$s.Parco</th>
+##<th>$s.Parco</th>
+<th>Stallo</th>
 <th>Merce</th>
 <th>Consegna</th>
 <th>Partitario</th>

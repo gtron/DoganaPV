@@ -9,6 +9,7 @@
 <h1>Autenticazione utente</h1>
 Utente : <select size="1" name="user">
 <option value="user">utente</option>
+<option value="admin">amministratore</option>
 </select> <br /><br />
 Password: <input type="password" name="pwd" /><br />
 <br />

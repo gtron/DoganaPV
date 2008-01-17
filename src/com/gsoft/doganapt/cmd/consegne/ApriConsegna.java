@@ -76,7 +76,8 @@ public class ApriConsegna extends VelocityCommand {
 						
 						sAdp.update(s);
 					}
-					else {
+					else if ( ! c.getIdIter().equals( 4 )) {
+						
 						ctx.put( "list" ,  new ConsegnaAdapter().getNonChiuse( ) ) ;
 						throw new UserException("Attenzione, lo stallo " + s  + " non è libero !") ;
 					}

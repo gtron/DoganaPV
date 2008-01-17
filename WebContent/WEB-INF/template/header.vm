@@ -27,7 +27,7 @@
 
 <div id="containTestata">
 <div id="testata">
-<h1>$siteTitle</h1>
+<h1><small style="font-variant:normal">$subTitle<br /></small>$siteTitle</h1>
 ##<a id="newEvento" href=".eventi?cmd=edit" onclick="try { newEvento(); }catch( e){alert(e);} ;return false;">Nuovo</a>
 <br /><br />
 #parse('mainmenu.vm')

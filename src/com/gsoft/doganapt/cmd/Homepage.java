@@ -30,12 +30,14 @@ public class Homepage extends VelocityCommand {
 		
 		HttpSession s =  req.getSession(false);
 		
+		if ( s == null )  return null ;
 		Boolean logged = (Boolean) s.getAttribute("logged") ;
 		if ( logged != Boolean.TRUE ) {
 			resp.sendRedirect(".main");
 		}
 		
-		
+		ctx.put("isAdmin", s.getAttribute("admin") ) ;
+
 		ctx.put("stalli", Stallo.newAdapter().getAll("id") );
 		
 //		BeanAdapter2 adp = BeanAdapter2.newAdapter();

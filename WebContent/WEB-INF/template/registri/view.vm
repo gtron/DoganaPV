@@ -35,6 +35,8 @@ row.className = isover ? 'hi' : row.getAttribute('origClass');
 }
 
 window.onload = initRowHighlighting;
+
+
 </script>
 *#
 #set( $addCss = ['/style/tablefilter/tableFilter.aggregator.css','/style/tablefilter/tableFilter.css','/style/grid.css','/js/jquery.ui/themes/flora/flora.dialog.css','/js/jquery.ui/themes/flora/flora.all.css'] )
@@ -57,7 +59,7 @@ row.onmouseout = function() { highlightRow(this, false);}
 
 function highlightRow( row, isover) { 
 if ( row.getAttribute('origClass') == null )
-	row.setAttribute('origClass' , row.className) ;
+	row.setAttribute('origClass' , row.className);
 	
 row.className = isover ? 'hi' : row.getAttribute('origClass');
 }
@@ -102,7 +104,7 @@ jQuery("#tablemovimenti").jqGrid({
 #if($iva)#set($regiva='iva=true&')#end
 url:'.registri?$!{regiva}json=true&records=$!records&idMerce='+ '' + '&inputNum= ' + $("#inputNum").val() + '&inputDal=' + $("#inputDal").val() + '&inputAl=' + $("#inputAl").val() + '&ndS='+new Date().getTime(),
 datatype: 'json', 
-height: 350, 
+height: 450, 
 colNames:['N.','Data','Cons.','Part.' , 'Documento', 'Merce','umido<br />IN','umido<br />OUT','secco<BR >IN','secco<BR />OUT'
 #if($iva) ,'&euro;','$'#end ],
 colModel:[
@@ -126,20 +128,30 @@ width:920
 
 ,rowNum:15,rowList:[15,30,60], 
 loadtext:'Caricamento dati...',
+loadComplete: function(){ 
+// -- 
+var arr = document.getElementsByTagName('input');
+var el ;
+for( var i = 0 ; i < arr.length ; i++ ) {
+el = arr[i];
+if ( el.type == 'checkbox' ) el.onclick = doSearch  ;
+}
+//--
+} ,
 imgpath: 'images', 
 pager: jQuery('#pager')
 });
 
-     popUpCal.regional['it'] = {clearText: 'Svuota', closeText: 'Chiudi',
-		prevText: '&lt;Prec', nextText: 'Succ&gt;', currentText: 'Oggi',
-		dayNames: ['Do','Lu','Ma','Me','Gio','Ve','Sa'],
-	monthNames: ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
+ popUpCal.regional['it'] = {clearText: 'Svuota', closeText: 'Chiudi',
+	prevText: '&lt;Prec', nextText: 'Succ&gt;', currentText: 'Oggi',
+	dayNames: ['Do','Lu','Ma','Me','Gio','Ve','Sa'],
+monthNames: ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
 	'Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre']};
 popUpCal.setDefaults(popUpCal.regional['it']);
    }
  
 );
-function doSearch(){ 
+function doSearch(){
 try{
 	var active=jQuery("#actNum");
 	var numero='';
@@ -161,7 +173,7 @@ try{
 	active=jQuery("#actMerce");
 	var idmerce='';
 	if(active.attr('checked')==true)
-		idmerce = jQuery("#selmerce").val();
+		idmerce = ''+ jQuery("#selmerce").val();
 	
 	jQuery("#tablemovimenti").setUrl(".registri?$!regiva&json=true&idMerce="+ idmerce + "&consegna=" + consegne + "&inputNum=" + numero + "&inputDal=" + dal + "&inputAl=" + al); 
 	jQuery("#tablemovimenti").setPage(1);
@@ -198,6 +210,10 @@ var iva = #if($isIva || $iva)'true'#else'false'#end ;
 $('#ret').load('.registri?iva=' + iva + '&cmd=stampa&f=' + from + '&n=' + numpag ) ;
 $('#dlg_Print').dialogClose();
 }
+function stampaCopertina() {
+$('#ret').load('cop_dog.html' ); // , {} , function(){window.print(); } ) ;
+setTimeout( function(){ window.print() } , 1500 );
+}
 var stp ;
 </script> 
 
@@ -218,8 +234,9 @@ var stp ;
 
 <div class="commands">
 <ul>
-<li><a href="#" onclick="$('#dlg_Prepara').dialogOpen(); return false;"><img src="$!images/action-ico-registra.png" />Prepara Pagine</a></li>
-<li><a href="#" onclick="$('#dlg_Print').dialogOpen(); return false;"><img src="$!images/action-ico-registra.png" />Stampa Registro</a></li>
+<li><a href="#" onclick="stampaCopertina(); return false;"><img src="$!images/action-ico-stampa.png" />Copertina</a></li>
+<li><a href="#" onclick="$('#dlg_Prepara').dialogOpen(); return false;"><img src="$!images/action-ico-stampa.png" />Prepara Pagine</a></li>
+<li><a href="#" onclick="$('#dlg_Print').dialogOpen(); return false;"><img src="$!images/action-ico-stampa.png" />Stampa Registro</a></li>
 </ul>
 </div>
 

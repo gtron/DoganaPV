@@ -4,21 +4,6 @@
 #parse('costanti.vm')
 #parse('header.vm')
 
-#*
-
-
-
-<script type="text/javascript" src="_dist/jquery-packed.js"></script>
-<script type="text/JavaScript" src="_dist/jquery.cookies-packed.js"></script>
-<script type="text/javascript" src="_dist/prototypes-packed.js"></script>
-<script type="text/javascript" src="_dist/json-packed.js"></script>
-<script type="text/javascript" src="_dist/jquery.truemouseout-packed.js"></script>
-<script type="text/javascript" src="_dist/daemachTools-packed.js"></script>
-<script type="text/javascript" src="_dist/jquery.tableFilter-packed.js"></script>
-<script type="text/javascript" src="_dist/jquery.tableFilter.aggregator-packed.js"></script>
-<script type="text/javascript" src="_dist/jquery.tableFilter.columnStyle-packed.js"></script>
-*#
-
 <h2>
 Elenco Consegne #if($chiuse)Chiuse#else Attive#end 
 </h2>

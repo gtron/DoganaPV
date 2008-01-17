@@ -7,6 +7,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.velocity.Template;
 import org.apache.velocity.context.Context;
 
+import com.gsoft.doganapt.cmd.merci.EditMerce;
 import com.gsoft.doganapt.cmd.merci.ImportMerci;
 import com.gsoft.doganapt.cmd.merci.ListMerci;
 import com.gsoft.framework.TooledServlet;
@@ -19,6 +20,9 @@ public class MerciServlet extends TooledServlet {
 		addCommand( Commands.DEFAULT ,
 				new ListMerci( this ) ) ;
 		
+		addCommand( Commands.EDIT ,
+				new EditMerce( this ) ) ;
+		
 		addCommand( Commands.DOIMPORT ,
 				new ImportMerci( this ) ) ;
 		
@@ -26,6 +30,7 @@ public class MerciServlet extends TooledServlet {
 
 	public static interface Commands {
 		public static final String DEFAULT = "" ;
+		public static final String EDIT = "edit" ;
 		public static final String DOIMPORT = "import" ;
 	}
 	
@@ -33,11 +38,14 @@ public class MerciServlet extends TooledServlet {
 
 		HttpSession s =  request.getSession(false);
 		Boolean logged = null ; 
+		Boolean admin = null ;
 		
-		if ( s != null )
+		if ( s != null ) {
 			logged = (Boolean) s.getAttribute("logged") ;
+			admin = (Boolean) s.getAttribute("admin") ; 
+		}
 		
-		if ( logged != Boolean.TRUE ) {
+		if ( logged != Boolean.TRUE || admin != Boolean.TRUE   ) {
 			response.sendRedirect(".main");
 		}
 		return super.handleRequest(request, response, ctx) ;

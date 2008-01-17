@@ -7,6 +7,7 @@
 #set( $regIVA = $!obj.Iter.Regiva )
 #set( $regDog = $!obj.Iter.Regdoganale )
 
+<div class="view">
 
 <div id="dettaglio">
 Consegna Num.: <strong>$!obj.Numero</strong> - Partitario : <strong>$!obj.NumeroPartitario</strong><br />
@@ -49,9 +50,13 @@ Tasso di Umidit&agrave;: <strong>$!tools.Number.format('##0.00000', $!obj.TassoU
 #if($hasPartitario)
 #parse('consegne/partitario.vm')
 #end
-
+</div>
+<div id="ret" c lass="print"></div>
 
 <script>
+function printPartitari() {
+$('#ret').load('?id=$obj.Id&cmd=print', {}, function(){windwo.print();} );
+}
 function initRowHighlighting(){
 var table = document.getElementById('tablemovimenti');
 attachRowMouseEvents(table.getElementsByTagName('tr'));
@@ -91,7 +96,7 @@ window.onload = initRowHighlighting;
 
 <div class="commands">
 <ul>
-
+<li><a href="#" onclick="printPartitari();return false;"><img src="$!images/action-ico-stampa.png" /> Stampa</a></li>
 #if($obj.isChiusa())
 
 #elseif($obj.isAperta()) 
@@ -112,7 +117,7 @@ window.onload = initRowHighlighting;
 <li><a href="#" onclick="$('#dlg_LiberaPratica').dialogOpen();"><img src="$!images/action-ico-registra.png" />Immetti in L.P.</a></li>
 #end
 
-#if( $rettificaDone && ! $immissioneLP )
+#if( $rettificaDone && ! $immissioneLP && $obj.isAperta())
 <li><a href="#" id="import_$obj.Id" onclick="openDialog($obj.Id,'#dlg_ImportTo');"><img src="$!images/action-ico-immetti.png" />Importa Scarichi</a></li>
 #if ($obj.isPesoFinalePortoCarico() && ! $registraIVA )
 <li><a href="?id=$obj.Id&amp;cmd=chiudiPFPC&exec=1" onclick="return confirm('Chiudere la consegna?');"><img src="$!images/action-ico-registra.png" />Chiudi PFPC</a></li>
@@ -147,11 +152,11 @@ Data : <input type="text" name="dataLP" size="10" id="dataLP" /><br>
 <fieldset><legend>Documento di Ingresso</legend>
 Tipo: <select name="doc"><option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option></select>
 Numero: <input type="text" name="doc_num" size="4"/>
-Data:  <input type="text" name="doc_data" id="doc_data" size="7"/></fieldset>
+Data:  <input type="text" name="doc_data" id="doc_data" size="9"/></fieldset>
 <fieldset><legend>Documento di Ingresso (Portovesme)</legend>
 Tipo: <select name="docPV"><option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option></select>
 Numero: <input type="text" name="docPV_num" size="4"/>
-Data:  <input type="text" id="docPV_data" name="docPV_data" size="7"/></fieldset>
+Data:  <input type="text" id="docPV_data" name="docPV_data" size="9"/></fieldset>
 <br />
 Note :<br />
 <textarea name="note" cols="40" rows="2"></textarea>

@@ -6,7 +6,7 @@
 <script>
 $().ready(function() 
 { try{
-$("#formConsegne").validate(); 
+// $("#formConsegne").validate(); 
 }
 catch(e){alert(e.message);}
 } 
@@ -97,7 +97,7 @@ Valore unitario : <input name="valoreunitario" size="8" value="$!tools.Number.fo
 <br><br>
 
 </td>
-#if( false && $obj.Id )
+#if( $isAdmin && $obj.Id )
 <td valign="top">
 #set($parco = "")
 #foreach( $s in $stalli ) 
@@ -136,7 +136,7 @@ if( labels[i].htmlFor == '$param_error.ParamName')  {
 
 <script type="text/javascript">
 
-var idConsegna = $obj.Id ;
+var idConsegna = '$!obj.Id' ;
 
 function getDouble(id){
 

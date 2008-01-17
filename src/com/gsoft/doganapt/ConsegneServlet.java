@@ -14,6 +14,7 @@ import com.gsoft.doganapt.cmd.consegne.EditConsegna;
 import com.gsoft.doganapt.cmd.consegne.ImmettiLiberaPratica;
 import com.gsoft.doganapt.cmd.consegne.ListConsegne;
 import com.gsoft.doganapt.cmd.consegne.PopolaStalli;
+import com.gsoft.doganapt.cmd.consegne.PrintConsegna;
 import com.gsoft.doganapt.cmd.consegne.ViewConsegna;
 import com.gsoft.doganapt.cmd.movimenti.EditGruppoMovimenti;
 import com.gsoft.doganapt.cmd.movimenti.EditMovimento;
@@ -26,6 +27,9 @@ public class ConsegneServlet extends TooledServlet {
 		
 		addCommand( Commands.DEFAULT ,
 				new ViewConsegna( this ) ) ;
+		
+		addCommand( Commands.PRINT ,
+				new PrintConsegna( this ) ) ;
 		
 		addCommand(Commands.EDIT , 
 				new EditConsegna(this) ) ;
@@ -62,6 +66,7 @@ public class ConsegneServlet extends TooledServlet {
 	public static interface Commands {
 		public static final String DEFAULT = "" ;
 		public static final String EDIT = "edit" ;
+		public static final String PRINT = "print" ;
 		public static final String EDIT_FATTURA = "editfattura" ;
 		public static final String APRI = "apri" ;
 		public static final String CHIUDI = "chiudi" ;

@@ -187,10 +187,16 @@ public class Consegna extends ModelBean2 {
 	
 	public void updateValore( MovimentoIVA m ) {
 		
+		if ( getValoreUnitario() == null ) return ;
+		if ( m.getSecco() == null ) return ;
+		
 		double valore = new Double( m.getSecco().doubleValue() * getValoreUnitario().doubleValue() ) ;
 		
 		if ( ! isValutaEuro.booleanValue() ) {
 			m.setValoreDollari( valore );
+			
+			if ( tassoCambio == null ) return ;
+			
 			valore = valore / tassoCambio.doubleValue() ;
 		}
 		 

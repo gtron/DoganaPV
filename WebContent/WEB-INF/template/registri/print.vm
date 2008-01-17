@@ -4,21 +4,22 @@
 
 HTML {}
 BODY {
-font-size : 10pt ;
+font-size : 7pt ;
 font-family : Arial;
 margin:	0;
-padding: 15mm 0 0 0;
+padding: 0;
 width:279mm;
 height: 190mm;
 }
-TABLE{ 
-width:260mm;margin:0 auto;
+TABLE{
+width:260mm;margin:30mm 0 0 0;
 font-size:1em; border : 2px solid #000; border-collapse: collapse;  }
-TH { border: 1px solid #000 ; font-size:0.9em;}
-TD { text-align: right; border: 1px solid #000 ; padding: 1pt 2pt;}
+TH { border: 1px solid #000 ; font-size:0.9em;text-align:center; }
+TD { height: 9mm; text-align: right; border: 1px solid #000 ; padding: 1pt 2pt;}
 TD.l { text-align: left; }
 TD.c { text-align: center; }
-.pb {page-break-after: always ;}
+.pb {page-break-before: always ;}
+
 </style>
 
 <script type="text/javascript">
@@ -32,46 +33,66 @@ var to = 0 ;
 #if($velocityCount % $righePerPagina == 1 )
 #if($velocityCount > 1 )</table>#end
 #if($velocityCount > 2 )<div class="pb">&nbsp;</div>#end
-<table border="0" class="movimenti" cellpadding="2" cellspacing="0" id="tablemovimenti">
+<table border="1" class="movimenti" cellpadding="2" cellspacing="0" id="tablemovimenti">
 <thead>
 <tr>
-<th rowspan="2" style="width:40pt;">
+<th rowspan="2" style="width:10mm;">
 <script type="text/javascript">from = $m.NumRegistro</script>
 Num.</th>
-<th rowspan="2" style="width:50pt;">Data</th>
-<th rowspan="2">Documento</th>
+<th rowspan="2" style="width:40pt;">Data</th>
+<th colspan="3" style="width:40mm;">Doc. Dogana</th>
+<th colspan="3" style="width:40mm;">Doc. Portovesme</th>
+#if($isIva)<th rowspan="2">Specie Colli</th>#end
+<th rowspan="2" style="width:50mm;">Descrizione delle Merci</th>
 <th rowspan="2">N.Cons.</th>
 <th rowspan="2">N.Part.</th>
-<th rowspan="2">Merce</th>
-<th colspan="2" style="width:40mm;">Umido</th>
-<th rowspan="2" style="width:1pt;"></th>
-<th colspan="2" style="width:40mm;">Secco</th>
+#if($isIva)<th rowspan="2" style="width:20mm;">Prov / Dest</th>#end
+##<th rowspan="2" style="width:10mm;">Pos.<br />Doganale</th>
+<th colspan="2" style="width:40mm;">Massa Lorda (Kg)</th>
+<th colspan="2" style="width:40mm;">Massa Netta (Kg)</th>
 #if ( $isIva )
-<th rowspan="2" style="width:1pt;"></th>
-<th colspan="2" style="width:40mm;">Valore</th>
+<th rowspan="2" style="width:20mm;">Valore (&euro;)</th>
 #end
-<th colspan="2" style="width:40mm;">Note</th>
 </tr>
 <tr>
+<th>Tipo</th>
+<th>N.</th>
+<th>Data</th>
+<th>Tipo</th>
+<th>N.</th>
+<th>Data</th>
 <th>Entrata</th>
 <th>Uscita</th>
 <th>Entrata</th>
 <th>Uscita</th>
-#if ( $isIva )
-<th>&euro;</th>
-<th>$</td>
-#end
 </tr></thead>
 #end
 #if($velocityCount == $list.size() )<script type="text/javascript">to = $m.NumRegistro</script>#end
 <tr#if($velocityCount%2  == 0) class="odd"#end>
 <td class="c">$m.NumRegistro</td>
 <td>$tools.Date.format($dateFormat, $m.Data).toUpperCase()</td>
-<td class="c">#if($m.Documento)$m.Documento#else - #end#if($m.DocumentoPV)<br />($m.DocumentoPV)#end</td>
+#if($m.Documento)
+<td class="c">$!m.Documento.Tipo</td>
+<td class="c">$!m.Documento.Numero</td>
+<td class="c">$!tools.Date.format('dd/MM/yy',$!m.Documento.Data)</td>
+#else
+<td></td><td></td><td></td>
+#end
+#if($m.DocumentoPV)
+<td class="c">$!m.DocumentoPV.Tipo</td>
+<td class="c">$!m.DocumentoPV.Numero</td>
+<td class="c">$!tools.Date.format('dd/MM/yy',$!m.DocumentoPV.Data)</td>
+#else
+<td></td><td></td><td></td>
+#end
+###else - #end#if($m.DocumentoPV)<br />($m.DocumentoPV)#end</td>
+
+#if ( $isIva )<td class="c">rinfusa</td>#end
+<td class="l">$!m.Consegna.Merce.Nome</td>
 <td class="c">$!m.Consegna.Numero</td>
 <td class="c">$!m.Consegna.NumeroPartitario</td>
-<td class="l">$!m.Consegna.Merce.Nome</td>
 
+<td >&nbsp;</td>
 #if($m.getIsScarico() ||  $m.Umido.intValue() < 0 )
 <td>&nbsp;</td>
 #if( $m.Umido.intValue() >= 0 )
@@ -83,8 +104,6 @@ Num.</th>
 <td class="r">$tools.Number.format($m.Umido)</td>
 <td>&nbsp;</td>
 #end
-
-<td>&nbsp;</td>
 
 #if($m.getIsScarico() ||  $m.Secco.intValue() < 0 )
 <td>&nbsp;</td>
@@ -99,17 +118,15 @@ Num.</th>
 #end
 
 #if ( $isIva )
-<td>&nbsp;</td>
 <td class="r">$!tools.Number.format('#,##0',$m.ValoreEuro )</td>
-<td class="r">$!tools.Number.format('#,##0',$m.ValoreDollari )</td>
 #end
 
-<td class="l">$!m.Note</td>
 </tr>
 #end
 </table>
 ##
 <script type="text/javascript">
-if ( from > 0 )
+try {if ( from > 0 )
 printIFrame(from, to);
+}catch(e){}
 </script>

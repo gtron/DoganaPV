@@ -32,6 +32,18 @@ public class Login extends VelocityCommand {
 			
 			if ( pwd != null && pwd.equals("d0gan4") ) {
 				s.setAttribute("logged", Boolean.TRUE) ;
+				s.setAttribute("admin", Boolean.FALSE) ;
+				resp.sendRedirect(".main?cmd=home");
+			}
+			else {
+				ctx.put("msg", "Password errata!") ;
+			}
+		}
+		else if ( "admin".equals(user)) {
+			
+			if ( pwd != null && pwd.equals("s1lente") ) {
+				s.setAttribute("logged", Boolean.TRUE) ;
+				s.setAttribute("admin", Boolean.TRUE) ;
 				resp.sendRedirect(".main?cmd=home");
 			}
 			else {

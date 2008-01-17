@@ -13,6 +13,7 @@ import org.apache.velocity.context.Context;
 import com.gsoft.doganapt.data.Consegna;
 import com.gsoft.doganapt.data.adapters.ConsegnaAdapter;
 import com.gsoft.doganapt.data.adapters.MerceAdapter;
+import com.gsoft.doganapt.data.adapters.MovimentoAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoDoganaleAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoIvaAdapter;
 import com.gtsoft.utils.common.BeanAdapter2;
@@ -81,7 +82,9 @@ public class ViewRegistro extends VelocityCommand {
 		Integer rows = getIntParam	(ROWS, false);
 		String nomeColonna = getParam(SIDX, false);
 		String ascDesc = getParam(SORD, false);
-		HttpSession session=request.getSession();
+		HttpSession session=request.getSession(false);
+		if ( session == null ) return null ; 
+		
 		Hashtable<String, String> hashOrder=(Hashtable<String, String>)session.getAttribute(HASHORDER);
 		if(hashOrder==null){
 			 hashOrder=new Hashtable<String, String>();
@@ -122,9 +125,13 @@ public class ViewRegistro extends VelocityCommand {
 		
 		/*ctx.put( "list" , ( isRegistroIva ? new MovimentoIvaAdapter() : new MovimentoDoganaleAdapter() ) 
 					.getRegistro( onlyRegistrati.booleanValue(), c )) ;*/
+		
+		MovimentoAdapter adp = ( isRegistroIva ? 
+				new MovimentoIvaAdapter() : new MovimentoDoganaleAdapter() ) ;
+		
 		if(records==null){
 			session.setAttribute(HASHORDER, new Hashtable<String, String>());
-			Vector list=(isRegistroIva ? new MovimentoIvaAdapter() : new MovimentoDoganaleAdapter() ) 
+			Vector list=adp 
 			.getRegistro( onlyRegistrati.booleanValue(),c);
 			records=list.size();
 			ctx.put( "list" , list) ;
@@ -134,7 +141,8 @@ public class ViewRegistro extends VelocityCommand {
 				if(rows >=records)
 					page=1;
 			}
-			ctx.put( "list" , ( isRegistroIva ? new MovimentoIvaAdapter() : new MovimentoDoganaleAdapter() ) 
+			
+			ctx.put( "list" , adp 
 				.getRegistro( onlyRegistrati.booleanValue(), c ,
 						page,rows,hashOrder,numero,dal,al,idMerce,numConsegna) ) ;
 		
@@ -155,7 +163,7 @@ public class ViewRegistro extends VelocityCommand {
 		if(idMerce!=null) ctx.put("actMerce",true);
 		if(numConsegna!=null) ctx.put("actConsegne",true);
 		
-		ctx.put( "merci" , MerceAdapter.getAllCached()) ;
+		ctx.put( "merci" , MerceAdapter.getAllCachedRegistro(adp)) ;
 		
 		return null ;
 	}
