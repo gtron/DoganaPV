@@ -51,11 +51,11 @@ Tasso di Umidit&agrave;: <strong>$!tools.Number.format('##0.00000', $!obj.TassoU
 #parse('consegne/partitario.vm')
 #end
 </div>
-<div id="ret" c lass="print"></div>
+<div id="ret" class="print"></div>
 
 <script>
 function printPartitari() {
-$('#ret').load('?id=$obj.Id&cmd=print', {}, function(){windwo.print();} );
+$('#ret').load('?id=$obj.Id&cmd=print', {}, function(){window.print();} );
 }
 function initRowHighlighting(){
 var table = document.getElementById('tablemovimenti');
@@ -135,19 +135,19 @@ Inserire la data fino alla quale si desidera importare (compresa):
 </div>
 
 <div id="dlg_LiberaPratica" class="flora" style="text-align:center;">
-<form action=".consegne" id="openC">
+<form action=".consegne" id="frm_immettiLP">
 Data : <input type="text" name="dataLP" size="10" id="dataLP" /><br>
 ##
 
 #foreach( $s in $obj.Stalli )
 #if(! $s.HasLiberaPratica )
-<input type="checkbox" name="immettiLP" value="$s.Id" id="libPrat_$velocityCount" />
+<input type="checkbox" name="list" value="$s.Id" id="libPrat_$velocityCount" />
 <label for="libPrat_$velocityCount">$s.Nome</label><br />
 #end#end
 
-<input type="hidden" name="cmd" value="apri" />
+<input type="hidden" name="cmd" value="immettiLP" />
 <input type="hidden" name="exec" value="1" />
-<input type="hidden" name="id" value="" />
+<input type="hidden" name="c" value="$obj.Id" />
 
 <fieldset><legend>Documento di Ingresso</legend>
 Tipo: <select name="doc"><option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option></select>
@@ -224,7 +224,7 @@ function immettiLP() {
 	
 	var ids = '' ;
 	for( var el = 0; el < list.length ; el++ ) {
-		if ( list[el].name && list[el].name == 'immettiLP' && list[el].checked ) {
+		if ( list[el].name && list[el].name == 'list' && list[el].checked ) {
 			ids += '&list=' + list[el].value ;
 		}
 	}
@@ -234,7 +234,13 @@ function immettiLP() {
 		return false ;
 	}
 	
-	location.href='?cmd=immettiLP&exec=1&c=$obj.Id&dataLP=' + data + ids ;
+	// location.href='?cmd=immettiLP&exec=1&c=$obj.Id&dataLP=' + data + ids ;
+	
+	var f = document.getElementById('frm_immettiLP') ;
+	if ( f ) 
+		f.submit() ;
+	else
+		alert( 'Errore: no form LP!');
 }
 </script>
 

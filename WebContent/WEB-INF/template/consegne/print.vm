@@ -1,6 +1,6 @@
 #set( $regIVA = $!obj.Iter.Regiva )
 #set( $regDog = $!obj.Iter.Regdoganale )
-<style>
+<style type="text/css" media="print">
 BODY {
 font-size : 10pt ;
 font-family : Arial;
@@ -11,18 +11,11 @@ height: 180mm;
 }
 
 TABLE { width : 100%; }
-
+.pb {page-break-before: always ;}
 </style>
 
-<div id="dettaglio">
-Consegna Num.: <strong>$!obj.Numero</strong> - Partitario : <strong>$!obj.NumeroPartitario</strong><br />
-Merce : <strong>$!obj.Merce.Nome</strong> - 
-Iter : <strong>$!obj.Iter.Nome</strong><br>
 
-#if( $!obj.Pesopolizza > 0 )Peso Polizza: <strong>$tools.Number.format($!obj.Pesopolizza) Kg #if($!obj.PesoFinalePortoCarico) (P.Finale Porto di Carico)#end</strong> -#end
-Tasso di Umidit&agrave;: <strong>$!tools.Number.format('##0.00000', $!obj.TassoUmidita)%</strong>
-</div>
-
+#set($sumPagina = 0)
 #set($dateFormat = 'dd/MM/yy')
 #set($oldStallo = '')
 #foreach( $m in $obj.Partitario )
@@ -35,6 +28,17 @@ Tasso di Umidit&agrave;: <strong>$!tools.Number.format('##0.00000', $!obj.TassoU
 #set($sumSecco = 0)
 #set($sumUmido = 0)
 #set($oldStallo = $m.Stallo)
+#set($sumPagina = $sumPagina + 1)
+#if($velocityCount > 2 )<div class="pb">&nbsp;</div>#end
+<div id="dettaglio">
+Consegna Num.: <strong>$!obj.Numero</strong> - Partitario : <strong>$!obj.NumeroPartitario / $sumPagina</strong><br />
+Merce : <strong>$!obj.Merce.Nome</strong> - 
+Iter : <strong>$!obj.Iter.Nome</strong><br>
+
+#if( $!obj.Pesopolizza > 0 )Peso Polizza: <strong>$tools.Number.format($!obj.Pesopolizza) Kg #if($!obj.PesoFinalePortoCarico) (P.Finale Porto di Carico)#end</strong> -#end
+Tasso di Umidit&agrave;: <strong>$!tools.Number.format('##0.00000', $!obj.TassoUmidita)%</strong>
+</div>
+
 <div id="partitario_$oldStallo.Id">
 <table border="0" class="movimenti" cellpadding="2" cellspacing="0" id="tablemovimenti">
 <caption>Stallo $oldStallo.Nome<br /><br /></caption>

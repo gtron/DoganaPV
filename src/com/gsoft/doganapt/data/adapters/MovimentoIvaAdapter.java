@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import com.gsoft.doganapt.data.Consegna;
 import com.gsoft.doganapt.data.Movimento;
 import com.gsoft.doganapt.data.MovimentoIVA;
 import com.gtsoft.utils.data.Field;
@@ -43,7 +44,8 @@ public class MovimentoIvaAdapter extends MovimentoAdapter {
 
 		fields.add( Fields.VALORE_DOLLARI, Field.Type.DOUBLE , (fill)? o.getValoreDollari() : null );
 		fields.add( Fields.VALORE_EURO, Field.Type.DOUBLE , (fill)? o.getValoreEuro() : null );
-
+		fields.add( Fields.POSIZIONE_DOGANALE, Field.Type.STRING , (fill)? o.getPosizioneDoganale() : null );
+		
 	}
 	
 	public Object getFromFields ( Object obj ) {
@@ -52,6 +54,7 @@ public class MovimentoIvaAdapter extends MovimentoAdapter {
 
 		o.setValoreDollari( (Double) fields.get( Fields.VALORE_DOLLARI).getValue() );
 		o.setValoreEuro( (Double) fields.get( Fields.VALORE_EURO).getValue() );
+		o.setPosizioneDoganale( (String) fields.get( Fields.POSIZIONE_DOGANALE).getValue() );
 		
 		return o ;
 	}
@@ -62,12 +65,13 @@ public class MovimentoIvaAdapter extends MovimentoAdapter {
 		
 		static final int VALORE_EURO = FIELDSHIFT + 1 ;
 		static final int VALORE_DOLLARI = FIELDSHIFT + 2;
+		static final int POSIZIONE_DOGANALE = FIELDSHIFT + 3;
 		
-		static final int FIELDSCOUNT = FIELDSHIFT + 3;
+		static final int FIELDSCOUNT = FIELDSHIFT + 4;
 	}
 
 	private static final String[] fieldNames = {
-		"valoreeuro","valoredollari"
+		"valoreeuro","valoredollari", "posdoganale"
 	};
 	
 	public int getFieldsCount() {
@@ -149,12 +153,17 @@ public class MovimentoIvaAdapter extends MovimentoAdapter {
 		
 		MovimentoIVA m = (MovimentoIVA) o;
 		
-		if (m.getValoreEuro() == null) {
-			m.getConsegna().updateValore(m);
+		Consegna c = m.getConsegna();
+		if ( c != null ) {
+			if (m.getValoreEuro() == null) {
+				c.updateValore(m);
+			}
+			
+			if ( m.getPosizioneDoganale() == null ) {
+				m.setPosizioneDoganale(c.getPosizione());
+			}
 		}
-		return super.create(m);
-		
+		return super.create(m);		
 	}
-	
-	
+
 }

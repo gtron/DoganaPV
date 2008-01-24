@@ -6,7 +6,9 @@ import com.gtsoft.utils.sql.IDatabase2;
 public class MovimentoIVA extends Movimento {
 	
 	Double valoreEuro;
-	Double valoreDollari; 
+	Double valoreDollari;
+	
+	String posizioneDoganale ;
 	
 	public Double getValoreEuro() {
 		return valoreEuro;
@@ -19,6 +21,14 @@ public class MovimentoIVA extends Movimento {
 	}
 	public void setValoreDollari(Double v) {
 		this.valoreDollari = v;
+	}
+	
+	
+	public String getPosizioneDoganale() {
+		return posizioneDoganale;
+	}
+	public void setPosizioneDoganale(String posizioneDoganale) {
+		this.posizioneDoganale = posizioneDoganale;
 	}
 	
 	public static synchronized MovimentoIvaAdapter newAdapter() throws Exception {		

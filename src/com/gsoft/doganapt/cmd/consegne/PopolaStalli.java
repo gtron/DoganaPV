@@ -300,6 +300,7 @@ public class PopolaStalli extends VelocityCommand {
 				if (mov instanceof MovimentoIVA) {
 					c.updateValore( (MovimentoIVA) mov);
 				}
+				mov.setId(null);
 				registro.create(mov);
 			}
 			

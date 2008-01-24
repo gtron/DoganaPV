@@ -192,7 +192,7 @@ public class Stallo extends ModelBean2 {
 			Stallo.newAdapter().update(this);
 		}
 	}
-	public void immettiInLiberaPratica( FormattedDate data, Documento docOut, Documento docIn, 
+	public void immettiInLiberaPratica( FormattedDate data, Documento doc, Documento docPV, 
 			MovimentoAdapter registroOut, 
 			MovimentoAdapter registroIn ) throws Exception {
 		
@@ -218,7 +218,8 @@ public class Stallo extends ModelBean2 {
 			}
 		
 	//		m = m.clone();
-			m.setDocumento(docOut);
+			m.setDocumento(doc);
+			m.setDocumentoPV(docPV);
 			m.setSecco(sommaSecco);
 			m.setUmido(sommaUmido);
 			m.setIsScarico(true);
@@ -232,7 +233,8 @@ public class Stallo extends ModelBean2 {
 			Movimento miva = registroIn.newMovimento();
 			
 			
-			miva.setDocumento(docIn);
+			miva.setDocumento(doc);
+			miva.setDocumentoPV(docPV);
 			miva.setIsScarico(false);
 			miva.setSecco(sommaSecco);
 			miva.setUmido(sommaUmido);

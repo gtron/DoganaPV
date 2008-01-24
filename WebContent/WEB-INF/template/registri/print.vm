@@ -92,7 +92,7 @@ Num.</th>
 <td class="c">$!m.Consegna.Numero</td>
 <td class="c">$!m.Consegna.NumeroPartitario</td>
 
-<td >&nbsp;</td>
+#if ( $isIva ) <td >&nbsp;</td> #end
 #if($m.getIsScarico() ||  $m.Umido.intValue() < 0 )
 <td>&nbsp;</td>
 #if( $m.Umido.intValue() >= 0 )

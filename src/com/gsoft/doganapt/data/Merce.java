@@ -13,6 +13,8 @@ public class Merce extends ModelBean2 {
 	Integer idIterDefault;
 	String codiceQuadrelli;
 	
+	String specieColli;
+	
 	Boolean hasRegistroIva = null;
 	Boolean hasRegistroDog = null;
 	
@@ -48,7 +50,16 @@ public class Merce extends ModelBean2 {
 	public String getCodiceQuadrelli() {
 		return codiceQuadrelli;
 	}
-	
+
+
+	public String getSpecieColli() {
+		return specieColli;
+	}
+
+	public void setSpecieColli(String specieColli) {
+		this.specieColli = specieColli;
+	}
+
 	public String toString() {
 		return this.nome ;
 	}
