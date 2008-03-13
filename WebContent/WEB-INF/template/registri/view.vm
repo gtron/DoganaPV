@@ -13,7 +13,6 @@
 #set( $addCss = ['/js/jquery.ui/themes/flora/flora.all.css','/style/tablefilter/tableFilter.aggregator.css','/style/tablefilter/tableFilter.css','/style/grid.css'] )
 #set( $addJs = ['/js/jquery.ui/ui.calendar.js','/js/jquery.jqgrid/jquery.jqGrid.js'])
 #parse('header.vm')
-
 <script>
 function initRowHighlighting(){
 var table = document.getElementById('tablemovimenti');
@@ -35,15 +34,11 @@ row.className = isover ? 'hi' : row.getAttribute('origClass');
 }
 
 window.onload = initRowHighlighting;
-
-
 </script>
 *#
 #set( $addCss = ['/style/tablefilter/tableFilter.aggregator.css','/style/tablefilter/tableFilter.css','/style/grid.css','/js/jquery.ui/themes/flora/flora.dialog.css','/js/jquery.ui/themes/flora/flora.all.css'] )
 #set( $addJs = ['/js/jquery.jqgrid/jquery.jqGrid.js','/js/jquery.ui/ui.calendar.js','/js/jquery.ui/ui.dimensions.js','/js/jquery.ui/ui.mouse.js','/js/jquery.ui/ui.draggable.js','/js/jquery.ui/ui.resizable.js','/js/jquery.ui/ui.dialog.js'])
 #parse('header.vm')
-
-
 <script type="text/javascript">
 function initRowHighlighting(){
 var table = document.getElementById('tablemovimenti');
@@ -104,7 +99,31 @@ jQuery("#tablemovimenti").jqGrid({
 #if($iva)#set($regiva='iva=true&')#end
 url:'.registri?$!{regiva}json=true&records=$!records&idMerce='+ '' + '&inputNum= ' + $("#inputNum").val() + '&inputDal=' + $("#inputDal").val() + '&inputAl=' + $("#inputAl").val() + '&ndS='+new Date().getTime(),
 datatype: 'json', 
-height: 450, 
+height: 450,
+#*
+
+subGrid: true,
+subGridRowExpanded: function(subgrid_id, row_id) {
+// we pass two parameters 
+// subgrid_id is a id of the div tag created whitin a table data
+// the id of this elemenet is a combination of the "sg_" + id of the row 
+// the row_id is the id of the row 
+// If we wan to pass additinal parameters to the url we can use 
+// a method getRowData(row_id) - which returns associative array in type name-value 
+// here we can easy construct the flowing
+var subgrid_table_id; 
+subgrid_table_id = subgrid_id+"_t";
+$("#"+subgrid_id).html('<input type="" name="" onclick="" />');
+},
+
+subGridRowColapsed: function(subgrid_id, row_id) {
+// this function is called before removing the data 
+var subgrid_table_id; 
+subgrid_table_id = subgrid_id+"_t"; jQuery("#"+subgrid_table_id).GridDestroy(); 
+}
+
+
+*#
 colNames:['N.','Data','Cons.','Part.' , 'Documento', 'Merce','umido<br />IN','umido<br />OUT','secco<BR >IN','secco<BR />OUT'
 #if($iva) ,'&euro;','$'#end ],
 colModel:[
@@ -124,9 +143,17 @@ colModel:[
 {name:'val_dollari',index:'valoreeuro',width:60,sortable:false}
 #end
 ],
-width:920
+width:920, 
 
-,rowNum:15,rowList:[15,30,60], 
+shrinkToFit: true,
+
+#*
+onSelectRow : function(row_id) {
+var ret = jQuery("#tablemovimenti").getRowData(row_id); 
+location.href= '.consegne?cmd=editgroup&n='+ret.numero;
+},
+*#
+rowNum:15,rowList:[15,30,60], 
 loadtext:'Caricamento dati...',
 loadComplete: function(){ 
 // -- 
@@ -187,12 +214,12 @@ var from = 0, to = 0;
 
 function printIFrame(f, t) {
 from = f ; to = t ;
-var iva = #if($isIva)'true'#else'false'#end ;
+var iva = #if($isIva || $iva)'true'#else'false'#end ;
 window.print();
 $('#dlg_Confirm').dialogOpen();
 }
 function confirmedStampa() {
-var iva = #if($isIva)'true'#else'false'#end ;
+var iva = #if($isIva || $iva)'true'#else'false'#end ;
 //stp.location.href='.registri?iva=' + iva + '&confirm=1&cmd=stampa&f=' + from + '&t=' + to ;
 $('#ret').load('.registri?iva=' + iva + '&confirm=1&cmd=stampa&f=' + from + '&t=' + to , 
 		{} , function() {$('#dlg_Confirm').dialogClose();});
@@ -215,6 +242,32 @@ $('#ret').load('cop_dog.html' ); // , {} , function(){window.print(); } ) ;
 setTimeout( function(){ window.print() } , 1500 );
 }
 var stp ;
+
+function editMovimento() { return actMovimento('.consegne' , 'editgroup' ); }
+function deregistraMovimento() { return actMovimento('.registri', 'deregistra', 'Attenzione: Procedere con l\'operazione richiesta ?'); }
+
+function actMovimento( servlet, action , doconferma ) {
+var t = jQuery("#tablemovimenti");
+var r = t.getSelectedRow();
+
+var n;
+if (r){ n = t.getRowData(r).numero; }
+
+n *= 1 ;
+
+if ( ! n > 0 ) {alert( 'Attenzione: selezionare la riga del movimento da modificare');return ;}
+
+var iva = #if($isIva || $iva)'1'#else'0'#end ;
+var conferma = '';
+if ( doconferma && doconferma ) {
+	if ( confirm(doconferma)  )	conferma = '&exec=1' ;
+	else return ;
+}
+
+location.href= servlet + '?cmd='+action+'&iva=' + iva + '&n='+n + conferma ;
+}
+
+
 </script> 
 
 ##<iframe name="stp" src="voidreg.html" width="10" height="10" style="visibility:hidden;position:absolute;"></iframe>
@@ -234,6 +287,10 @@ var stp ;
 
 <div class="commands">
 <ul>
+#if($isAdmin)
+<li style="border-right:2px solid #EEE;"><a href="#" onclick="deregistraMovimento(); return false;"><img src="$!images/action-ico-elimina.png" />De-Registra Movimento</a></li>
+#end
+<li style="border-right:2px solid #EEE;"><a href="#" onclick="editMovimento(); return false;"><img src="$!images/action-ico-modifica.png" />Modifica Movimento</a></li>
 <li><a href="#" onclick="stampaCopertina(); return false;"><img src="$!images/action-ico-stampa.png" />Copertina</a></li>
 <li><a href="#" onclick="$('#dlg_Prepara').dialogOpen(); return false;"><img src="$!images/action-ico-stampa.png" />Prepara Pagine</a></li>
 <li><a href="#" onclick="$('#dlg_Print').dialogOpen(); return false;"><img src="$!images/action-ico-stampa.png" />Stampa Registro</a></li>

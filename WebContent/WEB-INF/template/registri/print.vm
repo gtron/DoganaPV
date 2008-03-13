@@ -1,7 +1,6 @@
 #parse('costanti.vm')
 
 <style type="text/css" media="print">
-
 HTML {}
 BODY {
 font-size : 7pt ;

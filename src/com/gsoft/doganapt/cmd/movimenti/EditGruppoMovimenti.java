@@ -50,20 +50,31 @@ public class EditGruppoMovimenti extends BeanEditor {
 		ctx.put("iters" ,  IterAdapter.getAllCached());
 		ctx.put("stalli" ,  stalli);
 		
-		FormattedDate data = getDateParam("data", true);
-		Integer idConsegna = getIntParam("idC", true);
-		
+
 		MovimentoAdapter adp = (MovimentoAdapter) getAdapter() ;
 		
-		int tipo = getIntParam("t", true).intValue();
+		
 		
 		ArrayList<Integer> idMovimenti = getIntParams("id", 0) ;
 		
 		Vector movimenti = null ;
 		
 		if ( idMovimenti == null || idMovimenti.size() < 1 ){
-			movimenti = adp.getGroup(idConsegna,data , 
+			
+			Integer numReg  = getIntParam("n", false );
+			
+			if ( numReg != null ) {
+				movimenti = adp.getByNumeroRegistro(numReg);
+			}
+			else {
+				FormattedDate data = getDateParam("data", true);
+				Integer idConsegna = getIntParam("idC", true );
+				
+				int tipo = getIntParam("t", true).intValue();
+				
+				movimenti = adp.getGroup(idConsegna,data , 
 					( tipo == 1 || tipo - 10 == 1 ), tipo  > 9 );
+			}
 		}
 		else {
 			StringBuilder sb = new StringBuilder(idMovimenti.size() * 2);

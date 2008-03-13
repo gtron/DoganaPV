@@ -17,7 +17,8 @@
 #set($count=$velocityCount + 1)
 ,
 {id:"$count",cell:["$!m.NumRegistro","$!tools.Date.format($dateFormat, $m.Data)",
-"$!m.Consegna.Numero","$!m.Consegna.NumeroPartitario",
+'<a href=".consegne?id=$m.Consegna.Id">$!m.Consegna.Numero</a>',
+'<a href=".consegne?id=$m.Consegna.Id">$!m.Consegna.NumeroPartitario</a>',
 "$!m.Documento","$!m.Consegna.Merce",
 #if($m.getIsScarico() ||  $m.Umido.intValue() < 0 ) #if( $m.Umido.intValue() < 0 )
 "","$!tools.Number.format($tools.Math.mul( -1 , $m.Umido))",

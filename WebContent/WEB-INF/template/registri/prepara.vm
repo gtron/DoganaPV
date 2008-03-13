@@ -1,9 +1,13 @@
 #parse('costanti.vm')
-<link rel="stylesheet" type="text/css" href="$wwwRoot/style/registro.css" media="print" />
 #foreach( $i in $list )
+#if($velocityCount > 1 )<div class="pb"></div>#end
 <div class="page">
 <div class="topsx">Portovesme s.r.l.</div>
+#if($partitari)
+<div class="nomeReg">REGISTRO PARTITARIO </div>
+#else
 <div class="nomeReg">REGISTRO DI CARICO E SCARICO</div>
+#end
 <div class="num"><span>$i</span></div>
 </div>
 #end

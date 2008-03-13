@@ -30,7 +30,7 @@ public class DeregistraMovimento extends VelocityCommand {
 			
 			getAdapter();
 			
-			Integer num = getIntParam("num", true);
+			Integer num = getIntParam("n", true);
 			
 			Vector list = adapter.getByNumeroRegistro(num) ;
 			

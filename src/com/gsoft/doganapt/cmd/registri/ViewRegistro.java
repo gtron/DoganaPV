@@ -165,6 +165,9 @@ public class ViewRegistro extends VelocityCommand {
 		
 		ctx.put( "merci" , MerceAdapter.getAllCachedRegistro(adp)) ;
 		
+		HttpSession s =  req.getSession(false);
+		ctx.put("isAdmin", s.getAttribute("admin") ) ;
+		
 		return null ;
 	}
 	

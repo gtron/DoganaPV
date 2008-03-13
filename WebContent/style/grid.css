@@ -5,6 +5,7 @@ background-color: white;
 
 table.scroll tr.over td {
 background: #E1DCF4;
+
 }
 
 table.scroll tr.alt {
@@ -24,6 +25,7 @@ border-left: 1px solid #D4D0C8;
 text-overflow: ellipsis;
 overflow: hidden;
 white-space: nowrap;
+cursor:pointer;
 }
 
 table.scroll th  {

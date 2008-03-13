@@ -7,6 +7,9 @@ padding: 0;
 width:272mm;
 height: 210mm;
 }
-.page { position: relative; width:100%; height:100%; page-break-inside:avoid; }
+.page { position: relative; width:100%;  }
 .nomeReg { text-align:center; }
 .num { position: absolute ; top : 0mm; right:10mm;}
+
+.pb {page-break-before: always ;}
+

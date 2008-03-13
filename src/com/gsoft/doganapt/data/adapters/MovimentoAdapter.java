@@ -206,7 +206,10 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			
 			sql.append(" idstallo in ( ");
 			for ( Iterator i = stalli.iterator() ; i.hasNext() ;) {
-				sql.append( ((Stallo)i.next()).getId() ) ; 
+				sql.append( ((Stallo)i.next()).getId() ) ;
+				
+				if ( i.hasNext() )
+					sql.append( "," ) ;
 			}
 			sql.append( ")") ;
 		}

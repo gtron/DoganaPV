@@ -9,16 +9,13 @@ import org.apache.velocity.Template;
 import org.apache.velocity.context.Context;
 
 import com.gsoft.doganapt.data.adapters.MovimentoAdapter;
-import com.gsoft.doganapt.data.adapters.MovimentoDoganaleAdapter;
-import com.gsoft.doganapt.data.adapters.MovimentoIvaAdapter;
-import com.gtsoft.utils.common.BeanAdapter2;
 import com.gtsoft.utils.http.VelocityCommand;
 import com.gtsoft.utils.http.servlet.GtServlet;
 
 
 public class PreparaRegistro extends VelocityCommand {
 	
-	private final static Integer ROWS_PER_PAGE = new Integer(20);
+//	private final static Integer ROWS_PER_PAGE = new Integer(20);
 	
 	public PreparaRegistro ( GtServlet callerServlet) {
 		super(callerServlet);
@@ -39,6 +36,8 @@ public class PreparaRegistro extends VelocityCommand {
 			
 		}
 		ctx.put("list", list );
+		
+		ctx.put("partitari" , getBooleanParam("partitari", false));
 		
 		return null;
 	}

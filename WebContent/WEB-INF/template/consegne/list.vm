@@ -3,12 +3,16 @@
 #set( $addCss = ['/js/jquery.ui/themes/flora/flora.all.css','/style/tablefilter/tableFilter.aggregator.css','/style/tablefilter/tableFilter.css'] )
 #parse('costanti.vm')
 #parse('header.vm')
-
+<div class="print" id="ret"></div>
+<div class="view">
+<link rel="stylesheet" type="text/css" href="$wwwRoot/style/registro.css" media="print" />
 <h2>
 Elenco Consegne #if($chiuse)Chiuse#else Attive#end 
 </h2>
 
 <ul class="commands">
+<li><a href="#" onclick="stampaCopertina(); return false;"><img src="$!images/action-ico-stampa.png" />Copertina</a></li>
+<li><a href="#" onclick="$('#dlg_Prepara').dialogOpen(); return false;"><img src="$!images/action-ico-stampa.png" />Prepara Pagine</a></li>
 <li><a href=".consegne?cmd=edit"><img src="$!images/action-ico-nuovo.png" /> Nuova consegna</a></li>
 
 </ul>
@@ -54,7 +58,33 @@ TD { text-align: center; }
 </table>
 <br>
 
-<script>
+
+<script type="text/javascript">
+
+function preparaPagine() {
+//var w = window.open('voidreg.html','x','width=10,height=10,scrollable=no');
+//w.blur();
+var n = document.getElementById('numPagine').value ;
+var f = document.getElementById('fromPagina').value ;
+
+if ( n + 10 == 10 ) return false;
+if ( f + 10 == 10 ) return false;
+
+// stp.printPages( 1 * n, 1 * f);
+//alert( '.registri?cmd=prepara&f=' + f + '&t=' + ( 1 * f + 1 * n ) );
+$('#ret').load('.registri?cmd=prepara&partitari=true&f=' + f + '&t=' + ( ( 1 * f + 1 * n ) - 1 ) , 
+		{} , function() {$('#dlg_Prepara').dialogClose();window.print();});
+//setTimeout( function() { w.printPages(5,102); } , 1000 ) ;
+}
+
+$('document').ready( function() {
+
+$("#dlg_Prepara").dialog({ width:400,
+height:120,buttons:{Stampa: function(){preparaPagine();} ,Annulla : function() { $("#dlg_Prepara").dialogClose(); } } 
+});
+$("#dlg_Prepara").dialogClose();
+} ) ;
+
 var idConsegna = -1 ;
 
 $('document').ready( function() {
@@ -64,7 +94,16 @@ $("#consegne").eq(0).tableFilter();
 
 } ) ;
 
+function stampaCopertina() {
+$('#ret').load('cop_part.html' ); 
+setTimeout( function(){ window.print() } , 1500 );
+}
+
 </script>
+
+<div id="dlg_Prepara" class="flora" style="text-align:center;">
+Prepara <input type="text" id="numPagine" value="10" size="3" />pagine a partire dal numero  <input type="text" id="fromPagina" value="" size="3"  /> 
+</div>
 
 <div style="text-align:center;">
 #if($chiuse)
@@ -72,5 +111,5 @@ $("#consegne").eq(0).tableFilter();
 #else
 <a href=".consegne?cmd=list&chiuse=1">[Archivio Consegne Chiuse]</a>
 #end</div>
-
 #parse('footer.vm')
+</div>
