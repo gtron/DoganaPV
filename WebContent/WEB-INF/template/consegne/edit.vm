@@ -13,7 +13,7 @@ catch(e){alert(e.message);}
 );
 </script>
 
-#if( $result ) <div id="result">Modifica effettuata</div> #end
+#if( $result )<div id="result">#if( $msg ) $msg #else Modifica effettuata#end</div> #end
 
 <h2>
 #if ( $obj && $obj.Id )

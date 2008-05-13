@@ -28,6 +28,8 @@ public class ChiudiConsegna extends VelocityCommand {
 		
 		Integer id = getIntParam("id", true);
 		
+		Integer idStallo = getIntParam("idS", false);
+		
 		ConsegnaAdapter adp = Consegna.newAdapter();
 		Consegna c = (Consegna) adp.getByKey(id);
 		
@@ -36,28 +38,45 @@ public class ChiudiConsegna extends VelocityCommand {
 		if ( c != null && getBooleanParam(Strings.EXEC) ) {
 			
 			c.setDataChiusura(new FormattedDate()) ;
-			Stallo s ;
-			StalloAdapter sadp = new StalloAdapter();
 			
-			for ( Iterator i = c.getStalli().iterator() ; i.hasNext() ; ){
-				s = ( Stallo ) i.next() ;
-				s.setIdConsegnaAttuale(null);
-				s.setImmessoInLiberaPratica(Boolean.FALSE);
-				sadp.update(s);
+			if ( idStallo != null ) {
+				liberaStalli( c, idStallo ) ;
 				
+				// return success(Results.STALLO);
+				ctx.put(ContextKeys.RESULT , Boolean.TRUE ) ;
+				ctx.put( ContextKeys.MESSAGE , "Stallo liberato correttamente") ;
+				return null ;
 			}
-			
+
+			liberaStalli( c, idStallo ) ;
+
 			adp.update(c);
 			
-			ctx.put("result", Boolean.TRUE ) ;
+			// return success(Results.CONSEGNA);
+			
+			ctx.put(ContextKeys.RESULT , Boolean.TRUE ) ;
 			
 			ctx.put( "list" ,  new ConsegnaAdapter().getAll( ) ) ;
-
+			
+			ctx.put( ContextKeys.MESSAGE , "Consegna chiusa correttamente") ;
 		}
 		return null ;
 	}
 	
-
+	private void liberaStalli(Consegna c, Integer idStallo) throws Exception {
+		Stallo s ;
+		StalloAdapter sadp = new StalloAdapter();
+		
+		for ( Iterator i = c.getStalli().iterator() ; i.hasNext() ; ){
+			s = ( Stallo ) i.next() ;
+			
+			if ( idStallo == null || idStallo.equals(s.getId()) ) {
+				s.setIdConsegnaAttuale(null);
+				s.setImmessoInLiberaPratica(Boolean.FALSE);
+				sadp.update(s);
+			}
+		}
+	}
 	public VelocityCommand clone() {
 		return  new ChiudiConsegna(this.callerServlet);
 	}

@@ -186,14 +186,10 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 //			.append(" WHERE isscarico = ?") 
 			;
 			
-		sql.append(" WHERE ") ;
-		
-		if( c != null )
-			sql.append(" idconsegna = ?  ");
+		sql.append(" WHERE idconsegna = ?  ");
 		
 		if ( onlyScarichi ) {
-			if( c != null )
-				sql.append(" AND ");
+			sql.append(" AND ");
 			
 			sql.append(" isscarico = 1 ");
 		}
@@ -201,8 +197,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		ArrayList<Object> stalli = c.getStalli() ;
 		if ( stalli != null && stalli.size() > 0 ) {
 			
-			if( c != null || onlyScarichi )
-				sql.append(" AND ");
+			sql.append(" AND ");
 			
 			sql.append(" idstallo in ( ");
 			for ( Iterator i = stalli.iterator() ; i.hasNext() ;) {
@@ -220,8 +215,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			
 //			s.setBoolean(1, scarico);
 			
-			if( c != null )
-				s.setInt(1, c.getId().intValue()) ;
+			s.setInt(1, c.getId().intValue()) ;
 			
 			ResultSet rs = s.executeQuery() ;
 	
@@ -340,9 +334,8 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			
 			list = new Vector<Integer>(rs.getFetchSize()) ;
 	
-			if (rs != null )
-				while( rs.next() ) 
-					list.add( (Integer) rs.getObject(1) );
+			while( rs.next() ) 
+				list.add( (Integer) rs.getObject(1) );
 			
 		}
 		finally {

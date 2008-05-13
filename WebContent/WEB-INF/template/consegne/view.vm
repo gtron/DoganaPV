@@ -15,7 +15,7 @@ Merce : <strong>$!obj.Merce.Nome</strong> -
 Iter : <strong>$!obj.Iter.Nome</strong><br>
 
 #if( $!obj.Pesopolizza > 0 )Peso Polizza: <strong>$tools.Number.format($!obj.Pesopolizza) Kg #if($!obj.PesoFinalePortoCarico) (P.Finale Porto di Carico)#end</strong> -#end
-Tasso di Umidit&agrave;: <strong>$!tools.Number.format('##0.00000', $!obj.TassoUmidita)%</strong>
+Tasso di Umidit&agrave;: <strong>$!tools.Number.format('##0.0000000', $!obj.TassoUmidita)%</strong>
 </div>
 
 <ul id="menuConsegna">
@@ -76,22 +76,25 @@ if ( row.getAttribute('origClass') == null )
 if ( row.className.search(/nohi/i) < 0 )
 	row.className = isover ? 'hi' : row.getAttribute('origClass');
 }
-
 window.onload = initRowHighlighting;
 
- $(document).ready(function(){
-    $("#menuConsegna").tabs();
-	
-## #if(!$immissioneLP && $regIVA )$("#menuConsegna").tabsClick( 2 )#end
-  });
-</script>
+$(document).ready(function(){
+$("#menuConsegna").tabs();
 
 #set($immissioneLP=false)
-#if ( $regIVA)
-#foreach( $s in $obj.Stalli ) 
+#if ( $regDog  && $regIVA)
+#foreach( $s in $obj.Stalli )
 #if( ! $s.HasLiberaPratica )#set($immissioneLP=true)#end
 #end
 #end
+
+
+#if(!$immissioneLP && $regIVA )$("#menuConsegna").tabsClick( 2 );#end
+
+});
+</script>
+
+
 
 
 <div class="commands">
@@ -151,11 +154,11 @@ Data : <input type="text" name="dataLP" size="10" id="dataLP" /><br>
 
 <fieldset><legend>Documento di Ingresso</legend>
 Tipo: <select name="doc"><option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option></select>
-Numero: <input type="text" name="doc_num" size="4"/>
+Numero: <input type="text" name="doc_num" size="3"/>
 Data:  <input type="text" name="doc_data" id="doc_data" size="9"/></fieldset>
 <fieldset><legend>Documento di Ingresso (Portovesme)</legend>
 Tipo: <select name="docPV"><option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option></select>
-Numero: <input type="text" name="docPV_num" size="4"/>
+Numero: <input type="text" name="docPV_num" size="3"/>
 Data:  <input type="text" id="docPV_data" name="docPV_data" size="9"/></fieldset>
 <br />
 Note :<br />
@@ -188,6 +191,8 @@ $("#dlg_ImportTo").dialog({ width:360,
 height:140,buttons:{Importa: function(){importTo(true);} , Annulla : function() { importTo(); } } 
 });
 jQuery('#dataImport').calendar();
+jQuery('#docPV_data').calendar();
+jQuery('#doc_data').calendar();
 
 $("#dlg_ImportTo").dialogClose();
 

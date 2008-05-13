@@ -19,7 +19,6 @@ import com.gsoft.doganapt.data.adapters.StalloAdapter;
 import com.gsoft.pt_movimentazioni.data.MovimentoQuadrelliAdapter;
 import com.gsoft.pt_movimentazioni.utils.PtMovimentazioniImporter;
 import com.gtsoft.utils.common.FormattedDate;
-import com.gtsoft.utils.common.UserException;
 import com.gtsoft.utils.http.VelocityCommand;
 import com.gtsoft.utils.http.servlet.GtServlet;
 
@@ -66,7 +65,7 @@ public class ApriConsegna extends VelocityCommand {
 				s = (Stallo) sAdp.getByCodice( i.next() ) ;
 				
 				if ( s != null ) {
-					if ( s.getIdConsegnaAttuale() == null) {
+//					if ( s.getIdConsegnaAttuale() == null) {
 						s.setIdConsegnaAttuale(id);
 						s.setIdConsegnaPrenotata(null);
 						s.setImmessoInLiberaPratica(Boolean.FALSE) ;
@@ -75,12 +74,12 @@ public class ApriConsegna extends VelocityCommand {
 						s.setCaricato( new Double(0) );
 						
 						sAdp.update(s);
-					}
-					else if ( ! c.getIdIter().equals( 4 )) {
-						
-						ctx.put( "list" ,  new ConsegnaAdapter().getNonChiuse( ) ) ;
-						throw new UserException("Attenzione, lo stallo " + s  + " non è libero !") ;
-					}
+//					}
+//					else if ( ! c.getIdIter().equals( 4 )) {
+//						
+//						ctx.put( "list" ,  new ConsegnaAdapter().getNonChiuse( ) ) ;
+//						throw new UserException("Attenzione, lo stallo " + s  + " non è libero !") ;
+//					}
 				}
 			}
 			

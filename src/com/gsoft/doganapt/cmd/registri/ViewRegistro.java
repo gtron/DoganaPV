@@ -43,6 +43,7 @@ public class ViewRegistro extends VelocityCommand {
 	protected static String IDMERCE = "idMerce";
 	protected static String RECORDS = "records";
 	protected static String NUMCONSEGNA = "consegna";
+	protected static String PARTITARIO = "partitario";
 	
 	protected static String HASHORDER="HASHORDER";
 	
@@ -74,6 +75,12 @@ public class ViewRegistro extends VelocityCommand {
 		try  {
 			numConsegna = getIntParam(NUMCONSEGNA, false);
 		}catch(ParameterException pe){}
+		
+//		Integer numPartitario=null;
+//		try  {
+//			numPartitario = getIntParam(PARTITARIO, false);
+//		}catch(ParameterException pe){}
+		
 		
 		if(numConsegna!=null)
 			ctx.put("actConsegne", true);

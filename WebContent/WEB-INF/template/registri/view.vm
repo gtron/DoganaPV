@@ -13,6 +13,7 @@
 #set( $addCss = ['/js/jquery.ui/themes/flora/flora.all.css','/style/tablefilter/tableFilter.aggregator.css','/style/tablefilter/tableFilter.css','/style/grid.css'] )
 #set( $addJs = ['/js/jquery.ui/ui.calendar.js','/js/jquery.jqgrid/jquery.jqGrid.js'])
 #parse('header.vm')
+<link rel="stylesheet" type="text/css" href="$wwwRoot/style/registro.css" media="print" />
 <script>
 function initRowHighlighting(){
 var table = document.getElementById('tablemovimenti');
@@ -36,6 +37,7 @@ row.className = isover ? 'hi' : row.getAttribute('origClass');
 window.onload = initRowHighlighting;
 </script>
 *#
+#set( $addCssPrint = ['/style/registro.css'] )
 #set( $addCss = ['/style/tablefilter/tableFilter.aggregator.css','/style/tablefilter/tableFilter.css','/style/grid.css','/js/jquery.ui/themes/flora/flora.dialog.css','/js/jquery.ui/themes/flora/flora.all.css'] )
 #set( $addJs = ['/js/jquery.jqgrid/jquery.jqGrid.js','/js/jquery.ui/ui.calendar.js','/js/jquery.ui/ui.dimensions.js','/js/jquery.ui/ui.mouse.js','/js/jquery.ui/ui.draggable.js','/js/jquery.ui/ui.resizable.js','/js/jquery.ui/ui.dialog.js'])
 #parse('header.vm')
@@ -238,7 +240,13 @@ $('#ret').load('.registri?iva=' + iva + '&cmd=stampa&f=' + from + '&n=' + numpag
 $('#dlg_Print').dialogClose();
 }
 function stampaCopertina() {
-$('#ret').load('cop_dog.html' ); // , {} , function(){window.print(); } ) ;
+#if($isIva || $iva)
+$('#ret').load('cop_iva.html' );
+#else
+$('#ret').load('cop_dog.html' );
+#end
+
+## // $('#ret').load('cop_dog.html' ); // , {} , function(){window.print(); } ) ;
 setTimeout( function(){ window.print() } , 1500 );
 }
 var stp ;

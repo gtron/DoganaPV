@@ -87,11 +87,11 @@ Data: <input type="text" name="data" value="" size="10" id="data" />
 <fieldset style="float:left; width:45%;margin-right:2%"><legend>Documento Dogana</legend>
 Tipo: <select name="doc"><option value=""></option><option value="R">R</option><option value="IM7">IM7</option><option value="IM4">IM4</option></select>
 Numero: <input type="text" name="doc_num" size="4"/>
-Data:  <input type="text" name="doc_data" id="doc_data" size="7"/></fieldset>
+Data:  <input type="text" name="doc_data" id="doc_data" size="9"/></fieldset>
 <fieldset style="float:left; width:45%;"><legend>Documento Portovesme</legend>
 Tipo: <select name="docPV"><option value=""></option><option value="R">R</option><option value="IM7">IM7</option><option value="IM4">IM4</option></select>
 Numero: <input type="text" name="docPV_num" size="4"/>
-Data:  <input type="text" id="docPV_data" name="docPV_data" size="7"/></fieldset>
+Data:  <input type="text" id="docPV_data" name="docPV_data" size="9"/></fieldset>
 ##<label for="docImmPV">Documento Portovesme : </label><input type="text" name="docImmPV" id="docImm" value="" size="16" /><br />
 </fieldset><br /><br />
 #end

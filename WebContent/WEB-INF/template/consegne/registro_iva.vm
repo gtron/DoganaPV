@@ -59,13 +59,16 @@ $!m.NumRegistro
 #if( $m.Umido.intValue() < 0 )
 <td>&nbsp;</td>
 <td class="r">$!tools.Number.format($tools.Math.mul( -1 , $m.Umido))</td>
+#set($sumUmido = $tools.Math.add( $sumUmido , $m.Umido ) )
 #else
 <td>&nbsp;</td>
 <td class="r">$tools.Number.format($m.Umido)</td>
+#set($sumUmido = $tools.Math.sub( $sumUmido , $m.Umido ) )
 #end
 #else
 <td class="r">$tools.Number.format($m.Umido)</td>
 <td>&nbsp;</td>
+#set($sumUmido = $tools.Math.add( $sumUmido , $m.Umido ) )
 #end
 
 <td>&nbsp;</td>
@@ -74,13 +77,16 @@ $!m.NumRegistro
 #if( $m.Secco.intValue() < 0 )
 <td>&nbsp;</td>
 <td class="r">$!tools.Number.format($tools.Math.mul( -1 , $m.Secco))</td>
+#set($sumSecco = $tools.Math.add( $sumSecco , $m.Secco ) )
 #else
 <td>&nbsp;</td>
 <td class="r">$tools.Number.format($m.Secco)</td>
+#set($sumSecco = $tools.Math.sub( $sumSecco , $m.Secco ) )
 #end
 #else
 <td class="r">$tools.Number.format($m.Secco)</td>
 <td>&nbsp;</td>
+#set($sumSecco = $tools.Math.add( $sumSecco , $m.Secco ) )
 #end
 
 
@@ -92,13 +98,7 @@ $!m.NumRegistro
 ##<td><a #if($velocityCount%25  == 0) id="lnk$m.Id"#end href=".consegne?cmd=editmovimento&iva=1&id=$m.Id">Modifica</a></td>
 
 </tr>
-#if( $m.getIsScarico() )
-#set($sumSecco = $tools.Math.sub( $sumSecco , $m.Secco ) )
-#set($sumUmido = $tools.Math.sub( $sumUmido , $m.Umido ) )
-#else
-#set($sumSecco = $tools.Math.add( $sumSecco , $m.Secco ) )
-#set($sumUmido = $tools.Math.add( $sumUmido , $m.Umido ) )
-#end
+
 #if ( "$sumUmido" == '0.0' )
 ##<tr class="sep"><td colspan="10" align="center">Svuotamento Stallo</td></tr>
 #end

@@ -19,10 +19,15 @@
 <span>$count</span>
 <p>
 #if( $s.IdConsegnaAttuale )
-- Consegna n. <strong>$!s.Consegna.Numero</strong><br>
-Merce: <strong>$!s.Consegna.Merce.Nome</strong><br>
-N. Partitario: <strong>$!s.Consegna.NumeroPartitario</strong>
-<br>
+Cons: <strong>$!s.Consegna.Numero</strong> - Partit: <strong>$!s.Consegna.NumeroPartitario</strong><br>
+<strong>$!s.Consegna.Merce.Nome</strong><br>
+#if( $!s.Consegna.Iter.Regdoganale )
+Giacenza Dog.: $tools.Number.format($!s.getGiacenzaDoganale(true))<br>
+#end
+#if( $!s.Consegna.Iter.Regiva )
+Giacenza IVA : $tools.Number.format($!s.getGiacenzaIva(true))<br>
+#end
+
 ##G.Attuale : $tools.Number.format( $s.Attuale )<br>
 ##G.Registro: $tools.Number.format( $s.Caricato )<br>
 #else

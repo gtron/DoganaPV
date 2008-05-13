@@ -55,8 +55,8 @@ public class Homepage extends VelocityCommand {
 	public String getTemplateName() {
 		if ( getBooleanParam("p") )
 			return PRINT ;
-		else
-			return HOMEPAGE ;
+		
+		return HOMEPAGE ;
 	}
 	
 	

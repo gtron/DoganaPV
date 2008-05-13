@@ -1,8 +1,6 @@
 package com.gsoft.pt_movimentazioni.data;
 
 
-import java.util.Date;
-
 import com.gsoft.doganapt.data.Merce;
 import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.sql.IDatabase2;

@@ -1,3 +1,4 @@
+#parse('costanti.vm')
 #set( $regIVA = $!obj.Iter.Regiva )
 #set( $regDog = $!obj.Iter.Regdoganale )
 <style type="text/css" media="print">
@@ -5,46 +6,97 @@ BODY {
 font-size : 10pt ;
 font-family : Arial;
 margin:	0;
-padding: 0;
-width:260mm;
+padding: 12mm 0 0 0;
+width:270mm;
 height: 180mm;
+color: #000;
 }
 
-TABLE { width : 100%; }
+TABLE { width : 100%; font-size: 1em; border-collapse: collapse ; page-break-inside: avoid ; color: #000;}
+CAPTION {border-bottom: 1px solid #000 ; font-size: 12pt; font-weight: bold;}
+.movimenti TD {border: 1pt solid; padding: 1pt;}
+
+.partitario { page-break-inside: avoid}
 .pb {page-break-before: always ;}
+.c {text-align : center;}
+.r {text-align: right; padding: 1pt 2pt 1pt 1pt; }
+#numPartitario {   top:0; padding-left: 150mm ; font-size:14pt; font-weight: bold ;}
+.tot TD { border : 0 none ;  border-top : 2px solid ; }
+.tot TD.f { border : 0 none ;  }
 </style>
 
 
+
 #set($sumPagina = 0)
+#set($rigaPartitario = 0)
 #set($dateFormat = 'dd/MM/yy')
 #set($oldStallo = '')
 #foreach( $m in $obj.Partitario )
-#if($oldStallo == '' || $oldStallo.Id != $m.Stallo.Id)
-#if( $oldStallo.Id)
-
+#set($rigaPartitario = $rigaPartitario + 1 )
+#set($nuovoStallo = ( $oldStallo == '' || $oldStallo.Id != $m.Stallo.Id  ) )
+#if( $nuovoStallo || ( $rigaPartitario  % $righePartitiari ) == 0 )
+#if( $oldStallo.Id )
+#if ( $sumUmidoIn == $sumUmidoOut )
+<tr class="tot">
+<td colspan="10" class="f" style="height:1pt;"><img src="$!wwwRoot/images/bgrabber.gif" width="1" height="1" alt=" "/></td>
+</tr>
+<tr class="tot">
+<td colspan="5" class="f"></td>
+<td>$tools.Number.format($sumUmidoIn)</td>
+<td>$tools.Number.format($sumUmidoOut)</td>
+<td class="f">&nbsp;</td>
+<td>$tools.Number.format($sumSeccoIn)</td>
+<td>$tools.Number.format($sumSeccoOut)</td>
+<td class="f">&nbsp;</td>
+</tr>
+#end
 </tbody></table></div>
 #end
+#set($sumPagina = $sumPagina + 1)
+#if($velocityCount > 2 )
+<div class="pb">&nbsp;</div>#end
 
+#if( $nuovoStallo )
+#set($rigaPartitario = 0)
 #set($sumSecco = 0)
 #set($sumUmido = 0)
-#set($oldStallo = $m.Stallo)
-#set($sumPagina = $sumPagina + 1)
-#if($velocityCount > 2 )<div class="pb">&nbsp;</div>#end
+#set($sumUmidoIn = 0)
+#set($sumUmidoOut = 0)
+#set($sumSeccoIn = 0)
+#set($sumSeccoOut = 0)
+#end
+<div id="partitario_$oldStallo.Id" class="partitario">
+
+<table border="0" class="movimenti" cellpadding="2" cellspacing="0" class="tablemovimenti">
+<caption><div id="numPartitario">$!obj.NumeroPartitario / $sumPagina</div>
 <div id="dettaglio">
-Consegna Num.: <strong>$!obj.Numero</strong> - Partitario : <strong>$!obj.NumeroPartitario / $sumPagina</strong><br />
-Merce : <strong>$!obj.Merce.Nome</strong> - 
-Iter : <strong>$!obj.Iter.Nome</strong><br>
-
-#if( $!obj.Pesopolizza > 0 )Peso Polizza: <strong>$tools.Number.format($!obj.Pesopolizza) Kg #if($!obj.PesoFinalePortoCarico) (P.Finale Porto di Carico)#end</strong> -#end
-Tasso di Umidit&agrave;: <strong>$!tools.Number.format('##0.00000', $!obj.TassoUmidita)%</strong>
-</div>
-
-<div id="partitario_$oldStallo.Id">
-<table border="0" class="movimenti" cellpadding="2" cellspacing="0" id="tablemovimenti">
-<caption>Stallo $oldStallo.Nome<br /><br /></caption>
+<br />
+<table border="0" style="font-size:9pt"><tr><td valign="top" style="text-align:left; border:0;">
+Merce : <strong>$!obj.Merce.Nome</strong><br />
+Consegna: <strong>$!obj.Numero</strong><br />
+Peso Polizza: #if( $!obj.Pesopolizza ) <strong>$tools.Number.format($!obj.Pesopolizza) Kg #if( false && $!obj.PesoFinalePortoCarico) (P.Finale Porto di Carico)#end</strong>#end<br />
+##Tasso di Umidit&agrave;: <strong>$!tools.Number.format('##0.00000', $!obj.TassoUmidita)%</strong>
+Regime Doganale: <strong>$!obj.RegimeDoganale</strong><br />
+Designazione Merce: <strong>$!obj.Merce.Designazione</strong><br />
+Codice N.C.: <strong>$!obj.Merce.CodiceNC</strong><br />
+Posizione Doganale: <strong>$!obj.Posizione</strong><br />
+</td><td valign="top" style="text-align:left; border:0;">
+Provenienza: <strong>$!obj.Provenienza</strong><br />
+Origine: <strong>$!obj.Origine</strong><br />
+Mezzo di Trasporto: <strong>$!obj.Mezzo</strong><br />
+</td><td valign="top" style="text-align:left; border:0;">
+Tasso di cambio: <strong>$!obj.Tassodicambio</strong><br />
+Fattura Provvisoria: <strong>$!obj.Fatturaprovvisoria.Numero</strong>  del: <strong>$!obj.Fatturaprovvisoria.Data</strong><br />
+&euro;: <strong>$!obj.Fatturaprovvisoria.Euro</strong> / 
+$: <strong>$!obj.Fatturaprovvisoria.Euro</strong><br />
+Fattura Definitiva: <strong>$!obj.Fatturadefinitiva.Numero</strong>  del: <strong>$!obj.Fatturadefinitiva.Data</strong><br />
+&euro;: <strong>$!obj.Fatturadefinitiva.Euro</strong> / 
+$: <strong>$!obj.Fatturadefinitiva.Euro</strong><br />
+</td></tr></table>
+</div><br />Stallo $m.Stallo.Nome #if($oldStallo.Id == $m.Stallo.Id)(continua)#end<br /><br /></caption>
 <tr>
 <th rowspan="2">Num.Reg.</th>
-<th rowspan="2" style="width:70mm">Data</th>
+<th rowspan="2" style="width:20mm">Data</th>
 <th rowspan="2" colspan="3" style="width:70mm">Documento</th>
 <th width="10%" colspan="2" style="width:70mm">Umido</th>
 <th rowspan="2" width="20">&nbsp;</th>
@@ -65,7 +117,7 @@ Tasso di Umidit&agrave;: <strong>$!tools.Number.format('##0.00000', $!obj.TassoU
 #end
 
 <tr#if($velocityCount%2  == 0) class="odd"#end>
-<td>
+<td class="c">##$rigaPartitario
 #if ( $m.NumRegistro )
 $!m.NumRegistro
 #else
@@ -81,7 +133,7 @@ $!m.NumRegistro
 ####else&nbsp;&nbsp;&nbsp;&nbsp;#end</td>
 
 
-<td>$tools.Date.format($dateFormat, $m.Data)</td>
+<td class="c">$tools.Date.format($dateFormat, $m.Data)</td>
 
 
 #if($m.Documento)
@@ -103,13 +155,18 @@ $!m.NumRegistro
 #if( $m.Umido.intValue() < 0 )
 <td>&nbsp;</td>
 <td class="r">$!tools.Number.format($tools.Math.mul( -1 , $m.Umido))</td>
+#set($sumUmidoOut = $tools.Math.add( $sumUmidoOut , $tools.Math.mul( -1 , $m.Umido) ) )
+#set($sumUmido = $tools.Math.add( $sumUmido , $m.Umido ) )
 #else
 <td>&nbsp;</td>
 <td class="r">$tools.Number.format($m.Umido)</td>
+#set($sumUmidoOut = $tools.Math.add( $sumUmidoOut , $m.Umido ) )
+#set($sumUmido = $tools.Math.sub( $sumUmido , $m.Umido ) )
 #end
 #else
 <td class="r">$tools.Number.format($m.Umido)</td>
 <td>&nbsp;</td>
+#set($sumUmidoIn = $tools.Math.add( $sumUmidoIn , $m.Umido ) )
 #end
 
 <td>&nbsp;</td>
@@ -118,20 +175,22 @@ $!m.NumRegistro
 #if( $m.Secco.intValue() < 0 )
 <td>&nbsp;</td>
 <td class="r">$!tools.Number.format($tools.Math.mul( -1 , $m.Secco))</td>
+#set($sumSeccoOut = $tools.Math.sub( $sumSeccoOut , $m.Secco ) )
 #else
 <td>&nbsp;</td>
 <td class="r">$tools.Number.format($m.Secco)</td>
+#set($sumSeccoOut = $tools.Math.add( $sumSeccoOut , $m.Secco ) )
 #end
 #else
 <td class="r">$tools.Number.format($m.Secco)</td>
 <td>&nbsp;</td>
+#set($sumSeccoIn = $tools.Math.add( $sumSeccoIn , $m.Secco ) )
 #end
 
-
-<td>$!m.Note</td>
-
+<td class="c">$!m.Note</td>
 
 
+#*
 #if( $m.getIsScarico() )
 #set($sumSecco = $tools.Math.sub( $sumSecco , $m.Secco ) )
 #set($sumUmido = $tools.Math.sub( $sumUmido , $m.Umido ) )
@@ -139,14 +198,27 @@ $!m.NumRegistro
 #set($sumSecco = $tools.Math.add( $sumSecco , $m.Secco ) )
 #set($sumUmido = $tools.Math.add( $sumUmido , $m.Umido ) )
 #end
+*#
 
-#if ( "$sumUmido" == '0.0' )
+#if ( $sumUmidoIn == $sumUmidoIn )
 ##<tr class="sep"><td colspan="10" align="center">Svuotamento Stallo</td></tr>
 #end
+
+#set($oldStallo = $m.Stallo)
 
 #end
 
 #if( $oldStallo.Id)
-
+#if ( $sumUmidoIn == $sumUmidoOut )
+<tr class="tot">
+<td colspan="5"></td>
+<td>$tools.Number.format($sumUmidoIn)</td>
+<td>$tools.Number.format($sumUmidoOut)</td>
+<td>&nbsp;</td>
+<td>$tools.Number.format($sumSeccoIn)</td>
+<td>$tools.Number.format($sumSeccoOut)</td>
+<td></td>
+</tr>
+#end
 </tbody></table></div>
 #end

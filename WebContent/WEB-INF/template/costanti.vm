@@ -5,3 +5,5 @@
 #set( $siteTitle = 'Deposito Doganale' )
 #set( $subTitle = 'Portovesme s.r.l.' )
 #set( $htmlTitle = "$siteTitle v.$versione - $subTitle"  )
+#set($righePartitiari = 5)
+

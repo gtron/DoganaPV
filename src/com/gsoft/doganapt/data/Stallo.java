@@ -116,10 +116,13 @@ public class Stallo extends ModelBean2 {
 			else
 				val = m.getUmido().doubleValue() ;
 			
-			if ( m.isScarico ) {
-				sum -= val ;
+			if ( m.isScarico || m.getSecco().intValue() < 0 ) { 
+				if( m.getSecco().intValue() < 0 ) 
+					sum += val ;
+				else
+					sum -= val ;
 			}
-			else 
+			else
 				sum += val ;
 		}
 		
@@ -138,11 +141,15 @@ public class Stallo extends ModelBean2 {
 			else
 				val = m.getUmido().doubleValue() ;
 			
-			if ( m.isScarico ) {
-				sum -= val ;
+			if ( m.isScarico || m.getSecco().intValue() < 0 ) { 
+				if( m.getSecco().intValue() < 0 ) 
+					sum += val ;
+				else
+					sum -= val ;
 			}
-			else 
+			else
 				sum += val ;
+				
 		}
 		
 		return sum ;

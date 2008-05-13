@@ -15,8 +15,6 @@ import com.gsoft.doganapt.data.Movimento;
 import com.gsoft.doganapt.data.Stallo;
 import com.gsoft.doganapt.data.adapters.ConsegnaAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoIvaAdapter;
-import com.gsoft.doganapt.data.adapters.StalloAdapter;
-import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.common.UserException;
 import com.gtsoft.utils.http.VelocityCommand;
 import com.gtsoft.utils.http.servlet.GtServlet;
@@ -53,11 +51,12 @@ public class ChiudiPFPC extends VelocityCommand {
 				
 				giacenza = s.getGiacenzaIva(false) ;
 				
-				if ( giacenza > 0 ) 
+				if ( giacenza > 0 ) {
 					if ( giacenzaSecco != null ) 
 						throw new UserException("Attenzione, giacenza presente in più di uno stallo!" );
-					else 
-						giacenzaSecco = s.getGiacenzaIva(true);
+					
+					giacenzaSecco = s.getGiacenzaIva(true);
+				}
 			}
 			
 			
@@ -72,8 +71,7 @@ public class ChiudiPFPC extends VelocityCommand {
 			
 			new MovimentoIvaAdapter().update(m);
 			
-			if ( c != null )
-				resp.sendRedirect(".consegne?id=" + c.getId());
+			resp.sendRedirect(".consegne?id=" + c.getId());
 		}
 		return null ;
 	}

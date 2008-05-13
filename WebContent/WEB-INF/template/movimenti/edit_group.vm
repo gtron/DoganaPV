@@ -51,19 +51,25 @@ Merce : $!obj.Consegna.Merce.Nome<br>
 Consegna numero : $!obj.Consegna.Numero</a><br>
 Iter : $!obj.Consegna.Iter.Nome<br>
 <br>
-Numero Registro :<input type="text" value="$!obj.NumRegistro" name="numregistro" /><br>
+#if (  $isAdmin  || ( $m.NumRegistro && $m.NumRegistro.length() > 0 ) )
+Numero Registro : #if ( $isAdmin ) ##&& ! ( $m.NumRegistro  || $m.NumRegistro.length() > 0 ) )
+<input type="text" value="$!obj.NumRegistro" name="numregistro" />
+#else
+<strong>$!m.NumRegistro</strong>
+#end<br />
+#end
 
 
 
 <br />
 <fieldset><legend>Documento</legend>
 Tipo: <select name="doctype">#if( $obj.Documento)<option value="$!obj.Documento.Tipo">$!obj.Documento.Tipo</option>#end
-<option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option><option value="R">R</option></select>
+<option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option><option value="R">R</option><option value="FT">FT</option></select>
 Numero: <input type="text" name="docnum" size="4" value="$!obj.Documento.Numero" />
 Data:  <input type="text" name="docdate" id="doc_data" size="8" value="$!obj.Documento.Data.dmyString()"/></fieldset>
 <fieldset ><legend>Documento (Portovesme)</legend>
 Tipo: <select name="docpvtype">#if( $!obj.DocumentoPV)<option value="$!obj.Documento.Tipo">$!obj.DocumentoPV.Tipo</option>#end
-<option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option><option value="R">R</option></select>
+<option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option><option value="R">R</option><option value="FT">FT</option></select>
 Numero: <input type="text" name="docpvnum" size="4" value="$!obj.DocumentoPV.Numero"/>
 Data:  <input type="text" id="docpvdate" name="docpvdate" size="8" value="$!obj.DocumentoPV.Data.dmyString()"/></fieldset>
 
@@ -93,24 +99,25 @@ Data:  <input type="text" id="docpvdate" name="docpvdate" size="8" value="$!obj.
 <td class="r">
 <input type="text" value="$!tools.Number.format('###0',$tools.Math.mul( -1 , $m.Umido))" name="u1_$m.Id" size="10"/></td>
 #else
-<td class="r"><input type="text" value="$!tools.Number.format('###0', $m.Umido)" name="u0_$m.Id" size="10"/></td>
 <td class="r"><input type="text" value="0" name="u1_$m.Id" size="10" /></td>
+<td class="r"><input type="text" value="$!tools.Number.format('###0', $m.Umido)" name="u0_$m.Id" size="10"/></td>
 #end
 #else
 <td class="r"><input type="text" value="$!tools.Number.format('###0',$m.Umido)" name="u0_$m.Id" size="10" /></td>
 <td class="r"><input type="text" value="0" name="u1_$m.Id" size="10" /></td>
 #end
 
-<td>&nbsp;</td>
 
+
+<td>&nbsp;</td>
 #if($m.getIsScarico() ||  $m.Secco.intValue() < 0 )
 #if( $m.Secco.intValue() < 0 )
 <td class="r"><input type="text" value="0" name="s0_$m.Id" size="10" /></td>
 <td class="r">
 <input type="text" value="$!tools.Number.format('###0',$tools.Math.mul( -1 , $m.Secco))" name="s1_$m.Id" size="10"/></td>
 #else
-<td class="r"><input type="text" value="$!tools.Number.format('###0', $m.Secco)" name="s0_$m.Id" size="10"/></td>
 <td class="r"><input type="text" value="0" name="s1_$m.Id" size="10" /></td>
+<td class="r"><input type="text" value="$!tools.Number.format('###0', $m.Secco)" name="s0_$m.Id" size="10"/></td>
 #end
 #else
 <td class="r"><input type="text" value="$!tools.Number.format('###0',$m.Secco)" name="s0_$m.Id" size="10" /></td>

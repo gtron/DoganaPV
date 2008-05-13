@@ -1,6 +1,7 @@
-
-##
-##
+<style type="text/css" media="print">
+TABLE { border: 0 none ; color : #000 ; font-size: 1em ;}
+.head { text-align : center; border: 0 none ; font-weight:bold ; font-size: 1.1em;}
+</style>
 #set($oldParco = "")
 #foreach( $s in $stalli ) 
 #if($oldParco != $s.Parco)
@@ -8,7 +9,7 @@
 #if ( $velocityCount > 1)</tr></table><br>#end
 <table border="0" cellspacing="0" width="100%">
 <tr>
-<td colspan="8" class="c"><strong>Parco $s.Parco</strong></td>
+<td colspan="8" class="head">Parco $s.Parco</td>
 </tr>
 <tr>
 ##<th>$s.Parco</th>

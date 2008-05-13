@@ -48,8 +48,6 @@ public class ImmettiLiberaPratica extends VelocityCommand {
 		ctx.put( ContextKeys.OBJECT , c ) ;
 		
 		if ( c != null && getBooleanParam(Strings.EXEC) ) {
-
-			
 			c.getIter()
 				.getImporter(
 					new MovimentoDoganaleAdapter(),

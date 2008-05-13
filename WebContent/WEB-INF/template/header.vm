@@ -7,7 +7,9 @@
 <link rel="stylesheet" type="text/css" href="$wwwRoot/style/structure.css" media="screen" />
 
 <link rel="stylesheet" type="text/css" href="$wwwRoot/style/main_print.css" media="print" />
-
+#if( $!addCssPrint )#foreach( $j in $addCssPrint )
+<link rel="stylesheet" type="text/css" href="#if(!$j.startsWith('http:'))$wwwRoot#end$j"  media="print"/>
+#end#end
 
 #if( $!addCss )#foreach( $j in $addCss )
 <link rel="stylesheet" type="text/css" href="#if(!$j.startsWith('http:'))$wwwRoot#end$j" />

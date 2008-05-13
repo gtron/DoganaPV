@@ -28,14 +28,14 @@ import com.gtsoft.utils.http.VelocityCommand;
 import com.gtsoft.utils.http.servlet.GtServlet;
 
 
-public class EditGruppoMovimenti extends BeanEditor {
+public class NuovoMovimento extends BeanEditor {
 	
 	protected static String TEMPLATE = "movimenti/edit_group.vm";
 	
 	String template ;
 	boolean isIva = false ;
 	
-	public EditGruppoMovimenti ( GtServlet callerServlet) {
+	public NuovoMovimento ( GtServlet callerServlet) {
 		super(callerServlet);
 		template = TEMPLATE;
 	}
@@ -146,7 +146,7 @@ public class EditGruppoMovimenti extends BeanEditor {
 
 
 	public VelocityCommand clone() {
-		return  new EditGruppoMovimenti(this.callerServlet);
+		return  new NuovoMovimento(this.callerServlet);
 	}
 	MovimentoAdapter adapter = null ;
 	public BeanAdapter2 getAdapter(  )  {

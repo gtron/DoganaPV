@@ -214,7 +214,10 @@ public class Consegna extends ModelBean2 {
 	}
 	public Double calcolaSecco( Double umido ) {
 		if ( umido != null)
-			return new Double( Math.round( umido.doubleValue() - ( umido.doubleValue() * tassoUmidita ) ) );
+			return new Double( 
+					Math.round( 
+							umido.doubleValue() * 
+							(double) Math.round(  10000 - 10000 * tassoUmidita.doubleValue() ) / 10000  ) );
 		
 		return null ;
 	}
@@ -302,18 +305,18 @@ public class Consegna extends ModelBean2 {
 		
 		if ( dontcache )
 			return adp.getRegistro(soloRegistrati, this);
-		else {
-			if ( iva ) {
-				if (registroIva  == null )
-					registroIva = adp.getRegistro(soloRegistrati, this);
-				return registroIva ;
-			}
-			else {
-				if (registroDoganale   == null )
-					registroDoganale  = adp.getRegistro(soloRegistrati, this);
-				return registroDoganale ;
-			}
+		
+		if ( iva ) {
+			if (registroIva  == null )
+				registroIva = adp.getRegistro(soloRegistrati, this);
+			return registroIva ;
 		}
+		
+		if ( registroDoganale == null )
+			registroDoganale  = adp.getRegistro(soloRegistrati, this);
+		
+		return registroDoganale ;
+	
 		
 		
 	}

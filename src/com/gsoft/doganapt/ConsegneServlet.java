@@ -18,6 +18,7 @@ import com.gsoft.doganapt.cmd.consegne.PrintConsegna;
 import com.gsoft.doganapt.cmd.consegne.ViewConsegna;
 import com.gsoft.doganapt.cmd.movimenti.EditGruppoMovimenti;
 import com.gsoft.doganapt.cmd.movimenti.EditMovimento;
+import com.gsoft.doganapt.cmd.movimenti.NuovoMovimento;
 import com.gsoft.framework.TooledServlet;
 
 public class ConsegneServlet extends TooledServlet {
@@ -52,6 +53,9 @@ public class ConsegneServlet extends TooledServlet {
 		addCommand(Commands.EDIT_MOVIMENTO , 
 				new EditMovimento(this) );
 		
+		addCommand(Commands.NEW_MOVIMENTO , 
+				new NuovoMovimento(this) );
+		
 		addCommand(Commands.EDIT_MOVIMENTO_GROUP , 
 				new EditGruppoMovimenti(this) );
 		
@@ -73,7 +77,9 @@ public class ConsegneServlet extends TooledServlet {
 		public static final String CHIUDI_PFPC = "chiudiPFPC" ;
 		public static final String LIST = "list" ;
 		public static final String EDIT_MOVIMENTO = "editmovimento" ;
+		public static final String NEW_MOVIMENTO = "newmovimento" ;
 		public static final String EDIT_MOVIMENTO_GROUP = "editgroup" ;
+		
 		
 		public static final String POPOLA_STALLI = "popola" ;
 		public static final String IMMETTILP = "immettiLP" ;
@@ -89,6 +95,8 @@ public class ConsegneServlet extends TooledServlet {
 		
 		if ( logged != Boolean.TRUE ) {
 			response.sendRedirect(".main");
+			response.flushBuffer();
+			return null ;
 		}
 		return super.handleRequest(request, response, ctx) ;
 	}
