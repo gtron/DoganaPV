@@ -127,25 +127,25 @@ subgrid_table_id = subgrid_id+"_t"; jQuery("#"+subgrid_table_id).GridDestroy();
 
 *#
 colNames:['N.','Data','Cons.','Part.' , 'Documento', 'Merce','umido<br />IN','umido<br />OUT','secco<BR >IN','secco<BR />OUT'
-#if($iva) ,'&euro;','$'#end ],
+#if($iva) ,'&euro;'#end ],
 colModel:[
-{name:'numero',index:'numregistro',width:50,align:'center',filterType:'text'},
+{name:'numero',index:'numregistro',width:40,align:'center',filterType:'text'},
 {name:'data',index:'data',width:80,align:'center',filterType:'date'},
 {name:'consegna',index:'C.numero',width:60,align:'center',filterType:'text'},
-{name:'n_partitario',index:'C.numpartitario',width:50,align:'center'},
+{name:'n_partitario',index:'C.numpartitario',width:30,align:'center'},
 {name:'documento',index:'documento',width:100,sortable:false},
 {name:'merce',index:'M.nome',width:120,filterType:'select'},
 ##options:[#foreach($m in $merci)#if($velocityCount  >1),#end {name:'$m.Nome',value:'$m.Id'}#end]},
-{name:'umido_in',index:'umido',width:60,sortable:false},
-{name:'umido_out',index:'umido',width:60,sortable:false},
-{name:'secco_in',index:'secco',width:60,sortable:false}, 
-{name:'secco_out',index:'secco',width:60,sortable:false}
+{name:'umido_in',index:'umido',width:60,align:'right',sortable:false},
+{name:'umido_out',index:'umido',width:60,align:'right',sortable:false},
+{name:'secco_in',index:'secco',width:60,align:'right',sortable:false}, 
+{name:'secco_out',index:'secco',width:60,align:'right',sortable:false}
 #if($iva)
-,{name:'val_euro',index:'valoreeuro',width:60,sortable:false},
-{name:'val_dollari',index:'valoreeuro',width:60,sortable:false}
+,{name:'val_euro',index:'valoreeuro',width:60,sortable:false}
+##,{name:'val_dollari',index:'valoreeuro',align:'right',width:60,sortable:false}
 #end
 ],
-width:920, 
+width:910, 
 
 shrinkToFit: true,
 
@@ -274,8 +274,14 @@ if ( doconferma && doconferma ) {
 
 location.href= servlet + '?cmd='+action+'&iva=' + iva + '&n='+n + conferma ;
 }
-
-
+function riordina() {
+var iva = #if($isIva || $iva)'1'#else'0'#end ;
+##alert( '.registri?iva=' + iva + '&cmd=check&exec=1' );
+jQuery.get('.registri?iva=' + iva + '&cmd=check&exec=1', '', 
+function(d,t) { 
+if ( d == 'true') location.href = location.href ; else alert( 'Si è verificato un errore:\n' + d);
+});
+}
 </script> 
 
 ##<iframe name="stp" src="voidreg.html" width="10" height="10" style="visibility:hidden;position:absolute;"></iframe>
@@ -299,6 +305,7 @@ location.href= servlet + '?cmd='+action+'&iva=' + iva + '&n='+n + conferma ;
 <li style="border-right:2px solid #EEE;"><a href="#" onclick="deregistraMovimento(); return false;"><img src="$!images/action-ico-elimina.png" />De-Registra Movimento</a></li>
 #end
 <li style="border-right:2px solid #EEE;"><a href="#" onclick="editMovimento(); return false;"><img src="$!images/action-ico-modifica.png" />Modifica Movimento</a></li>
+<li><a href="#" onclick="riordina();return false;"><img src="$!images/action-ico-immetti.png" />Riordina Numerazione</a></li>
 <li><a href="#" onclick="stampaCopertina(); return false;"><img src="$!images/action-ico-stampa.png" />Copertina</a></li>
 <li><a href="#" onclick="$('#dlg_Prepara').dialogOpen(); return false;"><img src="$!images/action-ico-stampa.png" />Prepara Pagine</a></li>
 <li><a href="#" onclick="$('#dlg_Print').dialogOpen(); return false;"><img src="$!images/action-ico-stampa.png" />Stampa Registro</a></li>
