@@ -16,6 +16,7 @@ import com.gsoft.doganapt.cmd.consegne.ListConsegne;
 import com.gsoft.doganapt.cmd.consegne.PopolaStalli;
 import com.gsoft.doganapt.cmd.consegne.PrintConsegna;
 import com.gsoft.doganapt.cmd.consegne.ViewConsegna;
+import com.gsoft.doganapt.cmd.movimenti.DeleteMovimento;
 import com.gsoft.doganapt.cmd.movimenti.EditGruppoMovimenti;
 import com.gsoft.doganapt.cmd.movimenti.EditMovimento;
 import com.gsoft.doganapt.cmd.movimenti.NuovoMovimento;
@@ -65,6 +66,8 @@ public class ConsegneServlet extends TooledServlet {
 		addCommand(Commands.POPOLA_STALLI , 
 				new PopolaStalli(this) );
 		
+		addCommand( Commands.DELETE_MOVIMENTO,
+				new DeleteMovimento( this ) ) ;
 	}
 
 	public static interface Commands {
@@ -79,10 +82,11 @@ public class ConsegneServlet extends TooledServlet {
 		public static final String EDIT_MOVIMENTO = "editmovimento" ;
 		public static final String NEW_MOVIMENTO = "newmovimento" ;
 		public static final String EDIT_MOVIMENTO_GROUP = "editgroup" ;
-		
+		public static final String DELETE_MOVIMENTO = "delete" ;
 		
 		public static final String POPOLA_STALLI = "popola" ;
 		public static final String IMMETTILP = "immettiLP" ;
+		
 	}
 	
 	protected Template handleRequest(HttpServletRequest request, HttpServletResponse response, Context ctx) throws Exception {

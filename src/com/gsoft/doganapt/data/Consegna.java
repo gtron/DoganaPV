@@ -318,9 +318,6 @@ public class Consegna extends ModelBean2 {
 		return registroDoganale ;
 
 	}
-	
-	
-	
 
 	public Vector getPartitario() throws Exception {
 		

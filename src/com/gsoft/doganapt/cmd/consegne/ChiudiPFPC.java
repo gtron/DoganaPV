@@ -51,7 +51,7 @@ public class ChiudiPFPC extends VelocityCommand {
 				
 				giacenza = s.getGiacenzaIva(false) ;
 				
-				if ( giacenza > 0 ) {
+				if ( giacenza.intValue() != 0 ) {
 					if ( giacenzaSecco != null ) 
 						throw new UserException("Attenzione, giacenza presente in più di uno stallo!" );
 					
@@ -59,7 +59,7 @@ public class ChiudiPFPC extends VelocityCommand {
 				}
 			}
 			
-			if (  giacenza != null && giacenza > 0 ) {
+			if (  giacenza != null && giacenza.intValue() != 0 ) {
 				Vector v = c.getRegistro(true, false, true );
 				
 				Movimento m = (Movimento) v.lastElement() ;

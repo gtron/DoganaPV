@@ -7,6 +7,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.velocity.Template;
 import org.apache.velocity.context.Context;
 
+import com.gsoft.doganapt.cmd.movimenti.DeleteMovimento;
 import com.gsoft.doganapt.cmd.registri.DeregistraMovimento;
 import com.gsoft.doganapt.cmd.registri.PreparaRegistro;
 import com.gsoft.doganapt.cmd.registri.RegistraMovimento;
@@ -69,5 +70,6 @@ public class RegistriServlet extends TooledServlet {
 		public static final String DEREGISTRA = "deregistra" ;
 		public static final String PREPARA = "prepara" ;
 		public static final String CHECK = "check" ;
+
 	}
 }

@@ -123,6 +123,7 @@ public class MovimentoIvaAdapter extends MovimentoAdapter {
 		StringBuilder sql = new StringBuilder(70)
 			.append("SELECT max(numregistro) FROM ")
 			.append(getTable())
+			.append(" WHERE deleted = 0 ")
 			;
 		
 		Integer d = new Integer( 1 ) ;

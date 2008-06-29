@@ -44,12 +44,13 @@ public class MovimentoDoganaleAdapter extends MovimentoAdapter {
 				throw new Exception("Errore nella gestione della concorrenza sul registro") ;
 			}
 		}
-		Thread.sleep(1500);
+
 		busy = Boolean.TRUE ;
 		
 		StringBuilder sql = new StringBuilder(70)
 			.append("SELECT max(numregistro) FROM ")
 			.append(getTable())
+			.append(" WHERE deleted = 0 ")
 			;
 		
 		Integer d = new Integer( 1 ) ;

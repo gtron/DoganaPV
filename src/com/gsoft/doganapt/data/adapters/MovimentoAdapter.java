@@ -187,7 +187,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 //			.append(" WHERE isscarico = ?") 
 			;
 			
-		sql.append(" WHERE idconsegna = ?  ");
+		sql.append(" WHERE deleted = 0 AND idconsegna = ?  ");
 		
 		
 		
@@ -251,23 +251,22 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		return getByConsegna( false , null, id ,order, limit);
 	}
 	public Vector getByConsegna( boolean onlyRegistered, Integer idConsegna, Integer idStallo, String order, String limit ) throws Exception {
-		StringBuilder sb = new StringBuilder(30);
+		StringBuilder sb = new StringBuilder(50);
 		
+		sb.append(" deleted = 0 " ); 
 		if ( idConsegna != null ) { 
-			sb.append("idconsegna =")
+			sb.append("AND idconsegna =")
 				.append( idConsegna.toString() ) ; 
-			
-			if ( idStallo != null )
-				sb.append(" AND ") ;
+
 		}
 		if ( idStallo != null )
-			sb.append(" idstallo = ")
+			sb.append(" AND idstallo = ")
 				.append(idStallo.toString()) ;
 		
 		if ( onlyRegistered ) { 
-			if ( idStallo != null || idConsegna != null )
-				sb.append(" AND ") ;
-			sb.append(" numregistro > 0 ") ;
+//			if ( idStallo != null || idConsegna != null )
+//				sb.append(" AND ") ;
+			sb.append(" AND numregistro > 0 ") ;
 		}
 		
 		return getWithWhere( sb.toString() ,order, limit);
@@ -275,23 +274,47 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 	
 	public Vector getByNumeroRegistro(Integer num ) throws Exception {
 
-		return getWithWhere( "numregistro =" + num );
+		return getWithWhere( " deleted = 0 AND numregistro =" + num );
 	}
 	
-	public void unregister( Long id ) throws Exception {
+	public void setDeleted( Integer id ) throws Exception {
 		
 		Connection conn = null;
 		
 		StringBuilder sql = new StringBuilder(70)
 		.append("update ")
 		.append(getTable())
-		.append(" set numregistro = null where numregistro = " + id )
+		.append(" set deleted = 1 where id = " + id )
+		// .append ( "  AND numregistro = null ")
+		 ;
+		try {
+			conn = db.getConnection() ;
+			db.executeNonQuery(sql.toString(), conn) ;
+
+		}
+		catch ( Exception e ) {
+			throw e ;
+		}
+		finally {
+			db.freeConnection(conn) ;
+		}
+		
+	}
+	
+	public void unregister( Long numreg ) throws Exception {
+		
+		Connection conn = null;
+		
+		StringBuilder sql = new StringBuilder(70)
+		.append("update ")
+		.append(getTable())
+		.append(" set numregistro = null where deleted = 0 AND numregistro = " + numreg )
 		 ;
 		try {
 			conn = db.getConnection() ;
 			db.executeNonQuery(sql.toString(), conn) ;
 		
-			shiftRegistro( true, new Integer( id.intValue() ), conn ) ;
+			shiftRegistro( true, new Integer( numreg.intValue() ), conn ) ;
 			
 		}
 		catch ( Exception e ) {
@@ -312,10 +335,10 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		
 		
 		if ( down ) {
-			sql.append( " - 1 where numregistro > ") ;
+			sql.append( " - 1 where deleted = 0 AND numregistro > ") ;
 		}
 		else {
-			sql.append( " + 1 where numregistro >= ") ;
+			sql.append( " + 1 where deleted = 0 AND numregistro >= ") ;
 		}
 
 		sql.append( from ) ;
@@ -327,7 +350,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 	public ArrayList<Merce> getMerci() throws Exception {
 		StringBuilder sql = new StringBuilder(70)
 					.append("SELECT * FROM ")
-					.append(getTable()).append(" GROUP BY idmerce ") 
+					.append(getTable()).append(" WHERE deleted = 0 GROUP BY idmerce ") 
 					;
 		ArrayList<Merce> list = null ;
 		Connection conn = db.getConnection() ;
@@ -352,7 +375,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 	public Vector<Integer>  getIdMerci() throws Exception {
 		StringBuilder sql = new StringBuilder(70)
 					.append("SELECT distinct idmerce FROM ")
-					.append(getTable()).append(" WHERE numregistro > 0 ")  
+					.append(getTable()).append(" WHERE deleted = 0 AND numregistro > 0 ")  
 					;
 		Connection conn = db.getConnection() ;
 		Vector<Integer> list = null ;
@@ -430,18 +453,18 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			}
 		}
 		if ( soloRegistrati || c != null || numero != null || numConsegna != null || idMerce != null ) 
-			sql.append(" WHERE ");
+			sql.append(" WHERE R.deleted = 0 ");
 			
 		if ( soloRegistrati ) {
 			
-			sql.append(" numregistro > 0 ");
+			sql.append(" AND numregistro > 0 ");
 			
-			if ( c != null )
-				sql.append(" AND "); 
+//			if ( c != null )
+//				sql.append(" AND "); 
 		}
 
 		if( c != null )
-			sql.append(" idconsegna = ? ");
+			sql.append(" AND idconsegna = ? ");
 		
 		if( numero != null )
 			sql.append(" AND numregistro  = ").append(numero);
@@ -523,11 +546,10 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			.append(" R ");
 		
 		
-		if ( from != null) 
-			sql.append(" WHERE ");
+		sql.append(" WHERE deleted = 0 ");
 			
 		if ( from != null ) {
-			sql.append("numregistro >= ?");
+			sql.append(" AND numregistro >= ?");
 		}
 		
 		sql.append(" GROUP BY numregistro ORDER BY numregistro , data, isrettifica, idstallo " );
@@ -560,7 +582,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		StringBuilder sql = new StringBuilder(70)
 			.append(" UPDATE ")
 			.append(getTable())
-			.append( " SET locked = 1 WHERE numregistro >= ? AND numregistro <=  ?");
+			.append( " SET locked = 1 WHERE deleted = 0 AND numregistro >= ? AND numregistro <=  ?");
 		
 		Integer ret = null ;
 		Connection conn = db.getConnection() ;
@@ -606,7 +628,7 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 			.append("SELECT * FROM ")
 			.append(getTable())
 			.append(" r INNER JOIN consegne c ON r.idconsegna = c.idconsegna " )
-			.append(" INNER JOIN iter i ON c.iter = i.id  WHERE numregistro IS NULL ")
+			.append(" INNER JOIN iter i ON c.iter = i.id  WHERE deleted = 0 AND numregistro IS NULL ")
 			 ;
 			
 		if( idConsegna != null )
@@ -650,7 +672,7 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 		StringBuilder sql = new StringBuilder(70)
 			.append("SELECT * FROM ")
 			.append(getTable())
-			.append(" WHERE numregistro is null ");
+			.append(" WHERE deleted = 0 AND numregistro is null ");
 			 ;
 			
 		if( idConsegna != null )
@@ -690,7 +712,7 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 	public Vector getPartitario( Consegna c ) throws Exception {
 
 		String sql = "SELECT id, idmerce, idconsegna, data, idstallo, cast(isscarico as binary ) as isscarico, isrettifica, secco, umido, numregistro, doctype, docnum, docdate, docpvtype, docpvnum, docpvdate, note, posdoganale, locked, 0 , 0 " +
-				" FROM where idconsegna = ? union all select * from registroiva where idconsegna = ? order by idstallo, data ";
+				" FROM where deleted = 0 AND idconsegna = ? union all select * from registroiva where idconsegna = ? order by idstallo, data ";
 		
 		
 		Vector list = null ;
@@ -716,7 +738,7 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 	public ArrayList<Integer> getIdStalli(Integer idConsegna ) throws Exception {
 
 		String sql = "SELECT distinct idstallo FROM " + getTable() +
-			" where idconsegna = ? and idstallo is not null  order by idstallo ";
+			" where deleted = 0 AND idconsegna = ? and idstallo is not null  order by idstallo ";
 		
 		ArrayList<Integer> list = null ;
 		
@@ -745,7 +767,7 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 	 
 	public Vector getGroup(  Integer idConsegna , FormattedDate d , boolean scarico, boolean rettifica) throws Exception {
 		
-		return getWithWhere(" idconsegna = " + idConsegna.toString() 
+		return getWithWhere(" deleted = 0 AND idconsegna = " + idConsegna.toString() 
 				+ " AND data = '" + d.ymdString() + "'" 
 				+ " AND isrettifica = '" + (rettifica ? "1":"0") + "'" 
 				+ " AND isscarico = '" + (scarico ? "1":"0") + "'" 
@@ -755,7 +777,7 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 	
 	public Vector getByData( Integer idConsegna , FormattedDate d ) throws Exception {
 		
-		return getWithWhere(" idconsegna = " + idConsegna.toString() + " AND data = '" + d.ymdString() + "'" ) ;
+		return getWithWhere(" deleted = 0 AND idconsegna = " + idConsegna.toString() + " AND data = '" + d.ymdString() + "'" ) ;
 		
 	}
 	
