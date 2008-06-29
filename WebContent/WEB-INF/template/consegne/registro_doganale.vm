@@ -2,7 +2,7 @@
 <table border="0" class="movimenti" cellpadding="2" cellspacing="0" id="tablemovimenti">
 ##<caption>Registro Doganale per la Consegna n. <strong>$obj.Numero</strong><br/>Merce : <strong>$!obj.Merce.Nome</strong><br><br /></caption>
 <tr>
-<th rowspan="2">Num.Registro</th>
+<th rowspan="2">Num.Registro<br /><a  href=".consegne?cmd=newmovimento&idC=$obj.Id">[Nuovo]</a></th>
 ##<th  rowspan="2" width="6%">Tipo&nbsp;&nbsp;</th>
 <th rowspan="2">Data</th>
 <th rowspan="2">Documento</th>

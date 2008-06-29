@@ -82,14 +82,16 @@ $(document).ready(function(){
 $("#menuConsegna").tabs();
 
 #set($immissioneLP=false)
+#set($canImport=true)
 #if ( $regDog  && $regIVA)
+#set($canImport=false)
 #foreach( $s in $obj.Stalli )
-#if( ! $s.HasLiberaPratica )#set($immissioneLP=true)#end
+#if( ! $s.HasLiberaPratica )#set($immissioneLP=true)#else#set($canImport=true)#end
 #end
 #end
 
 
-#if(!$immissioneLP && $regIVA )$("#menuConsegna").tabsClick( 2 );#end
+## #if(!$immissioneLP && $regIVA )$("#menuConsegna").tabsClick( 2 );#end
 
 });
 </script>
@@ -120,7 +122,7 @@ $("#menuConsegna").tabs();
 <li><a href="#" onclick="$('#dlg_LiberaPratica').dialogOpen();"><img src="$!images/action-ico-registra.png" />Immetti in L.P.</a></li>
 #end
 
-#if( $rettificaDone && ! $immissioneLP && $obj.isAperta())
+#if( $rettificaDone && $canImport&& $obj.isAperta())
 <li><a href="#" id="import_$obj.Id" onclick="openDialog($obj.Id,'#dlg_ImportTo');"><img src="$!images/action-ico-immetti.png" />Importa Scarichi</a></li>
 #if ($obj.isPesoFinalePortoCarico() && ! $registraIVA )
 <li><a href="?id=$obj.Id&amp;cmd=chiudiPFPC&exec=1" onclick="return confirm('Chiudere la consegna?');"><img src="$!images/action-ico-registra.png" />Chiudi PFPC</a></li>
@@ -135,6 +137,13 @@ $("#menuConsegna").tabs();
 <div id="dlg_ImportTo" class="flora" style="text-align:center;">
 Inserire la data fino alla quale si desidera importare (compresa):
 <input type="text" size="10" maxlength="10" id="dataImport" />
+#if( $immissioneLP  )
+<br />
+#foreach( $s in $obj.Stalli )
+#if($s.HasLiberaPratica )
+<input type="checkbox" name="idstalli2import" value="$s.Id" id="libPrat_$velocityCount" />
+<label for="libPrat_$velocityCount">$s.Nome</label><br />
+#end#end#end
 </div>
 
 <div id="dlg_LiberaPratica" class="flora" style="text-align:center;">
@@ -188,7 +197,8 @@ height:420,buttons:{'Immetti in L.P.': function(){immettiLP(true);} ,Annulla : f
 $("#dlg_LiberaPratica").dialogClose();
 
 $("#dlg_ImportTo").dialog({ width:360,
-height:140,buttons:{Importa: function(){importTo(true);} , Annulla : function() { importTo(); } } 
+height:240,buttons:{Importa: function(){importTo(true);} , Annulla : function() { $("#dlg_ImportTo").dialogClose(); } }
+//  l'annulla era  importTo(); ma non so xke
 });
 jQuery('#dataImport').calendar();
 jQuery('#docPV_data').calendar();
@@ -208,9 +218,23 @@ function importTo( exec ) {
 $("#dlg_ImportTo").dialogClose();
 var data = jQuery('#dataImport').attr('value') ;
 
+var ids = '' ;
+var list = document.getElementsByTagName('input');
+for( var el = 0; el < list.length ; el++ ) {
+	if ( list[el].name && list[el].name == 'idstalli2import' && list[el].checked ) {
+		ids += '&stalli=' + list[el].value ;
+	}
+}
+#if( $immissioneLP  )
+if ( ids == '' )  {
+	alert ( 'Selezionare almeno uno stallo per effettuare l\'importazione') ; 
+	return false ;
+}
+#end
+
 // var lnk = 
 if( data && data != '' ) {
-window.location.href = '.main?cmd=import&exec=1&idConsegna=' + idConsegna + '&to=' +  data ;
+window.location.href = '.main?cmd=import&exec=1&idConsegna=' + idConsegna + '&to=' +  data + ids ;
 }
 
 idConsegna = -1 ;

@@ -1,0 +1,243 @@
+#if( $iva && $json)
+#parse('registri/json/iva.json_vm')
+#elseif($json)
+#parse('registri/json/doganale.json_vm')
+#else
+#if( $iva )
+#set($activeMenu='IVA')
+#else 
+#set($activeMenu='DOGANALE')
+#end
+#parse('costanti.vm')
+#set( $addCssPrint = ['/style/registro.css'] )
+#set( $addCss = ['/style/tablefilter/tableFilter.aggregator.css','/style/tablefilter/tableFilter.css','/style/grid.css','/js/jquery.ui/themes/flora/flora.dialog.css','/js/jquery.ui/themes/flora/flora.all.css'] )
+#set( $addJs = ['/js/jquery.jqgrid/jquery.jqGrid.js','/js/jquery.ui/ui.calendar.js','/js/jquery.ui/ui.dimensions.js','/js/jquery.ui/ui.mouse.js','/js/jquery.ui/ui.draggable.js','/js/jquery.ui/ui.resizable.js','/js/jquery.ui/ui.dialog.js'])
+#parse('header.vm')
+<script type="text/javascript">
+function initRowHighlighting(){
+var table = document.getElementById('tablemovimenti');
+attachRowMouseEvents(table.getElementsByTagName('tr'));
+}
+function attachRowMouseEvents(rows){
+for(var i = 0;i < rows.length;i++){
+var row = rows[i];
+row.onmouseover = function(){ highlightRow(this, true);}
+row.onmouseout = function() { highlightRow(this, false);}
+// row.style.cursor = 'pointer';
+}}
+
+function highlightRow( row, isover) { 
+if ( row.getAttribute('origClass') == null )
+	row.setAttribute('origClass' , row.className);
+	
+row.className = isover ? 'hi' : row.getAttribute('origClass');
+}
+
+
+
+function preparaPagine() {
+//var w = window.open('voidreg.html','x','width=10,height=10,scrollable=no');
+//w.blur();
+var n = document.getElementById('numPagine').value ;
+var f = document.getElementById('fromPagina').value ;
+
+if ( n + 10 == 10 ) return false;
+if ( f + 10 == 10 ) return false;
+
+// stp.printPages( 1 * n, 1 * f);
+//alert( '.registri?cmd=prepara&f=' + f + '&t=' + ( 1 * f + 1 * n ) );
+$('#ret').load('.registri?cmd=prepara&f=' + f + '&t=' + ( ( 1 * f + 1 * n ) - 1 ) , 
+		{} , function() {$('#dlg_Prepara').dialogClose();window.print();});
+//setTimeout( function() { w.printPages(5,102); } , 1000 ) ;
+}
+
+$('document').ready( function() {
+
+$("#dlg_Prepara").dialog({ width:400,
+height:120,buttons:{Stampa: function(){preparaPagine();} ,Annulla : function() { $("#dlg_Prepara").dialogClose(); } } 
+});
+$("#dlg_Prepara").dialogClose();
+
+
+$("#dlg_Print").dialog({ width:400,
+height:160,buttons:{Stampa: function(){stampaRegistro();} ,Annulla : function() { $("#dlg_Print").dialogClose(); } } 
+});
+$("#dlg_Print").dialogClose();
+
+$("#dlg_Confirm").dialog({ width:400,
+height:120,buttons:{Si: function(){confirmedStampa();} , No : function() { $("#dlg_Confirm").dialogClose(); } } 
+});
+$("#dlg_Confirm").dialogClose();
+
+jQuery("#tablemovimenti").jqGrid({
+#if($iva)#set($regiva='iva=true&')#end
+url:'.registri?$!{regiva}json=true&records=$!records&idMerce='+ '' + '&inputNum= ' + $("#inputNum").val() + '&inputDal=' + $("#inputDal").val() + '&inputAl=' + $("#inputAl").val() + '&ndS='+new Date().getTime(),
+datatype: 'json', 
+height: 450,
+#*
+
+subGrid: true,
+subGridRowExpanded: function(subgrid_id, row_id) {
+// we pass two parameters 
+// subgrid_id is a id of the div tag created whitin a table data
+// the id of this elemenet is a combination of the "sg_" + id of the row 
+// the row_id is the id of the row 
+// If we wan to pass additinal parameters to the url we can use 
+// a method getRowData(row_id) - which returns associative array in type name-value 
+// here we can easy construct the flowing
+var subgrid_table_id; 
+subgrid_table_id = subgrid_id+"_t";
+$("#"+subgrid_id).html('<input type="" name="" onclick="" />');
+},
+
+subGridRowColapsed: function(subgrid_id, row_id) {
+// this function is called before removing the data 
+var subgrid_table_id; 
+subgrid_table_id = subgrid_id+"_t"; jQuery("#"+subgrid_table_id).GridDestroy(); 
+}
+
+
+*#
+colNames:['N.','Data','Cons.','Part.' , 'Documento', 'Merce','umido<br />IN','umido<br />OUT','secco<BR >IN','secco<BR />OUT'
+#if($iva) ,'&euro;','$'#end ],
+colModel:[
+{name:'numero',index:'numregistro',width:50,align:'center',filterType:'text'},
+{name:'data',index:'data',width:80,align:'center',filterType:'date'},
+{name:'consegna',index:'C.numero',width:60,align:'center',filterType:'text'},
+{name:'n_partitario',index:'C.numpartitario',width:50,align:'center'},
+{name:'documento',index:'documento',width:100,sortable:false},
+{name:'merce',index:'M.nome',width:120,filterType:'select'},
+##options:[#foreach($m in $merci)#if($velocityCount  >1),#end {name:'$m.Nome',value:'$m.Id'}#end]},
+{name:'umido_in',index:'umido',width:60,sortable:false},
+{name:'umido_out',index:'umido',width:60,sortable:false},
+{name:'secco_in',index:'secco',width:60,sortable:false}, 
+{name:'secco_out',index:'secco',width:60,sortable:false}
+#if($iva)
+,{name:'val_euro',index:'valoreeuro',width:60,sortable:false},
+{name:'val_dollari',index:'valoreeuro',width:60,sortable:false}
+#end
+],
+width:920, 
+
+shrinkToFit: true,
+
+#*
+onSelectRow : function(row_id) {
+var ret = jQuery("#tablemovimenti").getRowData(row_id); 
+location.href= '.consegne?cmd=editgroup&n='+ret.numero;
+},
+*#
+rowNum:15,rowList:[15,30,60], 
+loadtext:'Caricamento dati...',
+loadComplete: function(){ 
+// -- 
+
+function printIFrame(f, t) {
+from = f ; to = t ;
+var iva = #if($isIva || $iva)'true'#else'false'#end ;
+window.print();
+$('#dlg_Confirm').dialogOpen();
+}
+function confirmedStampa() {
+var iva = #if($isIva || $iva)'true'#else'false'#end ;
+//stp.location.href='.registri?iva=' + iva + '&confirm=1&cmd=stampa&f=' + from + '&t=' + to ;
+$('#ret').load('.registri?iva=' + iva + '&confirm=1&cmd=stampa&f=' + from + '&t=' + to , 
+		{} , function() {$('#dlg_Confirm').dialogClose();});
+
+}
+function stampaRegistro() {
+var numpag = document.getElementById('numPaginePrint').value;
+var from = document.getElementById('fromMovimento').value;
+var iva = #if($isIva || $iva)'true'#else'false'#end ;
+
+//stp = window.open( '.registri?iva=' + iva + '&cmd=stampa&f=' + from + '&n=' + numpag , '' , 'width=10,height=10');
+//window.focus();
+##stp.location.href='.registri?iva=' + iva + '&cmd=stampa&f=' + from + '&n=' + numpag ;
+
+$('#ret').load('.registri?iva=' + iva + '&cmd=stampa&f=' + from + '&n=' + numpag ) ;
+$('#dlg_Print').dialogClose();
+}
+function stampaCopertina() {
+#if($isIva || $iva)
+$('#ret').load('cop_iva.html' );
+#else
+$('#ret').load('cop_dog.html' );
+#end
+
+## // $('#ret').load('cop_dog.html' ); // , {} , function(){window.print(); } ) ;
+setTimeout( function(){ window.print() } , 1500 );
+}
+var stp ;
+
+function editMovimento() { return actMovimento('.consegne' , 'editgroup' ); }
+function deregistraMovimento() { return actMovimento('.registri', 'deregistra', 'Attenzione: Procedere con l\'operazione richiesta ?'); }
+
+function actMovimento( servlet, action , doconferma ) {
+var t = jQuery("#tablemovimenti");
+var r = t.getSelectedRow();
+
+var n;
+if (r){ n = t.getRowData(r).numero; }
+
+n *= 1 ;
+
+if ( ! n > 0 ) {alert( 'Attenzione: selezionare la riga del movimento da modificare');return ;}
+
+var iva = #if($isIva || $iva)'1'#else'0'#end ;
+var conferma = '';
+if ( doconferma && doconferma ) {
+	if ( confirm(doconferma)  )	conferma = '&exec=1' ;
+	else return ;
+}
+
+location.href= servlet + '?cmd='+action+'&iva=' + iva + '&n='+n + conferma ;
+}
+
+
+</script> 
+
+
+#set($dateFormat = 'dd/MM/yy')
+
+<div class="print" id="ret"></div>
+
+<div class="view">
+
+<table border="0" id="tablemovimenti" class="scroll" cellpadding="0" cellspacing="0">
+#foreach( $i in $list ) 
+<tr>
+<td>$i.Id</td>
+</tr>
+#end
+</table>
+
+
+##<div align="center"><input type="button" value="Applica Filtri" onclick="return doSearch();"></div>
+
+
+<div class="commands">
+<ul>
+#if($isAdmin)
+<li style="border-right:2px solid #EEE;"><a href="#" onclick="deregistraMovimento(); return false;"><img src="$!images/action-ico-elimina.png" />De-Registra Movimento</a></li>
+#end
+<li style="border-right:2px solid #EEE;"><a href="#" onclick="editMovimento(); return false;"><img src="$!images/action-ico-modifica.png" />Modifica Movimento</a></li>
+<li><a href="#" onclick="stampaCopertina(); return false;"><img src="$!images/action-ico-stampa.png" />Copertina</a></li>
+<li><a href="#" onclick="$('#dlg_Prepara').dialogOpen(); return false;"><img src="$!images/action-ico-stampa.png" />Prepara Pagine</a></li>
+<li><a href="#" onclick="$('#dlg_Print').dialogOpen(); return false;"><img src="$!images/action-ico-stampa.png" />Stampa Registro</a></li>
+</ul>
+</div>
+
+<div id="dlg_Prepara" class="flora" style="text-align:center;">
+Prepara <input type="text" id="numPagine" value="10" size="3" />pagine a partire dal numero  <input type="text" id="fromPagina" value="" size="3"  /> 
+</div>
+<div id="dlg_Print" class="flora" style="text-align:center;">
+Stampa <input type="text" id="numPaginePrint" value="2" size="3" /> pagine <br />
+a partire dal movimento numero <input type="text" id="fromMovimento" value="$!proxNumDaStampare" size="3"  />
+</div>
+<div id="dlg_Confirm" class="flora" style="text-align:center;">
+La stampa &egrave; stata completata correttamente ?
+</div>
+#parse('footer.vm')
+
+</div>
+#end

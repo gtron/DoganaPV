@@ -1,0 +1,167 @@
+#parse('costanti.vm')
+#parse('header.vm')
+
+<script type="text/javascript">
+function calcolaSecco(btn) {
+var f = btn.form;
+var umido, secco ;
+var tasso = $obj.Stallo.Consegna.TassoUmidita ;
+
+try {
+umido = 1 * f.umido.value.replace('\.','').replace(',','.') ;
+
+f.secco.value = umido - ( umido * tasso / 100) ;
+
+}
+catch (e) { alert ( 'Errore  : ' + e.message) ; }
+}
+</script>
+<h2>
+Nuovo Movimento
+</h2>
+#set( $m = $obj )
+
+<form action="?" method="post" id="mainForm">
+<input type="hidden" name="cmd" value="newmovimento" />
+<input type="hidden" name="idC" value="$m.IdConsegna" />
+
+<input type="hidden" name="t" value="0" />
+<input type="hidden" name="isscarico" value="0" />
+
+<input type="hidden" name="umido" value="0" />
+<input type="hidden" name="secco" value="0" />
+<input type="hidden" name="locked" value="0" />
+<input type="hidden" name="idconsegna" value="$m.IdConsegna" />
+<input type="hidden" name="idmerce" value="$m.Consegna.Idmerce" />
+#if ( $isIva )
+<input type="hidden" name="iva" value="1" />
+<input type="hidden" name="valoreeuro" value="0" />
+#end
+<br />
+Registro : <select  name="iva">
+<option value="0">Doganale</option>
+<option value="1">IVA</option>
+</select>
+<br />
+<br />
+Tipo Movimento : <select  name="isrettifica">
+<option value="0">Carico/Scarico</option>
+<option value="1">Rettifica</option>
+</select>
+## <input type="hidden" name="isrettifica" value="0" />
+<br />
+<div style="float:left; width:40%; margin-right:2%;">
+Data: 
+<input type="text" name="data" value="$m.Data.dmyString()" /><br>
+##$tools.Date.format($dateFormat, $obj.Data) 
+
+Merce : $!obj.Consegna.Merce.Nome<br>
+Consegna numero : $!obj.Consegna.Numero</a><br>
+Iter : $!obj.Consegna.Iter.Nome<br>
+<br>
+#if (  $isAdmin  || ( $m.NumRegistro && $m.NumRegistro.length() > 0 ) )
+Numero Registro : #if ( $isAdmin ) ##&& ! ( $m.NumRegistro  || $m.NumRegistro.length() > 0 ) )
+<input type="text" value="$!obj.NumRegistro" name="numregistro" />
+#else
+<strong>$!m.NumRegistro</strong>
+#end<br />
+#end
+
+
+
+<br />
+<fieldset><legend>Documento</legend>
+Tipo: <select name="doctype">#if( $obj.Documento)<option value="$!obj.Documento.Tipo">$!obj.Documento.Tipo</option>#end
+<option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option><option value="R">R</option><option value="FT">FT</option></select>
+Numero: <input type="text" name="docnum" size="4" value="$!obj.Documento.Numero" />
+Data:  <input type="text" name="docdate" id="doc_data" size="8" value="$!obj.Documento.Data.dmyString()"/></fieldset>
+<fieldset ><legend>Documento (Portovesme)</legend>
+Tipo: <select name="docpvtype">#if( $!obj.DocumentoPV)<option value="$!obj.Documento.Tipo">$!obj.DocumentoPV.Tipo</option>#end
+<option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option><option value="R">R</option><option value="FT">FT</option></select>
+Numero: <input type="text" name="docpvnum" size="4" value="$!obj.DocumentoPV.Numero"/>
+Data:  <input type="text" id="docpvdate" name="docpvdate" size="8" value="$!obj.DocumentoPV.Data.dmyString()"/></fieldset>
+
+
+</div>
+
+
+<table border="1">
+<thead><tr><th>Stallo</th>
+<th>Umido<br>Ingresso</th><th>Umido<br>Uscita</th>
+<td>&nbsp;</td>
+<th>Secco<br>Ingresso</th><th>Secco<br>Uscita</th>
+
+#if ( $isIva )
+<th>&euro;</th>
+<th>$</th>
+#end
+</thead>
+<tbody>
+
+<tr>
+<td>
+<select name="idstallo">
+#foreach( $s in $consegna.Stalli )
+<option value="$s.Id">$s.Parco $!s.Numero</option>
+#end
+</select></td>
+
+<td class="r"><input type="text" value="0" name="u0_" size="10" /></td>
+<td class="r"><input type="text" value="0" name="u1_" size="10"/></td>
+
+<td>&nbsp;</td>
+
+<td class="r"><input type="text" value="0" name="s0_" size="10" /></td>
+<td class="r"><input type="text" value="0" name="s1_" size="10" /></td>
+
+#if ( $isIva )
+<td class="r"><input type="text" value="0" name="v0_" size="10" /></td>
+<td class="r"><input type="text" value="0" name="v1_" size="10" /></td>
+#end
+
+</tr>
+
+</tbody>
+</table>
+
+
+
+Note :<br />
+<textarea name="note" cols="40" rows="2">$!m.Note</textarea>
+
+<div style="clear:left;">
+<br />
+</div>
+
+
+
+<input type="hidden" name="cmd" value="newmovimento" />
+<input type="hidden" name="exec" value="1" />
+
+##<input type="hidden" name="id" value="$!obj.Id" />
+
+<br />
+
+#if( $result ) <div id="result">Modifica effettuata</div> #end
+
+#if( $param_error ) 
+$param_error.ParamName
+##$param_error.printStackTrace()
+<script type="text/javascript">
+
+</script>
+#end
+
+</form>
+
+
+<div class="commands">
+<ul>
+<li><a href="#" onclick="getElementById('mainForm').submit();"><img src="$!images/action-ico-registra.png" />Salva</a></li>
+<li><a href=".consegne?id=$m.Consegna.Id"><img src="$!images/action-ico-elimina.png" /> Annulla</a></li>
+</ul>
+</div>
+
+
+#parse('footer.vm')
+
