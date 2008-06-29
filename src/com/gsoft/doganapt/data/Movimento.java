@@ -13,8 +13,8 @@ public abstract class Movimento extends ModelBean2 {
 	Integer idstallo;
 	Integer idconsegna;
 	Stallo stallo ;
-	Boolean isScarico;
-	Boolean isRettifica;
+	Boolean isScarico = Boolean.FALSE;
+	Boolean isRettifica = Boolean.FALSE;
 	Double secco;
 	Double umido; 
 	

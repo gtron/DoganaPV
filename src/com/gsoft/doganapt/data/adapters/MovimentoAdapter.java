@@ -17,6 +17,7 @@ import com.gsoft.doganapt.data.Movimento;
 import com.gsoft.doganapt.data.Stallo;
 import com.gtsoft.utils.common.BeanAdapter2;
 import com.gtsoft.utils.common.FormattedDate;
+import com.gtsoft.utils.common.UserException;
 import com.gtsoft.utils.data.Field;
 import com.gtsoft.utils.data.FieldSet;
 import com.gtsoft.utils.sql.IDatabase2;
@@ -178,7 +179,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		return list ;
 	}
 	
-	public FormattedDate getLastDate( Consegna c , boolean onlyScarichi ) throws Exception {
+	public FormattedDate getLastDate( Consegna c , ArrayList<Integer> idStalli, boolean onlyScarichi ) throws Exception {
 		StringBuilder sql = new StringBuilder(70)
 			.append("SELECT max(data) FROM ")
 			.append(getTable())
@@ -188,13 +189,26 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			
 		sql.append(" WHERE idconsegna = ?  ");
 		
+		
+		
 		if ( onlyScarichi ) {
-			sql.append(" AND ");
-			
-			sql.append(" isscarico = 1 ");
+			sql.append(" AND ")
+				.append(" isscarico = 1 ");
 		}
 		
-		ArrayList<Object> stalli = c.getStalli() ;
+		
+		ArrayList<Object> stalli ;
+		if ( idStalli == null || idStalli.size() < 1 ) {
+			stalli = c.getStalli() ;
+		}
+		else {
+			stalli = new ArrayList<Object>(idStalli.size()) ;
+			
+			for ( Integer ids : idStalli ) {
+				stalli.add(StalloAdapter.get(ids));
+			}
+			
+		}
 		if ( stalli != null && stalli.size() > 0 ) {
 			
 			sql.append(" AND ");
@@ -208,6 +222,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			}
 			sql.append( ")") ;
 		}
+		
 		FormattedDate d = null ;
 		Connection conn = db.getConnection() ;
 		try {
@@ -272,18 +287,12 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		.append(getTable())
 		.append(" set numregistro = null where numregistro = " + id )
 		 ;
-		
 		try {
 			conn = db.getConnection() ;
 			db.executeNonQuery(sql.toString(), conn) ;
 		
-			sql = new StringBuilder(70)
-			.append("update ")
-			.append(getTable())
-			.append(" set numregistro = numregistro - 1 where numregistro > " + id )
-			 ;
+			shiftRegistro( true, new Integer( id.intValue() ), conn ) ;
 			
-			db.executeNonQuery(sql.toString(), conn) ;
 		}
 		catch ( Exception e ) {
 			throw e ;
@@ -291,6 +300,27 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		finally {
 			db.freeConnection(conn) ;
 		}
+		
+	}
+	
+	private void shiftRegistro(  boolean down , Integer from , Connection conn ) {
+
+		StringBuilder sql = new StringBuilder(70)
+			.append("update ")
+			.append(getTable())
+			.append(" set numregistro = numregistro ") ;
+		
+		
+		if ( down ) {
+			sql.append( " - 1 where numregistro > ") ;
+		}
+		else {
+			sql.append( " + 1 where numregistro >= ") ;
+		}
+
+		sql.append( from ) ;
+	
+		db.executeNonQuery(sql.toString(), conn) ;
 		
 	}
 	
@@ -344,10 +374,18 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		return list ;
 	}
 	
-	public Vector getRegistro( boolean soloRegistrati , Consegna c ) throws Exception {
-		return getRegistro( soloRegistrati , c,null,null,null,null,null,null,null,null );
+	public Vector getRegistro( Boolean soloRegistrati , Consegna c ) throws Exception {
+		return getRegistro( false, soloRegistrati , c,null,null,null,null,null,null,null,null );
 	}
-	public Vector getRegistro( boolean soloRegistrati , Consegna c,
+	public Vector getRegistro( Boolean soloRegistrati , Consegna c,
+			Integer page,Integer rows,Hashtable<String,String> orderColumn,
+			Integer numero,FormattedDate dal,FormattedDate al,Integer idMerce,Integer numConsegna ) throws Exception {
+		
+		return getRegistro( false, soloRegistrati , c,	page,rows,orderColumn,
+				 numero, dal, al,idMerce, numConsegna );
+	
+	}
+	public Vector getRegistro( Boolean ignoreNumRegistro , Boolean soloRegistrati , Consegna c,
 			Integer page,Integer rows,Hashtable<String,String> orderColumn,
 			Integer numero,FormattedDate dal,FormattedDate al,Integer idMerce,Integer numConsegna ) throws Exception {
 
@@ -391,7 +429,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 				}
 			}
 		}
-		if ( soloRegistrati || c != null) 
+		if ( soloRegistrati || c != null || numero != null || numConsegna != null || idMerce != null ) 
 			sql.append(" WHERE ");
 			
 		if ( soloRegistrati ) {
@@ -420,11 +458,11 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		}
 		sql.append(" GROUP BY ");
 		
-		if ( c == null) {
+		if ( c == null  ) {
 			sql.append(" numregistro, ");
 		}
 		
-		if ( ! soloRegistrati ) 
+		if ( ! soloRegistrati || ignoreNumRegistro ) 
 			sql.append("data,");
 		
 		sql.append( " isscarico , isrettifica");
@@ -445,8 +483,12 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 				 first=false;
 			}	
 		}
-		else
-			sql.append( " numregistro , data, isrettifica, idstallo " );
+		else {
+			if( ! ignoreNumRegistro ) 
+				sql.append( " numregistro, ") ;
+			
+			sql.append( "data, isrettifica, isscarico, idstallo " );
+		}
 		
 		if(page!=null && rows!=null){
 			sql.append(" LIMIT ").append((page - 1) *  rows).append(",").append(rows);
@@ -540,6 +582,69 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		return ret ;
 	}
 	
+	/*
+	 * Tira fuori i movimenti da registrare raggruppandoli in base anche all'iter
+	 */
+	public Vector getDaRegistrare2( Consegna c , FormattedDate data ) throws Exception {
+
+		/*
+		 * 
+		 * SELECT
+R.id, R.idmerce, R.idconsegna, R.data, R.idstallo, R.isscarico, R.isrettifica, sum(R.secco) as secco,
+sum(R.umido) as umido, R.numregistro, R.doctype, R.docnum, R.docdate, R.docpvtype, R.docpvnum, R.docpvdate, R.note,
+R.posdoganale, R.locked
+FROM registrodoganale R
+inner join consegne c on r.idconsegna = c.idconsegna
+inner join iter i on c.iter = i.id
+WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id else r.data end
+, idconsegna, isscarico , isrettifica ORDER BY  data, isrettifica, idstallo
+
+		 */
+		Integer idConsegna = c == null ? null : c.getId() ;
+		
+		StringBuilder sql = new StringBuilder(120)
+			.append("SELECT * FROM ")
+			.append(getTable())
+			.append(" r INNER JOIN consegne c ON r.idconsegna = c.idconsegna " )
+			.append(" INNER JOIN iter i ON c.iter = i.id  WHERE numregistro IS NULL ")
+			 ;
+			
+		if( idConsegna != null )
+			sql.append(" AND r.idconsegna = ? ");
+		
+		if( data != null )
+			sql.append("AND r.data = ? ");
+		
+		
+		sql.append(
+				" group by case when i.singolicarichi = 1 then r.id else r.data end , r.idconsegna, r.isscarico , r.isrettifica")
+			.append(" order by data, isrettifica, idstallo" );
+
+		Vector list = null ;
+		
+		Connection conn = db.getConnection() ;
+		try {
+			
+			int pos = 1 ;
+			PreparedStatement s = conn.prepareStatement(sql.toString()) ;
+			
+			if( idConsegna != null )	
+				s.setInt(pos++, idConsegna.intValue()) ;
+			
+			if( data != null )	
+				s.setDate(pos++, new Date(data.getTime()) ) ;
+			
+			list = getByStatment(s);
+	
+			
+		}
+		finally {
+			db.freeConnection(conn);
+		}
+		
+		return list ;
+	}
+	
 	public Vector getDaRegistrare( Integer idConsegna , FormattedDate data ) throws Exception {
 
 		StringBuilder sql = new StringBuilder(70)
@@ -555,7 +660,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			sql.append("AND data = ? ");
 		
 		
-		sql.append( " order by data, isrettifica, idstallo" );
+		sql.append( " order by data, isrettifica, isscarico, idstallo" );
 
 		Vector list = null ;
 		
@@ -683,4 +788,151 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 	public abstract Integer getNextNumRegistro() throws Exception;
 	public abstract Movimento newMovimento( );
 	
+	
+	public synchronized boolean checkIntegrity() throws Exception  {
+		return checkIntegrity(false);
+	}
+	
+	/* *
+	 * 
+	 * Prende i movimenti da un certo num in poi ignorando il num di registro     
+		SELECT *
+		FROM registrodoganale R  WHERE  numregistro > 0 
+		ORDER BY  data, numregistro , isrettifica, idstallo
+
+		 * 
+		 *  Poi cicla sui movimenti e gli cambia la numerazione in modo progressivo 
+		 *  ( oppure puo' solo verificare che sia corretta x vedere se ci son buchi x es ) 
+		 *   
+		 *  verificando se l'iter dice di registrare i singoli carichi oppure no
+		 *  e assegnando il num di reg successivo in base alle regole corrette
+	 */
+	public synchronized boolean checkIntegrity( boolean doFix ) throws Exception {
+		
+		Vector list = getRegistro( true , true , null,null,null,null,null,null,null,null,null );
+		
+		Movimento m ;
+		int currNum = 0 ;
+
+		Iterator i = list.iterator() ;
+		while ( i.hasNext()  ) { 
+			m = (Movimento) i.next() ;
+			
+			if ( ! m.getIsLocked() ) break ;
+			
+			currNum = m.getNumRegistro().intValue() ;
+
+		}
+//		throw new Exception();
+		if( currNum == 0 ) 
+			i = list.iterator() ;
+		
+		Connection conn = db.getConnection() ;
+		
+		boolean ret = false ;
+		
+		try {
+		while ( i.hasNext() ) {
+			m = (Movimento) i.next() ;
+			
+						
+			currNum ++;
+			
+			if ( doFix ) {
+				
+				Integer num = new Integer( currNum ) ;
+				
+//				String ids = getIdsFromNumRegistro( m ) ;
+				
+				
+				
+				
+//					shiftRegistro( false, num , conn  ) ;
+					
+					updateNumRegistro(m , num, conn);
+				
+			} 
+			else if ( m.getNumRegistro().intValue() != currNum  ) {
+				ret = false ;
+			}			
+		}
+			ret = true ;
+		}
+		catch ( Exception e ) {
+			throw new UserException(e) ;
+		}
+		finally {
+			db.freeConnection(conn);
+		}
+		return ret ;
+	}
+	
+	private void updateNumRegistro(Movimento m, Integer newNum , Connection cn ) throws Exception  {
+		
+		StringBuilder sql = new StringBuilder()
+			.append("UPDATE ").append( getTable())
+			.append(" t1 INNER JOIN ").append( getTable())
+			.append(" t2 ON t1.").append(fieldNames[Fields.NUMREGISTRO])
+			.append(" = t2.").append(fieldNames[Fields.NUMREGISTRO])
+			.append(" AND t1.").append(fieldNames[Fields.IDCONSEGNA])
+			.append(" = t2.").append(fieldNames[Fields.IDCONSEGNA])
+			.append(" AND t1.").append(fieldNames[Fields.ISSCARICO])
+			.append(" = t2.").append(fieldNames[Fields.ISSCARICO])
+			.append(" AND t1.").append(fieldNames[Fields.ISRETTIFICA])
+			.append(" = t2.").append(fieldNames[Fields.ISRETTIFICA])
+			.append(" AND t1.").append(fieldNames[Fields.DATA])
+			.append(" = t2.").append(fieldNames[Fields.DATA])
+			.append(" AND t2.").append(fieldNames[Fields.ID])
+			.append(" = ? ")
+			.append(" SET t1.").append(fieldNames[Fields.NUMREGISTRO])
+			.append(" = ? ");
+		
+			PreparedStatement p = cn.prepareStatement(sql.toString()) ;
+			p.setLong(1, m.getId() ) ;
+			
+			p.setInt(2, newNum ) ;
+			p.executeUpdate();
+	}
+	
+//	private String getIdsFromNumRegistro( Movimento m ) throws Exception {
+//		
+//		StringBuilder sql = new StringBuilder()
+//			.append("SELECT ").append(fieldNames[Fields.ID])
+//			.append(" FROM ").append( getTable())
+//			.append(" WHERE ").append(fieldNames[Fields.NUMREGISTRO]) 
+//			.append(" = ?") ;
+//		
+//		StringBuilder ret = null ;
+//		
+//		Connection cn = db.getConnection();
+//		try {
+//			PreparedStatement s = cn.prepareStatement(sql.toString()) ;
+//			
+//			s.setLong(1, m.getNumRegistro()) ;
+//			
+//			ResultSet rs = s.executeQuery() ;
+//			
+//			if (rs != null )
+//				while( rs.next() ) { 
+//					
+//					if ( ret == null )
+//						ret = new StringBuilder("");
+//					else 
+//						ret.append(",") ;
+//					
+//					ret.append( rs.getLong(1) );
+//				}
+//		}
+//		catch (Exception e) {
+//			throw e ;
+//		}
+//		finally {
+//			db.freeConnection(cn) ;
+//		}
+//
+//		if ( ret == null )
+//			return "" ;
+//		
+//		return ret.toString() ;
+//	}
 }

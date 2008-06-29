@@ -1,5 +1,7 @@
 package com.gsoft.doganapt.cmd;
 
+import java.util.ArrayList;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -30,11 +32,13 @@ public class ImportMovimenti extends VelocityCommand {
 		
 		Integer idConsegna = getIntParam(ID, false);
 		
+		ArrayList<Integer> stalli = getIntParams("stalli", 0);
+		
 		FormattedDate finoAl = getDateParam("to", false);
 		Consegna c = null ;
 		if ( idConsegna != null ) { 
 			c = ConsegnaAdapter.get(idConsegna);
-			PtMovimentazioniImporter.getInstance().importTo(c, finoAl);
+			PtMovimentazioniImporter.getInstance().importTo(c, finoAl,stalli);
 		}
 		else 
 			PtMovimentazioniImporter.getInstance().importTo(finoAl);

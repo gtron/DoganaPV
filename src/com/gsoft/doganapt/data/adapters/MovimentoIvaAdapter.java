@@ -150,17 +150,18 @@ public class MovimentoIvaAdapter extends MovimentoAdapter {
 	}
 	
 	public Object create(Object o) throws IOException {
-		
 		MovimentoIVA m = (MovimentoIVA) o;
 		
-		Consegna c = m.getConsegna();
-		if ( c != null ) {
-			if (m.getValoreEuro() == null) {
-				c.updateValore(m);
-			}
-			
-			if ( m.getPosizioneDoganale() == null ) {
-				m.setPosizioneDoganale(c.getPosizione());
+		if ( m != null ) {
+			Consegna c = m.getConsegna();
+			if ( c != null ) {
+				if (m.getValoreEuro() == null) {
+					c.updateValore(m);
+				}
+				
+				if ( m.getPosizioneDoganale() == null ) {
+					m.setPosizioneDoganale(c.getPosizione());
+				}
 			}
 		}
 		return super.create(m);		

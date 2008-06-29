@@ -217,7 +217,7 @@ public class Consegna extends ModelBean2 {
 			return new Double( 
 					Math.round( 
 							umido.doubleValue() * 
-							(double) Math.round(  10000 - 10000 * tassoUmidita.doubleValue() ) / 10000  ) );
+							(double) Math.round(  100000000 - 100000000 * tassoUmidita.doubleValue() ) / 100000000  ) );
 		
 		return null ;
 	}
@@ -316,9 +316,7 @@ public class Consegna extends ModelBean2 {
 			registroDoganale  = adp.getRegistro(soloRegistrati, this);
 		
 		return registroDoganale ;
-	
-		
-		
+
 	}
 	
 	

@@ -2,6 +2,7 @@ package com.gsoft.doganapt.cmd;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.context.Context;
@@ -23,6 +24,16 @@ public class Riepilogo extends VelocityCommand {
 	}
 
 	public Template exec(HttpServletRequest req, HttpServletResponse resp, Context ctx) throws Exception  {
+		
+		HttpSession s =  req.getSession(false);
+		
+		if ( s == null )  return null ;
+		Boolean logged = (Boolean) s.getAttribute("logged") ;
+		if ( logged != Boolean.TRUE ) {
+			resp.sendRedirect(".main");
+		}
+		
+		ctx.put("isAdmin", s.getAttribute("admin") ) ;
 		
 //		BeanAdapter2 adp = Evento.newAdapter();
 //		ctx.put( ContextKeys.LIST , adp.getAll() ) ;

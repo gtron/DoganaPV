@@ -59,19 +59,25 @@ public class ChiudiPFPC extends VelocityCommand {
 				}
 			}
 			
-			
-			Vector v = c.getRegistro(true, false, true );
-			
-			Movimento m = (Movimento) v.lastElement() ;
-			
-			if ( giacenza != null ) {
+			if (  giacenza != null && giacenza > 0 ) {
+				Vector v = c.getRegistro(true, false, true );
+				
+				Movimento m = (Movimento) v.lastElement() ;
+				
+				
 				m.setUmido( new Double( m.getUmido().doubleValue() + giacenza.doubleValue()  ) );
-				m.setSecco( new Double( m.getSecco().doubleValue() + giacenzaSecco.doubleValue()  ) );
+				
+				if ( giacenzaSecco != null ) {
+					m.setSecco( new Double( m.getSecco().doubleValue() + giacenzaSecco.doubleValue()  ) );
+				}
+				
+				new MovimentoIvaAdapter().update(m);
+				resp.sendRedirect(".consegne?id=" + c.getId());
 			}
-			
-			new MovimentoIvaAdapter().update(m);
-			
-			resp.sendRedirect(".consegne?id=" + c.getId());
+			else {
+				resp.sendRedirect(".consegne?cmd=chiudi&exec=1&id=" + c.getId());
+			}
+			resp.flushBuffer();
 		}
 		return null ;
 	}
