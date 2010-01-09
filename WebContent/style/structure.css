@@ -71,7 +71,7 @@ border-style: outset;
 
 */
 
-A.stallo  { display: block ; padding: 2px; margin:0; position:relative; color:#000; height:100%; }
+A.stallo  { display: block ; padding: 2px; margin:0; position:relative; color:#000; height:6em; }
 A.stallo SPAN { position:absolute; top:2px; left:0;width:24px; text-align:center;height:100%;font-weight:bold; cursor:pointer;}
 A.stallo P { padding:0 4px; margin:0; margin-left: 24px; background-color: #CCC;height:100%; cursor:pointer;}
 A.stallo:hover { b ackground-color : #F5F5B3; text-decoration:none; }
