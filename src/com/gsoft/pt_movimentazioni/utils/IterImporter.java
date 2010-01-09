@@ -1,6 +1,5 @@
 package com.gsoft.pt_movimentazioni.utils;
 
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
@@ -204,8 +203,8 @@ public abstract class IterImporter {
 		// TODO Metodo Vuoto xke l'azione non si applica ( rivedere gerarchia oggetti )
 	}
 	
-	public void importTo( Consegna c , FormattedDate to ) throws Exception {
-		ArrayList<FormattedDate> date = quadAdp.getDateDaImportare(c, getLastData( c ) ) ;
+	public void importTo( Consegna c , FormattedDate to , ArrayList<Integer> idStalli) throws Exception {
+		ArrayList<FormattedDate> date = quadAdp.getDateDaImportare(c, getLastData( c, idStalli ) ) ;
 		FormattedDate giornoCorrente = null ;
 
 		Stallo s ;
@@ -218,11 +217,25 @@ public abstract class IterImporter {
 				if ( to != null && to.before(giornoCorrente ) ) 
 					break ;
 				
+				ArrayList<Object> stalli ;
+				if ( idStalli == null || idStalli.size() < 1 ) {
+					stalli = c.getStalli() ;
+				}
+				else {
+					stalli = new ArrayList<Object>(idStalli.size()) ;
+					
+					for ( Integer ids : idStalli ) {
+						stalli.add(StalloAdapter.get(ids));
+					}
+					
+				}
+				
 				// E tutti gli stalli di ciascuna consegna ...
-				for ( Iterator is = c.getStalli().iterator() ; is.hasNext() ; ) {
+				for ( Iterator is = stalli.iterator() ; is.hasNext() ; ) {
 
 					s = (Stallo) is.next() ;
 
+//					if ( idStallo == null || idStallo.equals( s.getId() ) )  
 					doImport(c, s, giornoCorrente) ;
 				}
 			}
@@ -248,17 +261,17 @@ public abstract class IterImporter {
 
 //	protected abstract double importScarichi( Consegna c, Stallo s, FormattedDate giorno ) throws Exception;
 	
-	protected FormattedDate getLastData( Consegna c )  throws Exception  {
-		return getLastData(c, true); 
+	protected FormattedDate getLastData( Consegna c , ArrayList<Integer> idStalli )  throws Exception  {
+		return getLastData(c, idStalli, true); 
 	}
 	/**
 	 * Restituisce la data dell'ultima importazione, se non ho ancora importato
 	 * utilizzo la data di creazione al quale tolgo un giorno per fare in modo 
 	 * che venga importata anche quel giorno 
 	 */
-	protected FormattedDate getLastData( Consegna c , boolean onlyScarichi ) throws Exception {
-		FormattedDate lastData =  registroIVA.getLastDate(c, onlyScarichi);
-		FormattedDate lastData2 = registroDoganale.getLastDate(c, onlyScarichi);
+	protected FormattedDate getLastData( Consegna c ,  ArrayList<Integer> idStalli, boolean onlyScarichi ) throws Exception {
+		FormattedDate lastData =  registroIVA.getLastDate(c, idStalli, onlyScarichi);
+		FormattedDate lastData2 = registroDoganale.getLastDate(c, idStalli, onlyScarichi);
 		
 		if ( lastData == null || 
 				( lastData2 != null && lastData2.after( lastData ) ) )

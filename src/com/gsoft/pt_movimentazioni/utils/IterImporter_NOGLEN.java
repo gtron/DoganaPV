@@ -1,6 +1,7 @@
 package com.gsoft.pt_movimentazioni.utils;
 
 import java.sql.Date;
+import java.util.ArrayList;
 
 import com.gsoft.doganapt.data.Consegna;
 import com.gsoft.doganapt.data.Documento;
@@ -25,8 +26,8 @@ public class IterImporter_NOGLEN extends IterImporter {
 		
 	}
 	
-	protected FormattedDate getLastData( Consegna c ) throws Exception {
-		FormattedDate lastData = getLastData(c, false);
+	protected FormattedDate getLastData( Consegna c ,  ArrayList<Integer> idStalli) throws Exception {
+		FormattedDate lastData = getLastData(c, idStalli, false);
 		 
 		 if ( lastData == null ) { 
 				FormattedDate d = c.getDataCreazione() ;

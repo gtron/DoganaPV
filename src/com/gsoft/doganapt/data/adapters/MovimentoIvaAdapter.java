@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import com.gsoft.doganapt.data.Consegna;
 import com.gsoft.doganapt.data.Movimento;
@@ -150,7 +151,7 @@ public class MovimentoIvaAdapter extends MovimentoAdapter {
 		return new MovimentoIVA();
 	}
 	
-	public Object create(Object o) throws IOException {
+	public Object create(Object o) throws IOException , SQLException{
 		MovimentoIVA m = (MovimentoIVA) o;
 		
 		if ( m != null ) {

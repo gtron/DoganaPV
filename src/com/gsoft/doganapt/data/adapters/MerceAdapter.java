@@ -4,6 +4,7 @@ import gnu.trove.THashMap;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -92,7 +93,7 @@ public class MerceAdapter extends BeanAdapter2 {
 		return TABLE ;
 	}
 	
-	public Object create(Object o) throws IOException {
+	public Object create(Object o) throws IOException , SQLException{
 		Object c = super.create(o);
 		clearCache();
 		return c ;

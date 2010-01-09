@@ -12,7 +12,6 @@ import java.util.Vector;
 
 import com.gsoft.doganapt.data.Consegna;
 import com.gsoft.doganapt.data.Stallo;
-import com.gsoft.doganapt.data.adapters.StalloAdapter;
 import com.gtsoft.utils.common.BeanAdapter2;
 import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.data.Field;
@@ -365,8 +364,37 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 		
 		ArrayList<FormattedDate> list = null ;
 		
+		
 		try {
-			PreparedStatement s = conn.prepareStatement(sql.toString()) ;
+			
+//			ResultSet rs = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
+//           	ResultSet.CONCUR_READ_ONLY).executeQuery(sql.toString());
+//            		
+//			DatabaseMetaData metadata = conn.getMetaData();            
+//            ResultSet schemas = metadata.getCatalogs();
+//            
+//            
+//            conn.setReadOnly(true);
+//            //schemas.first();
+//            while(schemas.next()){
+//                String schemaName = schemas.getString(1);
+//                System.out.println(schemaName);
+//                //schemas.next();
+//            }
+//            
+//            ResultSet rs = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
+//            		ResultSet.CONCUR_READ_ONLY).executeQuery(sql.toString());
+//				PreparedStatement s = conn.prepareStatement(sql.toString()) ;
+//			int n = 1 ;
+//			if( c != null )	
+//				s.setString(n++, c.getNumero().toString()) ;
+//			
+//			if ( fromData != null )
+//				s.setDate(n++, new Date( fromData.getTime() ) ) ;
+//			
+//			 s.executeQuery() ;
+		
+		PreparedStatement s = conn.prepareStatement(sql.toString()) ;
 	
 			int n = 1 ;
 			if( c != null )	
@@ -376,7 +404,6 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 				s.setDate(n++, new Date( fromData.getTime() ) ) ;
 			
 			ResultSet rs = s.executeQuery() ;
-		
 			
 			
 			if ( rs != null ) {
@@ -386,6 +413,7 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 					list.add( new FormattedDate(rs.getString(1)) );
 			}
 		}
+		
 		finally {
 			db.freeConnection(conn) ;
 		}

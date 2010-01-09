@@ -1,5 +1,6 @@
 package com.gsoft.pt_movimentazioni.utils;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -57,18 +58,18 @@ public class PtMovimentazioniImporter {
 			
 			importer = c.getIter().getImporter(dogAdp,ivaAdp, quadAdp);
 			
-			importer.importTo(c, to);
+			importer.importTo(c, to, null );
 		}
 			
 	}
 	
-	public synchronized void importTo( Consegna c , FormattedDate to ) throws Exception {
+	public synchronized void importTo( Consegna c , FormattedDate to , ArrayList<Integer> idStalli ) throws Exception {
 		
 		IterImporter importer ;
 			
 		importer = c.getIter().getImporter(dogAdp,ivaAdp, quadAdp);
 		
-		importer.importTo(c, to);
+		importer.importTo(c, to, idStalli);
 			
 	}
 

@@ -56,20 +56,5 @@ public class DeleteMovimento extends VelocityCommand {
 	public String getTemplateName() {
 		return "consegne/view.vm" ;
 	}
-	
-//	static synchronized private Integer registraNuovoNum( Movimento m , MovimentoAdapter adapter ) throws Exception {
-//		Integer newNum  ;
-//		try {
-//			newNum = adapter.getNextNumRegistro();
-//			m.setNumRegistro( new Long(newNum ) );
-//			adapter.update(m);
-//		}
-//		catch (Exception e ) {
-//			throw e ;
-//		}
-//		finally {
-//			adapter.doneNextNumRegistro();
-//		}
-//		return newNum ;
-//	}
+
 }

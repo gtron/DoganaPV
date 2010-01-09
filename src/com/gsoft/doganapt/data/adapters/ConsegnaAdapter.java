@@ -5,6 +5,7 @@ import gnu.trove.THashMap;
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Vector;
 
 import com.gsoft.doganapt.data.Consegna;
@@ -148,7 +149,7 @@ public class ConsegnaAdapter extends BeanAdapter2 {
 	}
 	
 	@Override
-	public Object create(Object o) throws IOException {
+	public Object create(Object o) throws IOException, SQLException {
 		Consegna c = (Consegna) o ;
 		if ( c!= null ) {
 			if ( c.getDataCreazione() == null ) {
