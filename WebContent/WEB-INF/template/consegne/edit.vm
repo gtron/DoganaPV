@@ -109,6 +109,7 @@ Valore unitario : <input name="valoreunitario" size="8" value="$!tools.Number.fo
 #set($count = $count + 1 )
 <input type="checkbox" value="$s.Id" name="stalli" #if($s.IdConsegnaAttuale == $obj.Id || $s.IdConsegnaPrenotata == $obj.Id) checked #end id="stallo$velocityCount">
 <label for="stallo$velocityCount">$parco $count</label>
+#if($s.IdConsegnaAttuale == $obj.Id && $s.HasLiberaPratica)<a href=".main?cmd=resetILP&id=$s.Id&idC=$obj.Id&exec=1">[Reset ILP]</a>#end
 ## #if($s.IdConsegnaAttuale == $obj.Id)<a href=".consegne?id=$s.Id">[Movimenti]</a>#end
 <br>
 
