@@ -10,12 +10,12 @@
 #set($totpage=$records/$rows)
 #else #set($totpage=$records/$rows + 1) #end
 {total:$!totpage,page:$!page,records:$!records,rows:[
-{id:"1",cell:["<input type=\"text\" id=\"inputNum\" value=\"$!numero\"size=\"4\"><br /><input type=\"checkBox\" id=\"actNum\" onclick=\"doSearch();\" #if($actNum) checked #end > filtra",
+{id:"1",cell:["<input type=\"text\" id=\"inputNum\" value=\"$!numero\"size=\"4\"><br /><input type=\"checkBox\" id=\"actNum\" onclick=\"doSearch();\" #if($actNum) checked #end >",
 "Dal&nbsp;<input type=\"text\" size=\"9\" value=\"$!dal\" id=\"inputDal\"><br />Al&nbsp;&nbsp;<input type=\"text\" size=\"9\" value=\"$!al\" id=\"inputAl\"><br /><input type=\"checkBox\" id=\"actDate\" onclick=\"doSearch();\" #if($actDate) checked #end > filtra"
 ,"<input type=\"text\" id=\"consegne\" value=\"$!consegne\" size=\"6\"><br /><input type=\"checkBox\" id=\"actConsegne\" onclick=\"doSearch();\" #if($actConsegne) checked #end > filtra",
 '' 
 ## "<input type=\"text\" id=\"partitari\" value=\"$!partitari\" size=\"6\"><br /><input type=\"checkBox\" id=\"actPartitari\" onclick=\"doSearch();\" #if($actPartitari) checked #end > filtra"
-,"","<select id=\"selmerce\"><option value=\"\">---Scegli una merce---</option>#foreach($m in $merci)<option value=\"$m.Id\" #if($m.Id==$idMerce) selected #end>$m.Nome</option>#end</select><br /><input type=\"checkBox\" id=\"actMerce\" #if($actMerce) checked #end > filtra",'','','','','','']}
+,"","<select id=\"selmerce\"><option value=\"\">---Scegli una merce---</option>#foreach($m in $merci)<option value=\"$m.Id\" #if($m.Id==$idMerce) selected #end>$m.Nome</option>#end</select><br /><input type=\"checkBox\" id=\"actMerce\" #if($actMerce) checked #end > filtra",'','','','','']}
 #foreach( $m in $list )
 #set($count=$velocityCount + 1)
 ,
@@ -31,7 +31,7 @@
 "","$!tools.Number.format($tools.Math.mul( -1 , $m.Secco))",
 #else"","$!tools.Number.format($m.Secco)",#end
 #else"$!tools.Number.format($m.Secco)","",#end
-"$!tools.Number.format($m.ValoreEuro )",
-"$!tools.Number.format($m.ValoreDollari)"
+"$!tools.Number.format($m.ValoreEuro )"
+##,"$!tools.Number.format($m.ValoreDollari)"
 ]}#end
 ]}
