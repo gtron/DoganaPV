@@ -19,14 +19,29 @@ public class PtMovimentazioniImporter {
 	MovimentoQuadrelliAdapter quadAdp = null ;
 	AccessDB adb = null ;
 	
+	static boolean locked = false;
 	private static PtMovimentazioniImporter instance = null ;
 	
 	public static PtMovimentazioniImporter getInstance(){
 		
-		if ( instance == null )
+		if ( instance == null && ! locked )
 			instance = new PtMovimentazioniImporter();
 		
 		return instance ;
+	}
+	
+	public static void freeInstance() throws Exception{
+		if ( instance != null ){
+			instance.quadAdp.end();
+			instance = null;
+		}
+	}
+	
+	public static void setLocked(boolean b) throws Exception {
+		if ( b ){
+			freeInstance();
+		}
+		locked = b ;
 	}
 	
 	PtMovimentazioniImporter() {

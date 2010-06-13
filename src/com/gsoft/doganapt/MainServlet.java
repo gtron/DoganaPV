@@ -24,6 +24,8 @@ public class MainServlet extends TooledServlet {
 				new ResetImmissioneLPStallo( this ) ) ;
 		addCommand( Commands.VIEWSTALLO ,
 				new ViewStallo( this ) ) ;
+		addCommand( Commands.LOCKMDB ,
+				new LockMdb( this ) ) ;
 	}
 
 	public static interface Commands {
@@ -32,5 +34,6 @@ public class MainServlet extends TooledServlet {
 		public static final String VIEWSTALLO = "viewstallo" ;
 		public static final String RESETILP = "resetILP" ;
 		public static final String DOIMPORT = "import" ;
+		public static final String LOCKMDB = "lockMdb" ;
 	}
 }
