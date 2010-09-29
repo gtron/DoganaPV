@@ -37,6 +37,8 @@ public class PopolaStalli extends VelocityCommand {
 	}
 	public Template exec(HttpServletRequest req, HttpServletResponse resp, Context ctx) throws Exception  {
 
+		try {
+			
 		Integer id = getIntParam("id", true);
 		
 		Consegna c = ConsegnaAdapter.get(id);
@@ -78,6 +80,11 @@ public class PopolaStalli extends VelocityCommand {
 				}
 			}
 		}
+		
+		} catch ( Exception e) {
+			ctx.put("err" ,  e );
+		}
+		
 		
 		return null;
 	}
@@ -198,9 +205,9 @@ public class PopolaStalli extends VelocityCommand {
 //		String documentoRettifica = getParam("docR", false);
 //		String documentoImmissione = getParam("docImm", false);
 		
-		boolean isPesoFinalePC = c.getPesoFinalePortoCarico().booleanValue() ;
-		
-		FormattedDate dataRettifica = getDateParam("data", ! isPesoFinalePC);
+		FormattedDate dataRettifica = getDateParam("data", false);
+		boolean creaMovimentoRettifica = c.getPesoFinalePortoCarico().booleanValue() || ( dataRettifica == null ) ;
+
 		FormattedDate dataCarico = null ;
 		Long numRegistroCarico = null ;
 		
@@ -304,7 +311,7 @@ public class PopolaStalli extends VelocityCommand {
 				registro.create(mov);
 			}
 			
-			if ( ! isPesoFinalePC ) {
+			if ( ! creaMovimentoRettifica ) {
 				mov.setId(null);
 				mov.setNumRegistro(null);
 				mov.setData(dataRettifica);
@@ -335,6 +342,8 @@ public class PopolaStalli extends VelocityCommand {
 		Vector listMov = null ;
 
 		ArrayList<String> codiciStalli = quadAdp.getCodiciStalli(c, null);
+
+		ctx.put("c", codiciStalli );
 
 		ArrayList<ArrayList> list = new ArrayList<ArrayList>(codiciStalli.size());
 		ArrayList<Object> row = null;
