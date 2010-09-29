@@ -91,8 +91,8 @@ $!m.NumRegistro
 
 
 <td>&nbsp;</td>
-<td class="r">$!tools.Number.format('##0',$m.ValoreEuro )</td>
-<td class="r">$!tools.Number.format('##0',$m.ValoreDollari)</td>
+<td class="r"><strong>$!tools.Number.format('#,###0.00',$m.ValoreEuro )</strong></td>
+<td class="r">$!tools.Number.format('#,###0.00',$m.ValoreDollari)</td>
 
 
 ##<td><a #if($velocityCount%25  == 0) id="lnk$m.Id"#end href=".consegne?cmd=editmovimento&iva=1&id=$m.Id">Modifica</a></td>

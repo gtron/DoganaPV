@@ -52,8 +52,8 @@ $stallo.Parco</td><td align="center">$stallo.Numero</td>
 <td><input type="text" size="10" onchange="if(this.value=='')this.value=0;" name="u0_$stallo.Id" id="u0_$stallo.Id"value=#if($sommaUmido.intValue() >= 0)"$!tools.Number.format($sommaUmido).replaceAll('\.','')"#else"0"#end onfocus="this.select()" /></td>
 <td><input type="text" size="10" onchange="if(this.value=='')this.value=0;" name="u1_$stallo.Id" id="u1_$stallo.Id"value=#if($sommaUmido.intValue() >= 0)"0"#else"$!tools.Number.format( $!tools.Math.mul($sommaUmido, -1)).replaceAll('\.','')"#end onfocus="this.select()" /></td>
 <td align="center" id="secco_$stallo.Id" style="display:none;">$!tools.Number.format($obj.calcolaSecco($umido))</td>
-<td><input type="text" size="10" onchange="if(this.value=='')this.value=0;" name="s0_$stallo.Id" id="s0_$stallo.Id"value=#if($secco >= 0)"$secco"#else"0"#end onfocus="this.select()" /></td>
-<td><input type="text" size="10" onchange="if(this.value=='')this.value=0;" name="s1_$stallo.Id" id="s1_$stallo.Id"value=#if($secco >= 0)"0"#else"$!tools.Number.format($tools.Math.mul($secco, -1)).replaceAll('\.','')"#end onfocus="this.select()" /></td>
+<td><input type="text" size="10" onchange="if(this.value=='')this.value=0;" name="s0_$stallo.Id" id="s0_$stallo.Id"value=#if($secco.intValue() >= 0)"$!tools.Number.format($secco).replaceAll('\.','')"#else"0"#end onfocus="this.select()" /></td>
+<td><input type="text" size="10" onchange="if(this.value=='')this.value=0;" name="s1_$stallo.Id" id="s1_$stallo.Id"value=#if($secco.intValue() >= 0)"0"#else"$!tools.Number.format($tools.Math.mul($secco, -1)).replaceAll('\.','')"#end onfocus="this.select()" /></td>
 <td align="right" id="res_$stallo.Id">&nbsp;</td>
 </tr>                           
 #end
