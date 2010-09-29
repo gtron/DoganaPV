@@ -22,10 +22,10 @@
 Cons: <strong>$!s.Consegna.Numero</strong> - Partit: <strong>$!s.Consegna.NumeroPartitario</strong><br>
 <strong>$!s.Consegna.Merce.Nome</strong><br>
 #if( $!s.Consegna.Iter.Regdoganale )
-Giacenza Dog.: $tools.Number.format($!s.getGiacenzaDoganale(true))<br>
+Giacenza Dog.: $tools.Number.format($!s.getGiacenzaDoganale(false))<br>
 #end
 #if( $!s.Consegna.Iter.Regiva )
-Giacenza IVA : $tools.Number.format($!s.getGiacenzaIva(true))<br>
+Giacenza IVA : $tools.Number.format($!s.getGiacenzaIva(false))<br>
 #end
 
 ##G.Attuale : $tools.Number.format( $s.Attuale )<br>
