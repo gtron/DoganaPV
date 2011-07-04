@@ -1,8 +1,6 @@
 
 package com.gsoft.doganapt.cmd.consegne;
 
-import java.util.ArrayList;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,8 +15,6 @@ import com.gsoft.doganapt.data.adapters.ConsegnaAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoDoganaleAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoIvaAdapter;
-import com.gsoft.doganapt.data.adapters.StalloAdapter;
-import com.gsoft.pt_movimentazioni.data.MovimentoQuadrelli;
 import com.gtsoft.utils.common.BeanAdapter2;
 import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.http.VelocityCommand;
@@ -30,66 +26,88 @@ public class TravasaStallo extends VelocityCommand {
 	public TravasaStallo ( GtServlet callerServlet) {
 		super(callerServlet);
 	}
+	
+	Consegna consegna ;
+	FormattedDate data ;
+	Documento documento ;
+	Boolean isIva ;
+	
 	public Template exec(HttpServletRequest req, HttpServletResponse resp, Context ctx) throws Exception  {
 		
 		Integer idConsegna = getIntParam("idC", true);
-		Consegna c = ConsegnaAdapter.get(idConsegna);
-		ctx.put( ContextKeys.OBJECT , c ) ;
+		consegna = ConsegnaAdapter.get(idConsegna);
+		ctx.put( ContextKeys.OBJECT , consegna ) ;
 		
 		Integer idStalloOrigine= getIntParam("from", true);
 		Integer idStalloDestinazione= getIntParam("to", true);
 		
-		Stallo origine, destinazione;
-		for( Stallo s : c.getStalli() ) {
-			if ( s.getId() == idStalloOrigine ) origine = s ;
-			if ( s.getId() == idStalloDestinazione ) destinazione = s ;
+		Stallo s = null, origine = null, destinazione = null;
+		for( Object tmp : consegna.getStalli() ) {
+			s = (Stallo) tmp;
+			if ( s.getId().equals( idStalloOrigine )) origine = s ;
+			if ( s.getId().equals(idStalloDestinazione )) destinazione = s ;
 		}
 		
+		if ( origine == null || destinazione == null )
+				throw new Exception("Destinazione/Origine");
 		
-		FormattedDate data = getDateParam("data", true);
+		
+		data = getDateParam("data", false);
+		if ( data == null ) 
+			data = new FormattedDate();
 		
 		String doc = getParam("doc", false);
 		String doc_num = getParam("doc_num", false);
 		FormattedDate doc_data = getDateParam("doc_data", false);
 		
-		Documento doc = Documento.getDocumento( doc, doc_data , doc_num ); 
+		documento = Documento.getDocumento( doc, doc_data , doc_num ); 
 
-		ctx.put("isIva", getBooleanParam("iva", false).booleanValue()) ;
-
-
+		isIva = getBooleanParam("iva", false) ;
+		if ( isIva == null ) isIva = Boolean.FALSE;
+		ctx.put("isIva", isIva.booleanValue()) ;
 
 		
-		if ( c != null && getBooleanParam(Strings.EXEC) ) {
+		if ( consegna != null && getBooleanParam(Strings.EXEC) ) {
+			
+			Movimento scarico = getMovimento( origine , null );
+			
+			Movimento carico = getMovimento(destinazione, scarico);
 			
 			MovimentoAdapter adp = (MovimentoAdapter) getAdapter() ;
-
-			// Movimento Uscita dallo stallo di origine
-			Movimento m = adp.newMovimento() ;
-			m.setIdConsegna(idConsegna);
 			
-			m.setIsLocked(false);
-			m.setIsScarico(isScarico);
-			m.setIsRettifica( false );
-			m.setUmido(q.getNetto());
-			m.setSecco( c.calcolaSecco(m.getUmido()) );
-			m.setData(q.getData()) ;
-			m.setIdMerce( c.getIdmerce() );
-			m.setIdConsegna( c.getId()) ;
-			
-			Stallo s = null ;
-			if ( isScarico ) {
-				s = StalloAdapter.getByCodice((q.getCodiceFornitore()), false) ;
-			}
-			else {
-				s = StalloAdapter.getByCodice((q.getCodiceCliente()), false) ;
-			}
-			m.setStallo( s );
-
-			
-			
+			adp.create(scarico);
+			adp.create(carico);
 			
 		}
 		return null ;
+	}
+
+	private Movimento getMovimento( Stallo s , Movimento scarico) throws Exception {
+		
+		MovimentoAdapter adp = (MovimentoAdapter) getAdapter() ;
+
+		Movimento m = adp.newMovimento() ;
+		m.setIdConsegna( consegna.getId() );
+		m.setIdMerce( consegna.getIdmerce() );
+		
+		m.setIsLocked(false);
+		m.setIsRettifica( false );
+		m.setData(data) ;
+		m.setDocumento(documento);
+		m.setStallo( s );
+		
+		if ( scarico == null ) {
+			m.setUmido( s.getGiacenzaDoganale(false) );
+			m.setSecco( s.getGiacenzaDoganale(true) );
+			m.setIsScarico(true);
+		}
+		else {
+			m.setUmido( scarico.getUmido() );
+			m.setSecco( scarico.getSecco() );
+			m.setIsScarico(false);
+		}
+		
+		return m ;
 	}
 
 	MovimentoAdapter adapter = null ;

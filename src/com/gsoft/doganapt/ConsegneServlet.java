@@ -15,6 +15,7 @@ import com.gsoft.doganapt.cmd.consegne.ImmettiLiberaPratica;
 import com.gsoft.doganapt.cmd.consegne.ListConsegne;
 import com.gsoft.doganapt.cmd.consegne.PopolaStalli;
 import com.gsoft.doganapt.cmd.consegne.PrintConsegna;
+import com.gsoft.doganapt.cmd.consegne.TravasaStallo;
 import com.gsoft.doganapt.cmd.consegne.ViewConsegna;
 import com.gsoft.doganapt.cmd.movimenti.DeleteMovimento;
 import com.gsoft.doganapt.cmd.movimenti.EditGruppoMovimenti;
@@ -68,6 +69,8 @@ public class ConsegneServlet extends TooledServlet {
 		
 		addCommand( Commands.DELETE_MOVIMENTO,
 				new DeleteMovimento( this ) ) ;
+		addCommand( Commands.TRAVASA_STALLO,
+				new TravasaStallo( this ) ) ;
 	}
 
 	public static interface Commands {
@@ -83,6 +86,7 @@ public class ConsegneServlet extends TooledServlet {
 		public static final String NEW_MOVIMENTO = "newmovimento" ;
 		public static final String EDIT_MOVIMENTO_GROUP = "editgroup" ;
 		public static final String DELETE_MOVIMENTO = "delete" ;
+		public static final String TRAVASA_STALLO = "travasa" ;
 		
 		public static final String POPOLA_STALLI = "popola" ;
 		public static final String IMMETTILP = "immettiLP" ;
@@ -105,3 +109,4 @@ public class ConsegneServlet extends TooledServlet {
 		return super.handleRequest(request, response, ctx) ;
 	}
 }
+
