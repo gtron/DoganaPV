@@ -40,7 +40,7 @@ public class EditMovimento extends BeanEditor {
 		
 		ctx.put("isIva", isIva) ;
 		
-		Collection stalli = StalloAdapter.getAllCached();
+		Collection<?> stalli = StalloAdapter.getAllCached();
 		ctx.put("merci" ,  MerceAdapter.getAllCached());
 		ctx.put("iters" ,  IterAdapter.getAllCached());
 		ctx.put("stalli" ,  stalli);
@@ -52,7 +52,7 @@ public class EditMovimento extends BeanEditor {
 		
 		if ( getBooleanParam(Strings.EXEC) ) {
 
-			HashMap newParams = new HashMap(1);
+			HashMap<String, String[]> newParams = new HashMap<String, String[]>(1);
 			String[] id = {m.getIdConsegna().toString()} ;
 			newParams.put( "id", id );
 			setNextCommand(

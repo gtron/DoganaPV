@@ -56,7 +56,7 @@ public class EditGruppoMovimenti extends BeanEditor {
 		
 		ctx.put("isIva", isIva) ;
 		
-		Collection stalli = StalloAdapter.getAllCached();
+		Collection<?> stalli = StalloAdapter.getAllCached();
 		ctx.put("merci" ,  MerceAdapter.getAllCached());
 		ctx.put("iters" ,  IterAdapter.getAllCached());
 		ctx.put("stalli" ,  stalli);
@@ -68,7 +68,7 @@ public class EditGruppoMovimenti extends BeanEditor {
 		
 		ArrayList<Integer> idMovimenti = getIntParams("id", 0) ;
 		
-		Vector movimenti = null ;
+		Vector<?> movimenti = null ;
 		
 		if ( idMovimenti == null || idMovimenti.size() < 1 ){
 			
@@ -109,7 +109,7 @@ public class EditGruppoMovimenti extends BeanEditor {
 			adp.fillFromRequest(req, false);
 			Movimento m = null ;
 			
-			for ( Iterator i = movimenti.iterator() ; i.hasNext() ; ) {
+			for ( Iterator<?> i = movimenti.iterator() ; i.hasNext() ; ) {
 				m = (Movimento) i.next();
 				
 				if( m.getIsLocked() ) {
