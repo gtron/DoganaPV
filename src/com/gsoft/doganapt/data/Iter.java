@@ -164,11 +164,20 @@ public class Iter extends ModelBean2 {
 	public ArrayList<Object> getStalli( Integer idConsegna) throws Exception {
 		ArrayList<Object> list = null ;
 		ArrayList<Integer> id = null ;
+		ArrayList<Integer> idI = null ;
 		
 		if ( regdoganale ) 
 			id = MovimentoDoganale.newAdapter().getIdStalli(idConsegna) ;
-		else 
-			id = MovimentoIVA.newAdapter().getIdStalli(idConsegna) ;
+		
+		if ( regiva ) {
+			idI = MovimentoIVA.newAdapter().getIdStalli(idConsegna) ;
+			
+			if ( id != null && id.size() > 0  ) 
+				id.addAll(idI);
+			else 
+				id = idI ;
+		}
+		
 		
 		
 		if ( id != null ) {
