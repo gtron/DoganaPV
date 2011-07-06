@@ -371,5 +371,16 @@ public class Consegna extends ModelBean2 {
 		}
 		
 	}
+
+	public boolean isIva(Stallo s) {
+		
+		if ( getIter().getRegiva() ) {
+			
+			return s.getImmessoInLiberaPratica().booleanValue() ;
+
+		}
+		
+		return false;
+	}
 }
 

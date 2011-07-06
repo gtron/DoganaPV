@@ -114,6 +114,8 @@ $("#menuConsegna").tabs();
 
 #end
 
+<li><a href="#" onclick="$('#dlg_Travasa').dialogOpen();"><img src="$!images/action-ico-immetti.png" /> Travasa/Libera Stallo</a></li>
+
 #if( ! $rettificaDone && $obj.isAperta() )
 <li><a href="?id=$obj.Id&amp;cmd=popola"><img src="$!images/action-ico-immetti.png" /> Popola Stalli</a></li>
 #end
@@ -132,6 +134,32 @@ $("#menuConsegna").tabs();
 <li><a href=".consegne?cmd=edit&id=$obj.Id"><img src="$!images/action-ico-modifica.png" /> Modifica</a></li>
 ##<li><a href=".consegne?cmd=edit"><img src="$!images/action-ico-nuovo.png" /> Nuova consegna</a></li>
 </ul>
+</div>
+
+<div id="dlg_Travasa" class="flora" style="text-align:center;">
+<form action="" id="frm_Travasa" method="POST">
+<input type="hidden" name="cmd" value="travasa" />
+<input type="hidden" name="exec" value="1" />
+<input type="hidden" name="idC" value="$obj.Id" />
+
+Stallo di origine : 
+<select size="1" name="from">
+#foreach( $s in $obj.StalliRegistrati )
+<option value="$s.Id" >$s.Nome</option>
+#end
+</select>
+<br /><br />
+<label><input type="radio" group="travaso" name="travaso" checked="checked" value="false" /> Svuotamento totale</label><br />
+<br /><br />
+<label><input type="radio" group="travaso" name="travaso" value="true" /> Travasa allo stallo : </label> 
+<select size="1" name="to">
+#foreach( $s in $stalli )
+#if( $s.isLibero() )
+<option value="$s.Id" >$s.Nome</option>
+#end
+#end
+</select>
+</form>
 </div>
 
 <div id="dlg_ImportTo" class="flora" style="text-align:center;">
@@ -191,6 +219,11 @@ popUpCal.setDefaults(popUpCal.regional['it']);
 
 jQuery('#dataLP').calendar();
 
+$("#dlg_Travasa").dialog({ width:500,
+height:420,buttons:{'Travasa/Libera Stallo': function(){travasaStallo(true);} ,Annulla : function() { $("#dlg_Travasa").dialogClose(); } } 
+});
+$("#dlg_Travasa").dialogClose();
+
 $("#dlg_LiberaPratica").dialog({ width:500,
 height:420,buttons:{'Immetti in L.P.': function(){immettiLP(true);} ,Annulla : function() { $("#dlg_LiberaPratica").dialogClose(); } } 
 });
@@ -241,6 +274,13 @@ idConsegna = -1 ;
 return false ;
 }
 
+function travasaStallo() {
+	var f = document.getElementById('frm_Travasa') ;
+	if ( f ) 
+		f.submit() ;
+	else
+		alert( 'Errore: no form LP!');
+}
 
 function immettiLP() {
 	var list = document.getElementsByTagName('input');

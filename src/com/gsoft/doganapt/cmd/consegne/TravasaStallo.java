@@ -15,6 +15,7 @@ import com.gsoft.doganapt.data.adapters.ConsegnaAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoDoganaleAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoIvaAdapter;
+import com.gsoft.doganapt.data.adapters.StalloAdapter;
 import com.gtsoft.utils.common.BeanAdapter2;
 import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.http.VelocityCommand;
@@ -39,45 +40,58 @@ public class TravasaStallo extends VelocityCommand {
 		ctx.put( ContextKeys.OBJECT , consegna ) ;
 		
 		Integer idStalloOrigine= getIntParam("from", true);
-		Integer idStalloDestinazione= getIntParam("to", true);
+		Boolean isTravaso = getBooleanParam("travaso", true);
 		
-		Stallo s = null, origine = null, destinazione = null;
-		for( Object tmp : consegna.getStalli() ) {
-			s = (Stallo) tmp;
-			if ( s.getId().equals( idStalloOrigine )) origine = s ;
-			if ( s.getId().equals(idStalloDestinazione )) destinazione = s ;
-		}
-		
-		if ( origine == null || destinazione == null )
-				throw new Exception("Destinazione/Origine");
-		
-		
-		data = getDateParam("data", false);
-		if ( data == null ) 
-			data = new FormattedDate();
-		
-		String doc = getParam("doc", false);
-		String doc_num = getParam("doc_num", false);
-		FormattedDate doc_data = getDateParam("doc_data", false);
-		
-		documento = Documento.getDocumento( doc, doc_data , doc_num ); 
-
-		isIva = getBooleanParam("iva", false) ;
-		if ( isIva == null ) isIva = Boolean.FALSE;
-		ctx.put("isIva", isIva.booleanValue()) ;
-
+		Integer idStalloDestinazione= getIntParam("to", ! isTravaso);
 		
 		if ( consegna != null && getBooleanParam(Strings.EXEC) ) {
 			
+			if ( idStalloOrigine.equals(idStalloDestinazione)) 
+				return null;
+			
+			Stallo origine = StalloAdapter.get(idStalloOrigine);
+			
+			data = getDateParam("data", false);
+			if ( data == null ) 
+				data = new FormattedDate( new FormattedDate().dmyString() );
+			
+			String doc = getParam("doc", false);
+			String doc_num = getParam("doc_num", false);
+			FormattedDate doc_data = getDateParam("doc_data", false);
+			
+			documento = Documento.getDocumento( doc, doc_data , doc_num ); 
+
+			isIva = consegna.isIva(origine);
+			
 			Movimento scarico = getMovimento( origine , null );
 			
-			Movimento carico = getMovimento(destinazione, scarico);
+			if ( scarico.getUmido() <= 0 ) 
+				return null; 
 			
 			MovimentoAdapter adp = (MovimentoAdapter) getAdapter() ;
 			
 			adp.create(scarico);
-			adp.create(carico);
 			
+			Stallo destinazione = StalloAdapter.get(idStalloDestinazione);
+			
+			StalloAdapter a = new StalloAdapter();
+			
+			if ( destinazione != null ) {
+				Movimento carico = getMovimento(destinazione, scarico);
+				adp.create(carico);
+				
+				destinazione.setIdConsegnaAttuale(idConsegna);
+				destinazione.setImmessoInLiberaPratica(false);
+				a.update(origine);
+			}
+			
+
+			origine.setIdConsegnaAttuale(null);
+			origine.setImmessoInLiberaPratica(false);
+			a.update(origine);
+			
+			response.sendRedirect(".consegne?id=" + idConsegna );
+			response.flushBuffer();
 		}
 		return null ;
 	}

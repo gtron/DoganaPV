@@ -7,6 +7,7 @@ import org.apache.velocity.Template;
 import org.apache.velocity.context.Context;
 
 import com.gsoft.doganapt.data.adapters.ConsegnaAdapter;
+import com.gsoft.doganapt.data.adapters.StalloAdapter;
 import com.gtsoft.utils.common.BeanAdapter2;
 import com.gtsoft.utils.http.VelocityCommand;
 import com.gtsoft.utils.http.servlet.GtServlet;
@@ -25,6 +26,8 @@ public class ViewConsegna extends VelocityCommand {
 		Integer id = getIntParam(ID, true);
 
 		ctx.put(ContextKeys.OBJECT, getAdapter().getByKey(id) ) ;
+		
+		ctx.put("stalli", StalloAdapter.getAllCached());
 
 		return null ;
 	}

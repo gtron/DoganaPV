@@ -103,6 +103,10 @@ public class Stallo extends ModelBean2 {
 		return parco + " " + numero ;
 	}
 	
+	public boolean isLibero() {
+		return getIdConsegnaAttuale() == null ; 
+	}
+	
 	public Double getGiacenzaIva(boolean secco) throws Exception {
 		double sum = 0 ;
 		double val = 0;
