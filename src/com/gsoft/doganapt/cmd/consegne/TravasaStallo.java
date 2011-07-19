@@ -42,7 +42,7 @@ public class TravasaStallo extends VelocityCommand {
 		Integer idStalloOrigine= getIntParam("from", true);
 		Boolean isTravaso = getBooleanParam("travaso", true);
 		
-		Integer idStalloDestinazione= getIntParam("to", ! isTravaso);
+		Integer idStalloDestinazione= getIntParam("to", isTravaso);
 		
 		if ( consegna != null && getBooleanParam(Strings.EXEC) ) {
 			
@@ -74,21 +74,21 @@ public class TravasaStallo extends VelocityCommand {
 			
 			Stallo destinazione = StalloAdapter.get(idStalloDestinazione);
 			
-			StalloAdapter a = new StalloAdapter();
+			StalloAdapter stalloAdp = new StalloAdapter();
 			
-			if ( destinazione != null ) {
+			if ( isTravaso && destinazione != null ) {
 				Movimento carico = getMovimento(destinazione, scarico);
 				adp.create(carico);
 				
 				destinazione.setIdConsegnaAttuale(idConsegna);
-				destinazione.setImmessoInLiberaPratica(false);
-				a.update(origine);
+				destinazione.setImmessoInLiberaPratica( origine.getImmessoInLiberaPratica() );
+				stalloAdp.update(destinazione);
 			}
 			
 
 			origine.setIdConsegnaAttuale(null);
 			origine.setImmessoInLiberaPratica(false);
-			a.update(origine);
+			stalloAdp.update(origine);
 			
 			response.sendRedirect(".consegne?id=" + idConsegna );
 			response.flushBuffer();

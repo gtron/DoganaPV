@@ -2,6 +2,7 @@ package com.gsoft.doganapt;
 
 import com.gsoft.doganapt.cmd.Homepage;
 import com.gsoft.doganapt.cmd.ImportMovimenti;
+import com.gsoft.doganapt.cmd.LockMdb;
 import com.gsoft.doganapt.cmd.Login;
 import com.gsoft.doganapt.cmd.ViewStallo;
 import com.gsoft.doganapt.cmd.consegne.ResetImmissioneLPStallo;
