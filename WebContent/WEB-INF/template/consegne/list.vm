@@ -10,16 +10,33 @@
 Elenco Consegne #if($chiuse)Chiuse#else Attive#end 
 </h2>
 
+<style type="text/css">
+TH {
+	background-color: #BCBCBC;
+}
+TBODY TR TD { border-top : 2px solid #AAA ;
+}
+
+TBODY TR:hover {
+	background-color: #FFC;
+}
+TD { text-align: center; }
+
+TFOOT TD { 
+border-top : 2px solid #AAA ;
+}
+## .offColor { background-color : #EFEFEF; }
+ 
+</style>
+
 <ul class="commands">
 <li><a href="#" onclick="stampaCopertina(); return false;"><img src="$!images/action-ico-stampa.png" />Copertina</a></li>
 <li><a href="#" onclick="$('#dlg_Prepara').dialogOpen(); return false;"><img src="$!images/action-ico-stampa.png" />Prepara Pagine</a></li>
 <li><a href=".consegne?cmd=edit"><img src="$!images/action-ico-nuovo.png" /> Nuova consegna</a></li>
 
 </ul>
-<style>
-TD { text-align: center; }
-</style>
-<table border="1" width="100%" cellspacing="0" cellpadding="1" id="consegne">
+
+<table border="0" width="100%" cellspacing="0" cellpadding="1" id="consegne">
 <thead><tr class="header">
 <th>Partitario</th>
 <th>Numero</th>
