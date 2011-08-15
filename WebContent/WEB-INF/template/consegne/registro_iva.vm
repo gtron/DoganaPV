@@ -107,6 +107,7 @@ $!m.NumRegistro
 <tr class="sepNoHi">
 <th colspan="2">
 #if($registraIVA)
+<input type="checkbox" onchange="selectIVA(this);" id="selAll" /> <label for="selAll">Tutti</label><br />
 <input type="button" value="Registra" onclick="registraIVA();">#end
 &nbsp;</th>
 <th colspan="2"><br /><b>Giacenza Attuale:</b></th>
@@ -121,6 +122,14 @@ $!m.NumRegistro
 ## #if( ! $rettificaDone )<br /><a href="?id=$obj.Id&amp;cmd=popola">Popola Stalli</a><br /><br />#end
 
 <script type="text/javascript">
+function selectIVA(btn) {
+	var list = document.getElementsByTagName('input');
+	for( var el = 0; el < list.length ; el++ ) {
+		if ( list[el].name && list[el].name == 'registraIVA' ) {
+			list[el].checked = btn.checked ;
+		}
+	}
+}
 function registraIVA() {
 	var list = document.getElementsByTagName('input');
 	
