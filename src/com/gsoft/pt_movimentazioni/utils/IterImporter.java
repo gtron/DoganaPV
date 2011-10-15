@@ -320,7 +320,7 @@ public abstract class IterImporter {
 	}
 
 
-	protected Movimento getMovimento(final boolean isScarico , final MovimentoQuadrelli q, final Consegna c, final MovimentoAdapter registro) {
+	protected Movimento getMovimento(boolean isScarico , final MovimentoQuadrelli q, final Consegna c, final MovimentoAdapter registro) {
 		final Movimento m = registro.newMovimento() ;
 
 		boolean isRettifica = false ;
@@ -343,14 +343,21 @@ public abstract class IterImporter {
 			m.setNote("Errore al stabilire se il movimento è una rettifica: \n" + nota );
 		}
 
+		if ( isRettifica ) {
+			isScarico = "0".equals( q.getCodiceFornitore() );
+		}
+
 		m.setIsLocked(false);
-		m.setIsScarico(isRettifica ? ( ! isScarico ) : isScarico );
+
+
 		m.setIsRettifica(isRettifica);
 		m.setUmido(q.getNetto());
 		m.setSecco( c.calcolaSecco(m.getUmido()) );
 		m.setData(q.getData()) ;
 		m.setIdMerce( c.getIdmerce() );
 		m.setIdConsegna( c.getId()) ;
+
+		m.setIsScarico( isScarico );
 
 		Stallo s = null ;
 		if ( isScarico ) {
