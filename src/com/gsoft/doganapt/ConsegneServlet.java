@@ -15,6 +15,7 @@ import com.gsoft.doganapt.cmd.consegne.ImmettiLiberaPratica;
 import com.gsoft.doganapt.cmd.consegne.ListConsegne;
 import com.gsoft.doganapt.cmd.consegne.PopolaStalli;
 import com.gsoft.doganapt.cmd.consegne.PrintConsegna;
+import com.gsoft.doganapt.cmd.consegne.Rettifica;
 import com.gsoft.doganapt.cmd.consegne.TravasaStallo;
 import com.gsoft.doganapt.cmd.consegne.ViewConsegna;
 import com.gsoft.doganapt.cmd.movimenti.DeleteMovimento;
@@ -23,54 +24,57 @@ import com.gsoft.doganapt.cmd.movimenti.EditMovimento;
 import com.gsoft.doganapt.cmd.movimenti.NuovoMovimento;
 import com.gsoft.framework.TooledServlet;
 
+@SuppressWarnings("serial")
 public class ConsegneServlet extends TooledServlet {
 
-	public ConsegneServlet() { 
-		super(); 
-		
+	public ConsegneServlet() {
+		super();
+
 		addCommand( Commands.DEFAULT ,
 				new ViewConsegna( this ) ) ;
-		
+
 		addCommand( Commands.PRINT ,
 				new PrintConsegna( this ) ) ;
-		
-		addCommand(Commands.EDIT , 
+
+		addCommand(Commands.EDIT ,
 				new EditConsegna(this) ) ;
 
-		addCommand(Commands.EDIT_FATTURA , 
+		addCommand(Commands.EDIT_FATTURA ,
 				new EditConsegna(this) ) ;
 
-		addCommand(Commands.APRI , 
+		addCommand(Commands.APRI ,
 				new ApriConsegna(this) ) ;
-		
-		addCommand(Commands.CHIUDI , 
+
+		addCommand(Commands.CHIUDI ,
 				new ChiudiConsegna(this) ) ;
-		
-		addCommand(Commands.CHIUDI_PFPC , 
+
+		addCommand(Commands.CHIUDI_PFPC ,
 				new ChiudiPFPC(this) ) ;
-		
-		addCommand(Commands.LIST , 
+
+		addCommand(Commands.LIST ,
 				new ListConsegne(this) ) ;
-		
-		addCommand(Commands.EDIT_MOVIMENTO , 
+
+		addCommand(Commands.EDIT_MOVIMENTO ,
 				new EditMovimento(this) );
-		
-		addCommand(Commands.NEW_MOVIMENTO , 
+
+		addCommand(Commands.NEW_MOVIMENTO ,
 				new NuovoMovimento(this) );
-		
-		addCommand(Commands.EDIT_MOVIMENTO_GROUP , 
+
+		addCommand(Commands.EDIT_MOVIMENTO_GROUP ,
 				new EditGruppoMovimenti(this) );
-		
-		addCommand(Commands.IMMETTILP , 
+
+		addCommand(Commands.IMMETTILP ,
 				new ImmettiLiberaPratica(this) );
-		
-		addCommand(Commands.POPOLA_STALLI , 
+
+		addCommand(Commands.POPOLA_STALLI ,
 				new PopolaStalli(this) );
-		
+
 		addCommand( Commands.DELETE_MOVIMENTO,
 				new DeleteMovimento( this ) ) ;
 		addCommand( Commands.TRAVASA_STALLO,
 				new TravasaStallo( this ) ) ;
+		addCommand( Commands.RETTIFICA,
+				new Rettifica( this ) ) ;
 	}
 
 	public static interface Commands {
@@ -87,20 +91,23 @@ public class ConsegneServlet extends TooledServlet {
 		public static final String EDIT_MOVIMENTO_GROUP = "editgroup" ;
 		public static final String DELETE_MOVIMENTO = "delete" ;
 		public static final String TRAVASA_STALLO = "travasa" ;
-		
-		public static final String POPOLA_STALLI = "popola" ;
-		public static final String IMMETTILP = "immettiLP" ;
-		
-	}
-	
-	protected Template handleRequest(HttpServletRequest request, HttpServletResponse response, Context ctx) throws Exception {
 
-		HttpSession s =  request.getSession(false);
-		Boolean logged = null ; 
-		
-		if ( s != null )
+		public static final String POPOLA_STALLI = "popola" ;
+		public static final String RETTIFICA = "rettifica" ;
+		public static final String IMMETTILP = "immettiLP" ;
+
+	}
+
+	@Override
+	protected Template handleRequest(final HttpServletRequest request, final HttpServletResponse response, final Context ctx) throws Exception {
+
+		final HttpSession s =  request.getSession(false);
+		Boolean logged = null ;
+
+		if ( s != null ) {
 			logged = (Boolean) s.getAttribute("logged") ;
-		
+		}
+
 		if ( logged != Boolean.TRUE ) {
 			response.sendRedirect(".main");
 			response.flushBuffer();

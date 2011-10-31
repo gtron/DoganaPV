@@ -6,8 +6,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Vector;
 
 import com.gsoft.doganapt.data.Consegna;
@@ -27,20 +29,22 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 	public MovimentoAdapter() {
 		super();
 	}
-	public MovimentoAdapter( IDatabase2 db ) {
+	public MovimentoAdapter( final IDatabase2 db ) {
 		super( db );
 	}
 
-	public void fillFields(Object obj) { 
-		boolean fill = ( obj != null ) ;
-		
-		Movimento o = (Movimento) obj ;
+	@Override
+	public void fillFields(final Object obj) {
+		final boolean fill = ( obj != null ) ;
 
-		if ( fields == null || fields.isDirty() )
+		final Movimento o = (Movimento) obj ;
+
+		if ( fields == null || fields.isDirty() ) {
 			fields = new FieldSet( getFieldsCount() );
-		
+		}
+
 		fields.add( Fields.ID, Field.Type.INTEGER , (fill)? o.getId() : null , true );
-		
+
 		fields.add( Fields.IDMERCE, Field.Type.INTEGER , (fill)? o.getIdMerce() : null );
 		fields.add( Fields.IDCONSEGNA, Field.Type.INTEGER , (fill)? o.getIdConsegna() : null );
 		fields.add( Fields.DATA, Field.Type.DATE , (fill)? o.getData() : null );
@@ -51,62 +55,65 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		fields.add( Fields.UMIDO, Field.Type.DOUBLE , (fill)? o.getUmido() : null );
 		fields.add( Fields.NUMREGISTRO, Field.Type.LONG , (fill)? o.getNumRegistro() : null );
 		fields.add( Fields.LOCKED, Field.Type.BOOLEAN , (fill)? o.getIsLocked() : null );
-		
+
 		fields.add( Fields.NOTE, Field.Type.STRING , (fill)? o.getNote() : null );
-		
+
 		Documento d = null ;
-		if ( fill) d = o.getDocumento();
+		if ( fill) {
+			d = o.getDocumento();
+		}
 		boolean myfill = fill && d != null ;
 		fields.add( Fields.DOC_TIPO, Field.Type.STRING , (myfill)? d.getTipo() : null );
 		fields.add( Fields.DOC_DATA, Field.Type.DATE , (myfill )? d.getData() : null );
 		fields.add( Fields.DOC_NUMERO, Field.Type.STRING , (myfill)? d.getNumero() : null );
-		
+
 		d = null ;
-		if ( fill) d = o.getDocumentoPV();
-		
+		if ( fill) {
+			d = o.getDocumentoPV();
+		}
+
 		myfill = fill && d != null ;
 		fields.add( Fields.DOCPV_TIPO, Field.Type.STRING , (myfill)? d.getTipo() : null );
 		fields.add( Fields.DOCPV_DATA, Field.Type.DATE , (myfill)? d.getData() : null );
 		fields.add( Fields.DOCPV_NUMERO, Field.Type.STRING , (myfill)? d.getNumero() : null );
-		
+
 	}
 
 	public abstract Object getFromFields ( ) ;
-	
-	
-	public void updateCommonFields ( Movimento o ) {
+
+
+	public void updateCommonFields ( final Movimento o ) {
 		o.setIsScarico( (Boolean) fields.get( Fields.ISSCARICO).getValue() );
 		o.setIsRettifica( (Boolean) fields.get( Fields.ISRETTIFICA).getValue() );
-		o.setDocumento( 
-				Documento.getDocumento( 
+		o.setDocumento(
+				Documento.getDocumento(
 						(String) fields.get( Fields.DOC_TIPO).getValue(),
 						(FormattedDate) fields.get( Fields.DOC_DATA).getValue(),
 						(String) fields.get( Fields.DOC_NUMERO).getValue()
-					));
-		
-		o.setDocumentoPV( 
-				Documento.getDocumento( 
+						));
+
+		o.setDocumentoPV(
+				Documento.getDocumento(
 						(String) fields.get( Fields.DOCPV_TIPO).getValue(),
 						(FormattedDate) fields.get( Fields.DOCPV_DATA).getValue(),
 						(String) fields.get( Fields.DOCPV_NUMERO).getValue()
-					));
-					
+						));
+
 		o.setNumRegistro( (Long) fields.get( Fields.NUMREGISTRO).getValue() );
 		o.setIsLocked( (Boolean) fields.get( Fields.LOCKED).getValue() );
-		
-		o.setNote( (String) fields.get( Fields.NOTE).getValue() );
-		
-		o.setData( (FormattedDate) fields.get( Fields.DATA).getValue() );
-		
-	}
-	public Object getFromFields ( Object obj ) {
 
-		if ( obj == null ) {
+		o.setNote( (String) fields.get( Fields.NOTE).getValue() );
+
+		o.setData( (FormattedDate) fields.get( Fields.DATA).getValue() );
+
+	}
+	public Object getFromFields ( final Object obj ) {
+
+		if ( obj == null )
 			return null ;
-		}
-		
-		Movimento o = (Movimento) obj ;
-		
+
+		final Movimento o = (Movimento) obj ;
+
 		o.setId( (Integer) fields.get( Fields.ID).getValue());
 		o.setIdMerce( (Integer) fields.get( Fields.IDMERCE).getValue() );
 		o.setIdConsegna( (Integer) fields.get( Fields.IDCONSEGNA).getValue() );
@@ -114,12 +121,12 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		o.setIdStallo( (Integer) fields.get( Fields.IDSTALLO).getValue() );
 		o.setSecco( (Double) fields.get( Fields.SECCO).getValue() );
 		o.setUmido( (Double) fields.get( Fields.UMIDO).getValue() );
-		
+
 		updateCommonFields(o);
-		
+
 		return o ;
 	}
-	
+
 	public static interface Fields {
 		static final int ID = 0;
 		static final int IDMERCE = 1;
@@ -139,201 +146,207 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		static final int DOCPV_NUMERO = 15;
 		static final int DOCPV_DATA = 16;
 		static final int NOTE = 17;
-		
+
 		static final int FIELDSCOUNT = 18;
 	}
 
 	private static final String TABLE = "" ;
-	private String[] fieldNames = {
-		"id","idmerce","idconsegna","data","idstallo","isscarico","isrettifica", "secco",
+	private final String[] fieldNames = {
+			"id","idmerce","idconsegna","data","idstallo","isscarico","isrettifica", "secco",
 			"umido","numregistro","locked",
 			"doctype","docnum","docdate",
 			"docpvtype","docpvnum","docpvdate",
 			"note"
 	};
-	
+
+	@Override
 	public int getFieldsCount() {
 		return Fields.FIELDSCOUNT ;
 	}
-	
-	public String getHttpFieldName( int field ) {
+
+	public String getHttpFieldName( final int field ) {
 		return fieldNames[field] ;
 	}
-	public String getTableFieldName(Field f) {
+	public String getTableFieldName(final Field f) {
 		return fieldNames[f.getId()] ;
 	}
-	
+
 	public static String getStaticTable() {
 		return TABLE ;
 	}
+	@Override
 	public abstract String getTable() ;
-	
-	protected String getFieldsRegistro(String prefix) {
+
+	protected String getFieldsRegistro(final String prefix) {
 		String list = "%id, %idmerce, %idconsegna, %data, %idstallo, %isscarico, %isrettifica, sum(%secco) as secco, sum(%umido) as umido, %numregistro, %doctype, %docnum, %docdate, %docpvtype, %docpvnum, %docpvdate, %note, %posdoganale, %locked ";
-			
-		if ( prefix != null )
+
+		if ( prefix != null ) {
 			list = list.replaceAll("%", prefix) ;
-		else
+		} else {
 			list = list.replaceAll("%", "") ;
-		
+		}
+
 		return list ;
 	}
-	
-	public FormattedDate getLastDate( Consegna c , ArrayList<Integer> idStalli, boolean onlyScarichi ) throws Exception {
-		StringBuilder sql = new StringBuilder(70)
-			.append("SELECT max(data) FROM ")
-			.append(getTable())
 
-//			.append(" WHERE isscarico = ?") 
-			;
-			
+	public FormattedDate getLastDate( final Consegna c , final ArrayList<Integer> idStalli, final boolean onlyScarichi ) throws Exception {
+		final StringBuilder sql = new StringBuilder(70)
+		.append("SELECT max(data) FROM ")
+		.append(getTable())
+
+		//			.append(" WHERE isscarico = ?")
+		;
+
 		sql.append(" WHERE deleted = 0 AND idconsegna = ?  ");
-		
-		
-		
+
+
+
 		if ( onlyScarichi ) {
 			sql.append(" AND ")
-				.append(" isscarico = 1 ");
+			.append(" isscarico = 1 ");
 		}
-		
-		
+
+
 		ArrayList<Object> stalli ;
 		if ( idStalli == null || idStalli.size() < 1 ) {
 			stalli = c.getStalli() ;
 		}
 		else {
 			stalli = new ArrayList<Object>(idStalli.size()) ;
-			
-			for ( Integer ids : idStalli ) {
+
+			for ( final Integer ids : idStalli ) {
 				stalli.add(StalloAdapter.get(ids));
 			}
-			
+
 		}
 		if ( stalli != null && stalli.size() > 0 ) {
-			
+
 			sql.append(" AND ");
-			
+
 			sql.append(" idstallo in ( ");
-			for ( Iterator i = stalli.iterator() ; i.hasNext() ;) {
+			for ( final Iterator i = stalli.iterator() ; i.hasNext() ;) {
 				sql.append( ((Stallo)i.next()).getId() ) ;
-				
-				if ( i.hasNext() )
+
+				if ( i.hasNext() ) {
 					sql.append( "," ) ;
+				}
 			}
 			sql.append( ")") ;
 		}
-		
+
 		FormattedDate d = null ;
-		Connection conn = db.getConnection() ;
+		final Connection conn = db.getConnection() ;
 		try {
-			PreparedStatement s = conn.prepareStatement(sql.toString()) ;
-			
-//			s.setBoolean(1, scarico);
-			
+			final PreparedStatement s = conn.prepareStatement(sql.toString()) ;
+
+			//			s.setBoolean(1, scarico);
+
 			s.setInt(1, c.getId().intValue()) ;
-			
-			ResultSet rs = s.executeQuery() ;
-	
+
+			final ResultSet rs = s.executeQuery() ;
+
 			if ( rs != null && rs.next() ) {
-				String str = rs.getString(1);
-				if ( str != null )
+				final String str = rs.getString(1);
+				if ( str != null ) {
 					d = new FormattedDate( str );
+				}
 			}
 		}
 		finally {
 			db.freeConnection(conn);
 		}
-		
+
 		return d;
 	}
-	
-	public Vector getByStallo(Integer id, String order, String limit ) throws Exception {
+
+	public Vector getByStallo(final Integer id, final String order, final String limit ) throws Exception {
 		return getByConsegna( false , null, id ,order, limit);
 	}
-	public Vector getByConsegna( boolean onlyRegistered, Integer idConsegna, Integer idStallo, String order, String limit ) throws Exception {
-		StringBuilder sb = new StringBuilder(50);
-		
-		sb.append(" deleted = 0 " ); 
-		if ( idConsegna != null ) { 
+	public Vector getByConsegna( final boolean onlyRegistered, final Integer idConsegna, final Integer idStallo, final String order, final String limit ) throws Exception {
+		final StringBuilder sb = new StringBuilder(50);
+
+		sb.append(" deleted = 0 " );
+		if ( idConsegna != null ) {
 			sb.append("AND idconsegna =")
-				.append( idConsegna.toString() ) ; 
+			.append( idConsegna.toString() ) ;
 
 		}
-		if ( idStallo != null )
+		if ( idStallo != null ) {
 			sb.append(" AND idstallo = ")
-				.append(idStallo.toString()) ;
-		
-		if ( onlyRegistered ) { 
-//			if ( idStallo != null || idConsegna != null )
-//				sb.append(" AND ") ;
+			.append(idStallo.toString()) ;
+		}
+
+		if ( onlyRegistered ) {
+			//			if ( idStallo != null || idConsegna != null )
+			//				sb.append(" AND ") ;
 			sb.append(" AND numregistro > 0 ") ;
 		}
-		
+
 		return getWithWhere( sb.toString() ,order, limit);
 	}
-	
-	public Vector getByNumeroRegistro(Integer num ) throws Exception {
+
+	public Vector getByNumeroRegistro(final Integer num ) throws Exception {
 
 		return getWithWhere( " deleted = 0 AND numregistro =" + num );
 	}
-	
-	public void setDeleted( Integer id ) throws Exception {
-		
+
+	public void setDeleted( final Integer id ) throws Exception {
+
 		Connection conn = null;
-		
-		StringBuilder sql = new StringBuilder(70)
+
+		final StringBuilder sql = new StringBuilder(70)
 		.append("update ")
 		.append(getTable())
 		.append(" set deleted = 1 where id = " + id )
 		// .append ( "  AND numregistro = null ")
-		 ;
+		;
 		try {
 			conn = db.getConnection() ;
 			db.executeNonQuery(sql.toString(), conn) ;
 
 		}
-		catch ( Exception e ) {
+		catch ( final Exception e ) {
 			throw e ;
 		}
 		finally {
 			db.freeConnection(conn) ;
 		}
-		
+
 	}
-	
-	public void unregister( Long numreg ) throws Exception {
-		
+
+	public void unregister( final Long numreg ) throws Exception {
+
 		Connection conn = null;
-		
-		StringBuilder sql = new StringBuilder(70)
+
+		final StringBuilder sql = new StringBuilder(70)
 		.append("update ")
 		.append(getTable())
 		.append(" set numregistro = null where deleted = 0 AND numregistro = " + numreg )
-		 ;
+		;
 		try {
 			conn = db.getConnection() ;
 			db.executeNonQuery(sql.toString(), conn) ;
-		
+
 			shiftRegistro( true, new Integer( numreg.intValue() ), conn ) ;
-			
+
 		}
-		catch ( Exception e ) {
+		catch ( final Exception e ) {
 			throw e ;
 		}
 		finally {
 			db.freeConnection(conn) ;
 		}
-		
-	}
-	
-	private void shiftRegistro(  boolean down , Integer from , Connection conn ) {
 
-		StringBuilder sql = new StringBuilder(70)
-			.append("update ")
-			.append(getTable())
-			.append(" set numregistro = numregistro ") ;
-		
-		
+	}
+
+	private void shiftRegistro(  final boolean down , final Integer from , final Connection conn ) {
+
+		final StringBuilder sql = new StringBuilder(70)
+		.append("update ")
+		.append(getTable())
+		.append(" set numregistro = numregistro ") ;
+
+
 		if ( down ) {
 			sql.append( " - 1 where deleted = 0 AND numregistro > ") ;
 		}
@@ -342,26 +355,26 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		}
 
 		sql.append( from ) ;
-	
+
 		db.executeNonQuery(sql.toString(), conn) ;
-		
+
 	}
-	
+
 	public ArrayList<Merce> getMerci() throws Exception {
-		StringBuilder sql = new StringBuilder(70)
-					.append("SELECT * FROM ")
-					.append(getTable()).append(" WHERE deleted = 0 GROUP BY idmerce ") 
-					;
+		final StringBuilder sql = new StringBuilder(70)
+		.append("SELECT * FROM ")
+		.append(getTable()).append(" WHERE deleted = 0 GROUP BY idmerce ")
+		;
 		ArrayList<Merce> list = null ;
-		Connection conn = db.getConnection() ;
+		final Connection conn = db.getConnection() ;
 		try {
-			
-			PreparedStatement s = conn.prepareStatement(sql.toString()) ;
-			Vector ids = getByStatment(s);
-			
+
+			final PreparedStatement s = conn.prepareStatement(sql.toString()) ;
+			final Vector ids = getByStatment(s);
+
 			if ( ids != null && ids.size() > 0 ) {
 				list = new ArrayList<Merce>(ids.size());
-				for ( Iterator i = ids.iterator(); i.hasNext() ; ) {
+				for ( final Iterator i = ids.iterator(); i.hasNext() ; ) {
 					list.add( MerceAdapter.get( ((Movimento) i.next() ).getIdMerce() )  );
 				}
 			}
@@ -371,57 +384,58 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		}
 		return list ;
 	}
-	
+
 	public Vector<Integer>  getIdMerci() throws Exception {
-		StringBuilder sql = new StringBuilder(70)
-					.append("SELECT distinct idmerce FROM ")
-					.append(getTable()).append(" WHERE deleted = 0 AND numregistro > 0 ")  
-					;
-		Connection conn = db.getConnection() ;
+		final StringBuilder sql = new StringBuilder(70)
+		.append("SELECT distinct idmerce FROM ")
+		.append(getTable()).append(" WHERE deleted = 0 AND numregistro > 0 ")
+		;
+		final Connection conn = db.getConnection() ;
 		Vector<Integer> list = null ;
 		try {
-			
-			PreparedStatement s = conn.prepareStatement(sql.toString()) ;
-			
-			ResultSet rs = s.executeQuery() ;
-			
+
+			final PreparedStatement s = conn.prepareStatement(sql.toString()) ;
+
+			final ResultSet rs = s.executeQuery() ;
+
 			list = new Vector<Integer>(rs.getFetchSize()) ;
-	
-			while( rs.next() ) 
+
+			while( rs.next() ) {
 				list.add( (Integer) rs.getObject(1) );
-			
+			}
+
 		}
 		finally {
 			db.freeConnection(conn);
 		}
 		return list ;
 	}
-	
-	public Vector getRegistro( Boolean soloRegistrati , Consegna c ) throws Exception {
+
+	public Vector getRegistro( final Boolean soloRegistrati , final Consegna c ) throws Exception {
 		return getRegistro( false, soloRegistrati , c,null,null,null,null,null,null,null,null );
 	}
-	public Vector getRegistro( Boolean soloRegistrati , Consegna c,
-			Integer page,Integer rows,Hashtable<String,String> orderColumn,
-			Integer numero,FormattedDate dal,FormattedDate al,Integer idMerce,Integer numConsegna ) throws Exception {
-		
-		return getRegistro( false, soloRegistrati , c,	page,rows,orderColumn,
-				 numero, dal, al,idMerce, numConsegna );
-	
-	}
-	public Vector getRegistro( Boolean ignoreNumRegistro , Boolean soloRegistrati , Consegna c,
-			Integer page,Integer rows,Hashtable<String,String> orderColumn,
-			Integer numero,FormattedDate dal,FormattedDate al,Integer idMerce,Integer numConsegna ) throws Exception {
+	public Vector getRegistro( final Boolean soloRegistrati , final Consegna c,
+			final Integer page,final Integer rows,final Hashtable<String,String> orderColumn,
+			final Integer numero,final FormattedDate dal,final FormattedDate al,final Integer idMerce,final Integer numConsegna ) throws Exception {
 
-		StringBuilder sql = new StringBuilder(70)
-			.append("SELECT ")
-			.append(getFieldsRegistro("R."))
-			.append(" FROM ")
-			.append(getTable())
-			.append(" R ");
-		
+		return getRegistro( false, soloRegistrati , c,	page,rows,orderColumn,
+				numero, dal, al,idMerce, numConsegna );
+
+	}
+	public Vector getRegistro( final Boolean ignoreNumRegistro , final Boolean soloRegistrati , final Consegna c,
+			final Integer page,final Integer rows,final Hashtable<String,String> orderColumn,
+			final Integer numero,final FormattedDate dal,final FormattedDate al,final Integer idMerce,final Integer numConsegna ) throws Exception {
+
+		final StringBuilder sql = new StringBuilder(70)
+		.append("SELECT ")
+		.append(getFieldsRegistro("R."))
+		.append(" FROM ")
+		.append(getTable())
+		.append(" R ");
+
 		boolean writeJoinConsegne=true;
 		boolean writeJoinMerce=true;
-		
+
 		if(numConsegna!=null){
 			sql.append(" INNER JOIN ");
 			sql.append(new ConsegnaAdapter().getTable());
@@ -432,10 +446,9 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		if(orderColumn!=null){
 			nomeColonna = orderColumn.keySet();
 			if(nomeColonna!=null){
-				for (Iterator<String> iterator = nomeColonna.iterator(); iterator.hasNext();) {
-					String nc = iterator.next();
-					boolean orderForFieldConsegna= nc!=null && nc.startsWith("C.");
-					boolean orderForFieldMerce= nc!=null && nc.startsWith("M.");
+				for (final String nc : nomeColonna) {
+					final boolean orderForFieldConsegna= nc!=null && nc.startsWith("C.");
+					final boolean orderForFieldMerce= nc!=null && nc.startsWith("M.");
 					if(writeJoinConsegne && (orderForFieldConsegna || orderForFieldMerce)){
 						sql.append(" INNER JOIN ");
 						sql.append(new ConsegnaAdapter().getTable());
@@ -448,166 +461,178 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 						sql.append(" M ON M.id = C.idmerce ");
 						writeJoinMerce=false;
 					}
-					
+
 				}
 			}
 		}
-		if ( soloRegistrati || c != null || numero != null || numConsegna != null || idMerce != null ) 
+		if ( soloRegistrati || c != null || numero != null || numConsegna != null || idMerce != null ) {
 			sql.append(" WHERE R.deleted = 0 ");
-			
-		if ( soloRegistrati ) {
-			
-			sql.append(" AND numregistro > 0 ");
-			
-//			if ( c != null )
-//				sql.append(" AND "); 
 		}
 
-		if( c != null )
+		if ( soloRegistrati ) {
+
+			sql.append(" AND numregistro > 0 ");
+
+			//			if ( c != null )
+			//				sql.append(" AND ");
+		}
+
+		if( c != null ) {
 			sql.append(" AND idconsegna = ? ");
-		
-		if( numero != null )
+		}
+
+		if( numero != null ) {
 			sql.append(" AND numregistro  = ").append(numero);
-		
-		if( numConsegna != null )
+		}
+
+		if( numConsegna != null ) {
 			sql.append(" AND C.numero  = ").append(numConsegna);
-		
-		if( idMerce != null )
+		}
+
+		if( idMerce != null ) {
 			sql.append(" AND R.idmerce  = ").append(idMerce).append(" ");
-		
+		}
+
 		if( dal != null && al!=null){
 			sql.append(" AND '").append(dal.fullString()).
-				append("' <= data AND '").append(al.fullString()).append("' >= data ");
+			append("' <= data AND '").append(al.fullString()).append("' >= data ");
 		}
 		sql.append(" GROUP BY ");
-		
+
 		if ( c == null  ) {
 			sql.append(" numregistro, ");
 		}
-		
-		if ( ! soloRegistrati || ignoreNumRegistro ) 
+
+		if ( ! soloRegistrati || ignoreNumRegistro ) {
 			sql.append("data,");
-		
+		}
+
 		sql.append( " isscarico , isrettifica");
-		
+
 		sql.append(" ORDER BY ");
-		
-		
+
+
 		if(nomeColonna!=null && nomeColonna.size() > 0){
 			String nc;
 			boolean first=true;
-			for (Iterator<String> iterator = nomeColonna.iterator(); iterator.hasNext();) {
-				 if(!first) sql.append(",");
-				 nc = iterator.next();
-				 sql.append(nc);
-				 String ascDesc= orderColumn.get(nc);
-				 if(ascDesc!=null)
+			for (final Iterator<String> iterator = nomeColonna.iterator(); iterator.hasNext();) {
+				if(!first) {
+					sql.append(",");
+				}
+				nc = iterator.next();
+				sql.append(nc);
+				final String ascDesc= orderColumn.get(nc);
+				if(ascDesc!=null) {
 					sql.append(" ").append(ascDesc);
-				 first=false;
-			}	
+				}
+				first=false;
+			}
 		}
 		else {
-			if( ! ignoreNumRegistro ) 
+			if( ! ignoreNumRegistro ) {
 				sql.append( " numregistro, ") ;
-			
+			}
+
 			sql.append( "data, isrettifica, isscarico, idstallo " );
 		}
-		
+
 		if(page!=null && rows!=null){
 			sql.append(" LIMIT ").append((page - 1) *  rows).append(",").append(rows);
 		}
 		Vector list = null ;
-		
-		Connection conn = db.getConnection() ;
+
+		final Connection conn = db.getConnection() ;
 		try {
-			
-			PreparedStatement s = conn.prepareStatement(sql.toString()) ;		
-			if( c != null )	
+
+			final PreparedStatement s = conn.prepareStatement(sql.toString()) ;
+			if( c != null ) {
 				s.setInt(1, c.getId().intValue()) ;
-			
+			}
+
 			list = getByStatment(s);
-	
-			
+
+
 		}
 		finally {
 			db.freeConnection(conn);
 		}
-		
+
 		return list ;
 	}
-	
-	public Vector getDaStampare( Integer from , Integer num ) throws Exception {
 
-		StringBuilder sql = new StringBuilder(70)
-			.append("SELECT ")
-			.append(getFieldsRegistro("R."))
-			.append(" FROM ")
-			.append(getTable())
-			.append(" R ");
-		
-		
+	public Vector getDaStampare( final Integer from , final Integer num ) throws Exception {
+
+		final StringBuilder sql = new StringBuilder(70)
+		.append("SELECT ")
+		.append(getFieldsRegistro("R."))
+		.append(" FROM ")
+		.append(getTable())
+		.append(" R ");
+
+
 		sql.append(" WHERE deleted = 0 ");
-			
+
 		if ( from != null ) {
 			sql.append(" AND numregistro >= ?");
 		}
-		
+
 		sql.append(" GROUP BY numregistro ORDER BY numregistro , data, isrettifica, idstallo " );
-		
+
 		if( num!=null ){
 			sql.append(" LIMIT ").append(num);
 		}
 		Vector list = null ;
-		
-		Connection conn = db.getConnection() ;
+
+		final Connection conn = db.getConnection() ;
 		try {
-			
-			PreparedStatement s = conn.prepareStatement(sql.toString()) ;		
-			if( from != null )	
+
+			final PreparedStatement s = conn.prepareStatement(sql.toString()) ;
+			if( from != null ) {
 				s.setInt(1, from.intValue()) ;
-			
+			}
+
 			list = getByStatment(s);
-	
-			
+
+
 		}
 		finally {
 			db.freeConnection(conn);
 		}
-		
+
 		return list ;
 	}
-	
-	public Integer confermaStampa( Integer from , Integer to ) throws Exception {
 
-		StringBuilder sql = new StringBuilder(70)
-			.append(" UPDATE ")
-			.append(getTable())
-			.append( " SET locked = 1 WHERE deleted = 0 AND numregistro >= ? AND numregistro <=  ?");
-		
+	public Integer confermaStampa( final Integer from , final Integer to ) throws Exception {
+
+		final StringBuilder sql = new StringBuilder(70)
+		.append(" UPDATE ")
+		.append(getTable())
+		.append( " SET locked = 1 WHERE deleted = 0 AND numregistro >= ? AND numregistro <=  ?");
+
 		Integer ret = null ;
-		Connection conn = db.getConnection() ;
+		final Connection conn = db.getConnection() ;
 		try {
-			
-			PreparedStatement s = conn.prepareStatement(sql.toString()) ;		
-			
+
+			final PreparedStatement s = conn.prepareStatement(sql.toString()) ;
+
 			s.setInt(1, from.intValue()) ;
 			s.setInt(2, to.intValue()) ;
-			
+
 			ret = new Integer( s.executeUpdate() );
-	
-			
+
+
 		}
 		finally {
 			db.freeConnection(conn);
 		}
-		
+
 		return ret ;
 	}
-	
+
 	/*
 	 * Tira fuori i movimenti da registrare raggruppandoli in base anche all'iter
 	 */
-	public Vector getDaRegistrare2( Consegna c , FormattedDate data ) throws Exception {
+	public Vector getDaRegistrare2( final Consegna c , final FormattedDate data ) throws Exception {
 
 		/*
 		 * 
@@ -622,265 +647,309 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 , idconsegna, isscarico , isrettifica ORDER BY  data, isrettifica, idstallo
 
 		 */
-		Integer idConsegna = c == null ? null : c.getId() ;
-		
-		StringBuilder sql = new StringBuilder(120)
-			.append("SELECT * FROM ")
-			.append(getTable())
-			.append(" r INNER JOIN consegne c ON r.idconsegna = c.idconsegna " )
-			.append(" INNER JOIN iter i ON c.iter = i.id  WHERE deleted = 0 AND numregistro IS NULL ")
-			 ;
-			
-		if( idConsegna != null )
+		final Integer idConsegna = c == null ? null : c.getId() ;
+
+		final StringBuilder sql = new StringBuilder(120)
+		.append("SELECT * FROM ")
+		.append(getTable())
+		.append(" r INNER JOIN consegne c ON r.idconsegna = c.idconsegna " )
+		.append(" INNER JOIN iter i ON c.iter = i.id  WHERE deleted = 0 AND numregistro IS NULL ")
+		;
+
+		if( idConsegna != null ) {
 			sql.append(" AND r.idconsegna = ? ");
-		
-		if( data != null )
+		}
+
+		if( data != null ) {
 			sql.append("AND r.data = ? ");
-		
-		
+		}
+
+
 		sql.append(
 				" group by case when i.singolicarichi = 1 then r.id else r.data end , r.idconsegna, r.isscarico , r.isrettifica")
-			.append(" order by data, isrettifica, idstallo" );
+				.append(" order by data, isrettifica, idstallo" );
 
 		Vector list = null ;
-		
-		Connection conn = db.getConnection() ;
+
+		final Connection conn = db.getConnection() ;
 		try {
-			
+
 			int pos = 1 ;
-			PreparedStatement s = conn.prepareStatement(sql.toString()) ;
-			
-			if( idConsegna != null )	
+			final PreparedStatement s = conn.prepareStatement(sql.toString()) ;
+
+			if( idConsegna != null ) {
 				s.setInt(pos++, idConsegna.intValue()) ;
-			
-			if( data != null )	
+			}
+
+			if( data != null ) {
 				s.setDate(pos++, new Date(data.getTime()) ) ;
-			
+			}
+
 			list = getByStatment(s);
-	
-			
+
+
 		}
 		finally {
 			db.freeConnection(conn);
 		}
-		
+
 		return list ;
 	}
-	
-	public Vector getDaRegistrare( Integer idConsegna , FormattedDate data ) throws Exception {
 
-		StringBuilder sql = new StringBuilder(70)
-			.append("SELECT * FROM ")
-			.append(getTable())
-			.append(" WHERE deleted = 0 AND numregistro is null ");
-			 ;
-			
-		if( idConsegna != null )
+	public Vector getDaRegistrare( final Integer idConsegna , final FormattedDate data ) throws Exception {
+
+		final StringBuilder sql = new StringBuilder(70)
+		.append("SELECT * FROM ")
+		.append(getTable())
+		.append(" WHERE deleted = 0 AND numregistro is null ");
+		;
+
+		if( idConsegna != null ) {
 			sql.append(" AND idconsegna = ? ");
-		
-		if( data != null )
+		}
+
+		if( data != null ) {
 			sql.append("AND data = ? ");
-		
-		
+		}
+
+
 		sql.append( " order by data, isrettifica, isscarico, idstallo" );
 
 		Vector list = null ;
-		
-		Connection conn = db.getConnection() ;
+
+		final Connection conn = db.getConnection() ;
 		try {
-			
+
 			int pos = 1 ;
-			PreparedStatement s = conn.prepareStatement(sql.toString()) ;
-			
-			if( idConsegna != null )	
+			final PreparedStatement s = conn.prepareStatement(sql.toString()) ;
+
+			if( idConsegna != null ) {
 				s.setInt(pos++, idConsegna.intValue()) ;
-			
-			if( data != null )	
+			}
+
+			if( data != null ) {
 				s.setDate(pos++, new Date(data.getTime()) ) ;
-			
+			}
+
 			list = getByStatment(s);
-	
-			
+
+
 		}
 		finally {
 			db.freeConnection(conn);
 		}
-		
+
 		return list ;
 	}
-	
-	public Vector getPartitario( Consegna c ) throws Exception {
 
-		String sql = "SELECT id, idmerce, idconsegna, data, idstallo, cast(isscarico as binary ) as isscarico, isrettifica, secco, umido, numregistro, doctype, docnum, docdate, docpvtype, docpvnum, docpvdate, note, posdoganale, locked, 0 , 0 " +
+	public Vector getPartitario( final Consegna c ) throws Exception {
+
+		final String sql = "SELECT id, idmerce, idconsegna, data, idstallo, cast(isscarico as binary ) as isscarico, isrettifica, secco, umido, numregistro, doctype, docnum, docdate, docpvtype, docpvnum, docpvdate, note, posdoganale, locked, 0 , 0 " +
 				" FROM where deleted = 0 AND idconsegna = ? union all select * from registroiva where idconsegna = ? order by idstallo, data ";
-		
-		
+
+
 		Vector list = null ;
-		
-		Connection conn = db.getConnection() ;
+
+		final Connection conn = db.getConnection() ;
 		try {
-			
-			PreparedStatement s = conn.prepareStatement(sql.toString()) ;		
-			
+
+			final PreparedStatement s = conn.prepareStatement(sql.toString()) ;
+
 			s.setInt(1, c.getId().intValue()) ;
 			s.setInt(2, c.getId().intValue()) ;
-			
+
 			list = getByStatment(s);
-	
+
 		}
 		finally {
 			db.freeConnection(conn);
 		}
-		
+
 		return list ;
 	}
-	
-	public ArrayList<Integer> getIdStalli(Integer idConsegna ) throws Exception {
 
-		String sql = "SELECT distinct idstallo FROM " + getTable() +
-			" where deleted = 0 AND idconsegna = ? and idstallo is not null  order by idstallo ";
-		
+	public ArrayList<Integer> getIdStalli(final Integer idConsegna ) throws Exception {
+
+		final String sql = "SELECT distinct idstallo FROM " + getTable() +
+				" where deleted = 0 AND idconsegna = ? and idstallo is not null  order by idstallo ";
+
 		ArrayList<Integer> list = null ;
-		
-		Connection conn = db.getConnection() ;
+
+		final Connection conn = db.getConnection() ;
 		try {
-			
-			PreparedStatement s = conn.prepareStatement(sql.toString()) ;		
-			
+
+			final PreparedStatement s = conn.prepareStatement(sql.toString()) ;
+
 			s.setInt(1, idConsegna.intValue()) ;
 			ResultSet rs = null ;
-		
+
 			rs = s.executeQuery() ;
-	
+
 			list = new ArrayList<Integer>(rs.getFetchSize()) ;
-	
-			while( rs.next() ) 
+
+			while( rs.next() ) {
 				list.add( (Integer) rs.getObject(1) );
-			
+			}
+
 		}
 		finally {
 			db.freeConnection(conn);
 		}
-		
+
 		return list ;
 	}
-	 
-	public Vector getGroup(  Integer idConsegna , FormattedDate d , boolean scarico, boolean rettifica) throws Exception {
-		
-		return getWithWhere(" deleted = 0 AND idconsegna = " + idConsegna.toString() 
-				+ " AND data = '" + d.ymdString() + "'" 
-				+ " AND isrettifica = '" + (rettifica ? "1":"0") + "'" 
-				+ " AND isscarico = '" + (scarico ? "1":"0") + "'" 
+
+	public Vector getGroup(  final Integer idConsegna , final FormattedDate d , final boolean scarico, final boolean rettifica) throws Exception {
+
+		return getWithWhere(" deleted = 0 AND idconsegna = " + idConsegna.toString()
+				+ " AND data = '" + d.ymdString() + "'"
+				+ " AND isrettifica = '" + (rettifica ? "1":"0") + "'"
+				+ " AND isscarico = '" + (scarico ? "1":"0") + "'"
 				) ;
-		
+
 	}
-	
-	public Vector getByData( Integer idConsegna , FormattedDate d ) throws Exception {
-		
+
+	public Vector getByData( final Integer idConsegna , final FormattedDate d ) throws Exception {
+
 		return getWithWhere(" deleted = 0 AND idconsegna = " + idConsegna.toString() + " AND data = '" + d.ymdString() + "'" ) ;
-		
+
 	}
-	
-//	double importa( Vector list , Consegna c, Stallo s, FormattedDate data ) throws Exception {
-//		
-//		Movimento m = null ;
-//		double sommaPesoUmido = 0 ;
-//
-//		if ( list != null )
-//			for ( Iterator i = list.iterator() ; i.hasNext();) {
-//
-//				m = getMovimento(false, (MovimentoQuadrelli) i.next(), c ) ;
-//				m.setSecco(c.calcolaSecco(m.getUmido()));
-//				m.setIdConsegna(c.getId());
-//
-//				if ( data != null )
-//					m.setData(data);
-//				
-//				create(m);
-//				
-//				m.getStallo().notifyMovimento(m, true);
-//
-//				sommaPesoUmido += m.getUmido().doubleValue() ;
-//			}
-//
-//		return sommaPesoUmido ;
-//	}
-	
+
+	public final static Integer ID_STALLO_CARICO_APERTURA = Integer.valueOf(0);
+
+	@SuppressWarnings("unchecked")
+	public Map<Integer, Movimento> getCarichiInizialiPerStallo(final Consegna consegna) throws Exception {
+
+		/*
+		 * carica i carichi attualmente presenti, quello senza stallo sarà quello che ancora devo distribuire
+		   popolerà un array di stalli che hanno già i carichi, confronterò il totale con quello che mi dice quadrelli
+		   se è inferiore lo attualizzo scontandolo dal movimento originario
+		   se il movimento ha il num di registro non si tocca
+		 */
+
+		final Map<Integer, Movimento> out = new HashMap<Integer, Movimento>(7);
+
+		final Vector<Movimento> movimenti = getByConsegna(false, consegna.getId(), null, "isscarico asc,isrettifica desc", "");
+
+		Integer idStallo = null ;
+		for ( final Movimento m : movimenti ) {
+			idStallo = m.getIdStallo();
+
+			if ( ! m.getIsScarico() && ! m.getIsRettifica() ) {
+				if ( idStallo == null ) {
+					// è il carico di apertura ( non ha stallo e il suo umido è quanto resta da assegnare agli stalli )
+					idStallo = ID_STALLO_CARICO_APERTURA;
+				}
+				out.put(idStallo, m);
+			}
+		}
+
+		return out;
+	}
+
+	//	double importa( Vector list , Consegna c, Stallo s, FormattedDate data ) throws Exception {
+	//
+	//		Movimento m = null ;
+	//		double sommaPesoUmido = 0 ;
+	//
+	//		if ( list != null )
+	//			for ( Iterator i = list.iterator() ; i.hasNext();) {
+	//
+	//				m = getMovimento(false, (MovimentoQuadrelli) i.next(), c ) ;
+	//				m.setSecco(c.calcolaSecco(m.getUmido()));
+	//				m.setIdConsegna(c.getId());
+	//
+	//				if ( data != null )
+	//					m.setData(data);
+	//
+	//				create(m);
+	//
+	//				m.getStallo().notifyMovimento(m, true);
+	//
+	//				sommaPesoUmido += m.getUmido().doubleValue() ;
+	//			}
+	//
+	//		return sommaPesoUmido ;
+	//	}
+
 	public abstract void doneNextNumRegistro() throws Exception;
 	public abstract Integer getNextNumRegistro() throws Exception;
 	public abstract Movimento newMovimento( );
-	
-	
+
+
 	public synchronized boolean checkIntegrity() throws Exception  {
 		return checkIntegrity(false);
 	}
-	
+
 	/* *
 	 * 
-	 * Prende i movimenti da un certo num in poi ignorando il num di registro     
+	 * Prende i movimenti da un certo num in poi ignorando il num di registro
 		SELECT *
-		FROM registrodoganale R  WHERE  numregistro > 0 
+		FROM registrodoganale R  WHERE  numregistro > 0
 		ORDER BY  data, numregistro , isrettifica, idstallo
 
-		 * 
-		 *  Poi cicla sui movimenti e gli cambia la numerazione in modo progressivo 
-		 *  ( oppure puo' solo verificare che sia corretta x vedere se ci son buchi x es ) 
-		 *   
-		 *  verificando se l'iter dice di registrare i singoli carichi oppure no
-		 *  e assegnando il num di reg successivo in base alle regole corrette
+	 * 
+	 *  Poi cicla sui movimenti e gli cambia la numerazione in modo progressivo
+	 *  ( oppure puo' solo verificare che sia corretta x vedere se ci son buchi x es )
+	 * 
+	 *  verificando se l'iter dice di registrare i singoli carichi oppure no
+	 *  e assegnando il num di reg successivo in base alle regole corrette
 	 */
-	public synchronized boolean checkIntegrity( boolean doFix ) throws Exception {
-		
-		Vector list = getRegistro( true , true , null,null,null,null,null,null,null,null,null );
-		
+	public synchronized boolean checkIntegrity( final boolean doFix ) throws Exception {
+
+		final Vector list = getRegistro( true , true , null,null,null,null,null,null,null,null,null );
+
 		Movimento m ;
 		int currNum = 0 ;
 
 		Iterator i = list.iterator() ;
-		while ( i.hasNext()  ) { 
+		while ( i.hasNext()  ) {
 			m = (Movimento) i.next() ;
-			
-			if ( ! m.getIsLocked() ) break ;
-			
+
+			if ( ! m.getIsLocked() ) {
+				break ;
+			}
+
 			currNum = m.getNumRegistro().intValue() ;
 
 		}
-//		throw new Exception();
-		if( currNum == 0 ) 
+		//		throw new Exception();
+		if( currNum == 0 ) {
 			i = list.iterator() ;
-		
-		Connection conn = db.getConnection() ;
-		
-		boolean ret = false ;
-		
-		try {
-		while ( i.hasNext() ) {
-			m = (Movimento) i.next() ;
-			
-						
-			currNum ++;
-			
-			if ( doFix ) {
-				
-				Integer num = new Integer( currNum ) ;
-				
-//				String ids = getIdsFromNumRegistro( m ) ;
-				
-				
-				
-				
-//					shiftRegistro( false, num , conn  ) ;
-					
-					updateNumRegistro(m , num, conn);
-				
-			} 
-			else if ( m.getNumRegistro().intValue() != currNum  ) {
-				ret = false ;
-			}			
 		}
+
+		final Connection conn = db.getConnection() ;
+
+		boolean ret = false ;
+
+		try {
+			while ( i.hasNext() ) {
+				m = (Movimento) i.next() ;
+
+
+				currNum ++;
+
+				if ( doFix ) {
+
+					final Integer num = new Integer( currNum ) ;
+
+					//				String ids = getIdsFromNumRegistro( m ) ;
+
+
+
+
+					//					shiftRegistro( false, num , conn  ) ;
+
+					updateNumRegistro(m , num, conn);
+
+				}
+				else if ( m.getNumRegistro().intValue() != currNum  ) {
+					ret = false ;
+				}
+			}
 			ret = true ;
 		}
-		catch ( Exception e ) {
+		catch ( final Exception e ) {
 			throw new UserException(e) ;
 		}
 		finally {
@@ -888,73 +957,73 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 		}
 		return ret ;
 	}
-	
-	private void updateNumRegistro(Movimento m, Integer newNum , Connection cn ) throws Exception  {
-		
-		StringBuilder sql = new StringBuilder()
-			.append("UPDATE ").append( getTable())
-			.append(" t1 INNER JOIN ").append( getTable())
-			.append(" t2 ON t1.").append(fieldNames[Fields.NUMREGISTRO])
-			.append(" = t2.").append(fieldNames[Fields.NUMREGISTRO])
-			.append(" AND t1.").append(fieldNames[Fields.IDCONSEGNA])
-			.append(" = t2.").append(fieldNames[Fields.IDCONSEGNA])
-			.append(" AND t1.").append(fieldNames[Fields.ISSCARICO])
-			.append(" = t2.").append(fieldNames[Fields.ISSCARICO])
-			.append(" AND t1.").append(fieldNames[Fields.ISRETTIFICA])
-			.append(" = t2.").append(fieldNames[Fields.ISRETTIFICA])
-			.append(" AND t1.").append(fieldNames[Fields.DATA])
-			.append(" = t2.").append(fieldNames[Fields.DATA])
-			.append(" AND t2.").append(fieldNames[Fields.ID])
-			.append(" = ? ")
-			.append(" SET t1.").append(fieldNames[Fields.NUMREGISTRO])
-			.append(" = ? ");
-		
-			PreparedStatement p = cn.prepareStatement(sql.toString()) ;
-			p.setLong(1, m.getId() ) ;
-			
-			p.setInt(2, newNum ) ;
-			p.executeUpdate();
+
+	private void updateNumRegistro(final Movimento m, final Integer newNum , final Connection cn ) throws Exception  {
+
+		final StringBuilder sql = new StringBuilder()
+		.append("UPDATE ").append( getTable())
+		.append(" t1 INNER JOIN ").append( getTable())
+		.append(" t2 ON t1.").append(fieldNames[Fields.NUMREGISTRO])
+		.append(" = t2.").append(fieldNames[Fields.NUMREGISTRO])
+		.append(" AND t1.").append(fieldNames[Fields.IDCONSEGNA])
+		.append(" = t2.").append(fieldNames[Fields.IDCONSEGNA])
+		.append(" AND t1.").append(fieldNames[Fields.ISSCARICO])
+		.append(" = t2.").append(fieldNames[Fields.ISSCARICO])
+		.append(" AND t1.").append(fieldNames[Fields.ISRETTIFICA])
+		.append(" = t2.").append(fieldNames[Fields.ISRETTIFICA])
+		.append(" AND t1.").append(fieldNames[Fields.DATA])
+		.append(" = t2.").append(fieldNames[Fields.DATA])
+		.append(" AND t2.").append(fieldNames[Fields.ID])
+		.append(" = ? ")
+		.append(" SET t1.").append(fieldNames[Fields.NUMREGISTRO])
+		.append(" = ? ");
+
+		final PreparedStatement p = cn.prepareStatement(sql.toString()) ;
+		p.setLong(1, m.getId() ) ;
+
+		p.setInt(2, newNum ) ;
+		p.executeUpdate();
 	}
-	
-//	private String getIdsFromNumRegistro( Movimento m ) throws Exception {
-//		
-//		StringBuilder sql = new StringBuilder()
-//			.append("SELECT ").append(fieldNames[Fields.ID])
-//			.append(" FROM ").append( getTable())
-//			.append(" WHERE ").append(fieldNames[Fields.NUMREGISTRO]) 
-//			.append(" = ?") ;
-//		
-//		StringBuilder ret = null ;
-//		
-//		Connection cn = db.getConnection();
-//		try {
-//			PreparedStatement s = cn.prepareStatement(sql.toString()) ;
-//			
-//			s.setLong(1, m.getNumRegistro()) ;
-//			
-//			ResultSet rs = s.executeQuery() ;
-//			
-//			if (rs != null )
-//				while( rs.next() ) { 
-//					
-//					if ( ret == null )
-//						ret = new StringBuilder("");
-//					else 
-//						ret.append(",") ;
-//					
-//					ret.append( rs.getLong(1) );
-//				}
-//		}
-//		catch (Exception e) {
-//			throw e ;
-//		}
-//		finally {
-//			db.freeConnection(cn) ;
-//		}
-//
-//		if ( ret == null )
-//			return "" ;
-//		
-//		return ret.toString() ;
-//	}
+
+	//	private String getIdsFromNumRegistro( Movimento m ) throws Exception {
+	//
+	//		StringBuilder sql = new StringBuilder()
+	//			.append("SELECT ").append(fieldNames[Fields.ID])
+	//			.append(" FROM ").append( getTable())
+	//			.append(" WHERE ").append(fieldNames[Fields.NUMREGISTRO])
+	//			.append(" = ?") ;
+	//
+	//		StringBuilder ret = null ;
+	//
+	//		Connection cn = db.getConnection();
+	//		try {
+	//			PreparedStatement s = cn.prepareStatement(sql.toString()) ;
+	//
+	//			s.setLong(1, m.getNumRegistro()) ;
+	//
+	//			ResultSet rs = s.executeQuery() ;
+	//
+	//			if (rs != null )
+	//				while( rs.next() ) {
+	//
+	//					if ( ret == null )
+	//						ret = new StringBuilder("");
+	//					else
+	//						ret.append(",") ;
+	//
+	//					ret.append( rs.getLong(1) );
+	//				}
+	//		}
+	//		catch (Exception e) {
+	//			throw e ;
+	//		}
+	//		finally {
+	//			db.freeConnection(cn) ;
+	//		}
+	//
+	//		if ( ret == null )
+	//			return "" ;
+	//
+	//		return ret.toString() ;
+	//	}
 }

@@ -33,7 +33,13 @@ Tasso di Umidit&agrave;: <strong>$!tools.Number.format('##0.0000000', $!obj.Tass
 ##<li><a href="#dettaglio">Dettaglio</a></li>
 </ul>
 
-#if ( $regDog ) 
+#if($obj.Iter.getHasrettifica())#set($needRettifica=true)#end
+
+#if ( $regDog )
+#if($needRettifica)
+#foreach( $m in $obj.getRegistroDoganale(false) )
+#if($m.IsRettifica)#set($needRettifica=false)#end
+#end#end
 <div id="doganale">
 #parse('consegne/registro_doganale.vm')
 </div>
@@ -41,7 +47,12 @@ Tasso di Umidit&agrave;: <strong>$!tools.Number.format('##0.0000000', $!obj.Tass
 
 
 
-#if ( $regIVA ) 
+#if ( $regIVA )
+#if($needRettifica && ! $regDog)) 
+#foreach( $m in $obj.getRegistroDoganale(false) )
+#if($m.IsRettifica)#set($needRettifica=false)#end
+#end#end
+
 <div id="iva">
 #parse('consegne/registro_iva.vm')
 </div>
@@ -116,8 +127,10 @@ $("#menuConsegna").tabs();
 
 <li><a href="#" onclick="$('#dlg_Travasa').dialogOpen();"><img src="$!images/action-ico-immetti.png" /> Travasa/Libera Stallo</a></li>
 
-#if( ! $rettificaDone && $obj.isAperta() )
-<li><a href="?id=$obj.Id&amp;cmd=popola"><img src="$!images/action-ico-immetti.png" /> Popola Stalli</a></li>
+## Sostituisce il test su rettificaDone, che va cambiato di nome xke non rispecchia il vero senso della variabile...
+#if( $needRettifica )
+<li><a href="?id=$obj.Id&amp;cmd=popola"><img src="$!images/action-ico-immetti.png" />Popola Stalli</a></li>
+<li><a href="?id=$obj.Id&amp;cmd=rettifica"><img src="$!images/action-ico-immetti.png" />Rettifica</a></li>
 #end
 
 #if($rettificaDone && $immissioneLP && $obj.isAperta() )

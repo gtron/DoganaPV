@@ -1,3 +1,18 @@
+#if($err)
+<div style="border:1px solid red;widht:100%;background:#FF8;color:red;">
+<b>ATTENZIONE:<br>
+$err<br></b>
+<br><br>
+Dettagli dell'errore (da copiare e inviare via mail) :
+$err<br>
+#set($trace=$err.getStackTrace())
+#foreach($r in $trace)
+#if($velocityCount<6)
+$r<br>#end#end
+<br><br>
+</div>
+#end
+
 <style>
 INPUT { text-align : right;}
 </style>
@@ -10,7 +25,7 @@ INPUT { text-align : right;}
 #set($totUmido=0)
 #set($totSecco=0)
 <form action="?" name="rettifica" method="POST" id="mainForm">
-<input type="hidden" name="cmd" value="popola" />
+<input type="hidden" name="cmd" value="rettifica" />
 <input type="hidden" name="id" value="$obj.Id" />
 <input type="hidden" name="exec" value="1" />
 <table border="0" cellspacing="0">
@@ -195,26 +210,18 @@ rettificaUmido=1 * umidoPos.value  - 1 * umidoNeg.value ;
 
 function checkDataRettifica() {
 var d = document.getElementById('data');
-
 if ( d.value == '' ) {
-var ok = confirm(
-"Non si è specificato la data del movimento di rettifica!\nPremere OK per effettuare il solo PopolaStalli senza Rettifica.");
-if ( ! ok ) {
-d.focus();
-return false;
+alert("Non si è specificato la data del movimento di rettifica!");
+d.focus();return false;
 }
-}
-return true;
-}
+return true ;}
 
 function popolaStalli(f){
 for(el in f.elements){
 if(f.elements[el] && f.elements[el].name){
 n=''+f.elements[el].name;
 if(n.substr(0,5)== 'umido')stalli.push(1 * f.elements[el].name.replace('umido_',''));
-}
-}
-}
+}}}
 
 function calcola(btn){
 var f=btn.form ;
