@@ -827,7 +827,7 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 		   se il movimento ha il num di registro non si tocca
 		 */
 
-		final Map<Integer, Movimento> out = new HashMap<Integer, Movimento>(7);
+		Map<Integer, Movimento> out = new HashMap<Integer, Movimento>(7);
 
 		final Vector<Movimento> movimenti = getByConsegna(false, consegna.getId(), null, "isscarico asc,isrettifica desc", "");
 
