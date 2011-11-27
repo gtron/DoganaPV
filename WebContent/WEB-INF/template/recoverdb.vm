@@ -1,0 +1,24 @@
+#set($activeMenu='PRINCIPALE')
+#parse('costanti.vm')
+#parse('header.vm')
+
+<br />
+
+<form action="?" method="post" >
+<input type="hidden" name="exec" value="1" />
+<div style="text-align:center">
+<h1>Ripristino Database</h1>
+
+<br />
+<h2>Punti di ripristino disponibili: </h2>
+<select size="10" name="toRecover" multiple="false">
+#foreach( $f in $list ) 
+<option value="$f.Id">$f.Descrizione</option>
+#end
+</select> <br /><br />
+<a href="?cmd=main">&laquo; Indietro</a> - <input type="submit" value="Recupera" />
+</div>
+</form>
+<br /><br /><br />
+
+#parse('footer.vm')
