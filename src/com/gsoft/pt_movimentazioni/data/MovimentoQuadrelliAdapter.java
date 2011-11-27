@@ -199,10 +199,22 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 		else
 			sql = s.getConsegna().getIter().getQueryin(s.getConsegna(), s, data) ;
 
-		Connection cn = db.getConnection();
+		String key = QuadrelliCacher.getCachedKey(sql);
+		try { 
+			Connection cn = db.getConnection();
+		} catch (Exception e) {
+			if ( key != null ) {
+				return QuadrelliCacher.get(key);
+			}
+		}
+		
 		try {
 			PreparedStatement stmt = cn.prepareStatement(sql);
-			return getByStatment(stmt);
+			Vector res = getByStatment(stmt);
+			
+			QuadrelliCacher.set(key, res);
+			
+			return res;
 		}
 		catch (Exception e) {
 			e.printStackTrace();
