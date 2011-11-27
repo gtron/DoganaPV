@@ -163,6 +163,9 @@ public class PopolaStalli extends VelocityCommand {
 				}
 				else {
 					carico = primoCarico.clone();
+
+					carico.setDocumento(primoCarico.getDocumento());
+					carico.setDocumentoPV(primoCarico.getDocumentoPV());
 				}
 				carico.setIdStallo(s.getId());
 
