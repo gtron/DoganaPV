@@ -1,7 +1,6 @@
 package com.gsoft.doganapt.cmd.consegne;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,56 +20,63 @@ import com.gtsoft.utils.http.servlet.GtServlet;
 
 
 public class ChiudiPFPC extends VelocityCommand {
-	
+
 	protected static String TEMPLATE = "consegne/list.vm" ;
-	
+
 	public ChiudiPFPC ( GtServlet callerServlet) {
 		super(callerServlet);
 	}
+	@Override
 	public Template exec(HttpServletRequest req, HttpServletResponse resp, Context ctx) throws Exception  {
-		
+
 		Integer id = getIntParam("id", true);
-		
+
 		ConsegnaAdapter adp = Consegna.newAdapter();
 		Consegna c = (Consegna) adp.getByKey(id);
-		
+
 		ctx.put( ContextKeys.OBJECT , c ) ;
-		
+
 		if ( c != null && getBooleanParam(Strings.EXEC) ) {
-			
-			
-			
-			
+
+
+
+
 			ArrayList<Object> stalli = c.getStalli();
 			Stallo s = null ;
 			Double giacenza = null ;
 			Double giacenzaSecco = null ;
-			
-			for ( Iterator<Object> i = stalli.iterator() ; i.hasNext() ; ) {
-				s = (Stallo) i.next();
-				
+
+			for (Object object : stalli) {
+				s = (Stallo) object;
+
 				giacenza = s.getGiacenzaIva(false) ;
-				
+
 				if ( giacenza.intValue() != 0 ) {
-					if ( giacenzaSecco != null ) 
+					if ( giacenzaSecco != null )
 						throw new UserException("Attenzione, giacenza presente in più di uno stallo!" );
-					
+
 					giacenzaSecco = s.getGiacenzaIva(true);
 				}
 			}
-			
+
 			if (  giacenza != null && giacenza.intValue() != 0 ) {
 				Vector v = c.getRegistro(true, false, true );
-				
+
 				Movimento m = (Movimento) v.lastElement() ;
-				
-				
+
+				if ( ! m.getIsScarico() ) {
+					m = m.clone() ;
+					m.setIsScarico(true);
+					m.setUmido(0d);
+					m.setSecco(0d);
+				}
+
 				m.setUmido( new Double( m.getUmido().doubleValue() + giacenza.doubleValue()  ) );
-				
+
 				if ( giacenzaSecco != null ) {
 					m.setSecco( new Double( m.getSecco().doubleValue() + giacenzaSecco.doubleValue()  ) );
 				}
-				
+
 				new MovimentoIvaAdapter().update(m);
 				resp.sendRedirect(".consegne?id=" + c.getId());
 			}
@@ -81,12 +87,14 @@ public class ChiudiPFPC extends VelocityCommand {
 		}
 		return null ;
 	}
-	
 
+
+	@Override
 	public VelocityCommand clone() {
-		return  new ChiudiPFPC(this.callerServlet);
+		return  new ChiudiPFPC(callerServlet);
 	}
-	
+
+	@Override
 	public String getTemplateName() {
 		return TEMPLATE;
 	}

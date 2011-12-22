@@ -132,6 +132,7 @@ public class PopolaStalli extends VelocityCommand {
 		}
 
 		Movimento carico = null;
+		double sommaUmido = 0 ;
 		for ( final Stallo s : getStalliFromQuadrelli() ) {
 
 			// verifico se c'è già il movimento di carico
@@ -179,9 +180,23 @@ public class PopolaStalli extends VelocityCommand {
 				}
 			}
 
+			sommaUmido += s.getAttuale();
+
 			stalloAdp.update(s);
 
 		}
+
+		double umidoRestante = consegna.getPesopolizza().doubleValue() - sommaUmido ;
+		if ( umidoRestante != 0 ) {
+			double caricato = carico.getUmido();
+			double nuovoCarico = caricato + umidoRestante ;
+
+			carico.setUmido(nuovoCarico);
+			carico.setSecco( consegna.calcolaSecco(carico.getUmido()) );
+
+			registro.update(carico);
+		}
+
 
 		response.sendRedirect(".consegne?id=" + consegna.getId() );
 	}
@@ -190,6 +205,9 @@ public class PopolaStalli extends VelocityCommand {
 	public ArrayList<Stallo> getStalliFromQuadrelli() throws Exception {
 
 		final ArrayList<String> codiciStalli = quadAdp.getCodiciStalli(consegna, null);
+
+		if ( codiciStalli == null )
+			throw new Exception("Non sono stati trovati stalli per la consegna!");
 
 		final ArrayList<Stallo> list = new ArrayList<Stallo>(codiciStalli.size());
 
@@ -221,7 +239,6 @@ public class PopolaStalli extends VelocityCommand {
 				s.setAttuale(sommaUmido);
 			}
 		}
-
 		return list ;
 	}
 
