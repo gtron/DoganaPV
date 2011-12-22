@@ -139,6 +139,16 @@ public class StalloAdapter extends BeanAdapter2 {
 		return list;
 	}
 
+	public void resetStallo( Stallo s ) throws IOException {
+		s.setAttuale(0d);
+		s.setCaricato(0d);
+		s.setIdConsegnaAttuale(null);
+		s.setIdConsegnaPrenotata(null);
+		s.setImmessoInLiberaPratica(false);
+
+		update(s);
+	}
+
 	public static final THashMap cache = new THashMap(7);
 	public static final THashMap cacheByCodice = new THashMap(7);
 	public static Stallo get(final Integer id) {
@@ -227,5 +237,7 @@ public class StalloAdapter extends BeanAdapter2 {
 
 		return list ;
 	}
+
+
 
 }
