@@ -33,25 +33,27 @@ Tasso di Umidit&agrave;: <strong>$!tools.Number.format('##0.0000000', $!obj.Tass
 ##<li><a href="#dettaglio">Dettaglio</a></li>
 </ul>
 
-#if($obj.Iter.getHasrettifica())#set($needRettifica=true)#end
+#set($needPopolaStalli=false)
+#if($obj.Iter.getHasrettifica() && ! $obj.isPesoFinalePortoCarico())#set($needRettifica=true)#end
 
 #if ( $regDog )
 #if($needRettifica)
 #foreach( $m in $obj.getRegistroDoganale(false) )
 #if($m.IsRettifica)#set($needRettifica=false)#end
+#if(! $m.getIdStallo())#set($needPopolaStalli=true)#end
 #end#end
 <div id="doganale">
 #parse('consegne/registro_doganale.vm')
 </div>
 #end
 
-
-
-#if ( $regIVA )
-#if($needRettifica && ! $regDog)) 
-#foreach( $m in $obj.getRegistroDoganale(false) )
+#if ( $regIVA)
+#if(! $regDog)
+#foreach( $m in $obj.getRegistroIva(false) )
 #if($m.IsRettifica)#set($needRettifica=false)#end
-#end#end
+#if(! $m.getIdStallo())#set($needPopolaStalli=true)#end
+#end
+#end
 
 <div id="iva">
 #parse('consegne/registro_iva.vm')
@@ -127,22 +129,29 @@ $("#menuConsegna").tabs();
 
 <li><a href="#" onclick="$('#dlg_Travasa').dialogOpen();"><img src="$!images/action-ico-immetti.png" /> Travasa/Libera Stallo</a></li>
 
+#if ( $obj.isAperta() )
+
+#if($needRettifica || $needPopolaStalli)
+<li><a href="?id=$obj.Id&amp;cmd=popola"><img src="$!images/action-ico-immetti.png" />Popola Stalli</a></li>
+#end
 ## Sostituisce il test su rettificaDone, che va cambiato di nome xke non rispecchia il vero senso della variabile...
 #if( $needRettifica )
-<li><a href="?id=$obj.Id&amp;cmd=popola"><img src="$!images/action-ico-immetti.png" />Popola Stalli</a></li>
 <li><a href="?id=$obj.Id&amp;cmd=rettifica"><img src="$!images/action-ico-immetti.png" />Rettifica</a></li>
 #end
 
-#if($rettificaDone && $immissioneLP && $obj.isAperta() )
+#if($rettificaDone && $immissioneLP )
 <li><a href="#" onclick="$('#dlg_LiberaPratica').dialogOpen();"><img src="$!images/action-ico-registra.png" />Immetti in L.P.</a></li>
 #end
 
-#if( $rettificaDone && $canImport&& $obj.isAperta())
+#if( $rettificaDone && $canImport )
 <li><a href="#" id="import_$obj.Id" onclick="openDialog($obj.Id,'#dlg_ImportTo');"><img src="$!images/action-ico-immetti.png" />Importa Scarichi</a></li>
 #if ($obj.isPesoFinalePortoCarico() && ! $registraIVA )
 <li><a href="?id=$obj.Id&amp;cmd=chiudiPFPC&exec=1" onclick="return confirm('Chiudere la consegna?');"><img src="$!images/action-ico-registra.png" />Chiudi PFPC</a></li>
 #end
 #end
+
+#end
+## END IF IS APERTA
 
 <li><a href=".consegne?cmd=edit&id=$obj.Id"><img src="$!images/action-ico-modifica.png" /> Modifica</a></li>
 ##<li><a href=".consegne?cmd=edit"><img src="$!images/action-ico-nuovo.png" /> Nuova consegna</a></li>
@@ -203,11 +212,11 @@ Data : <input type="text" name="dataLP" size="10" id="dataLP" /><br>
 <input type="hidden" name="c" value="$obj.Id" />
 
 <fieldset><legend>Documento di Ingresso</legend>
-Tipo: <select name="doc"><option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option></select>
+Tipo: <select name="doc"><option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option><option value="COM">COM</option></select>
 Numero: <input type="text" name="doc_num" size="3"/>
 Data:  <input type="text" name="doc_data" id="doc_data" size="9"/></fieldset>
 <fieldset><legend>Documento di Ingresso (Portovesme)</legend>
-Tipo: <select name="docPV"><option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option></select>
+Tipo: <select name="docPV"><option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option><option value="COM">COM</option></select>
 Numero: <input type="text" name="docPV_num" size="3"/>
 Data:  <input type="text" id="docPV_data" name="docPV_data" size="9"/></fieldset>
 <br />

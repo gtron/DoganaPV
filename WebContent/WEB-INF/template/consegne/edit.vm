@@ -24,12 +24,13 @@ Nuova Consegna
 </h2>
 <form action="?" method="post" id="formConsegne">
 
-<table border="1" width="100%" cellspacing="0" cellpadding="3">
-#if( $obj.Id )
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+#if(false && $obj.Id )
 <thead><tr>
 <th>Dettagli</th>
 ##<th>Stalli: </th>
-</tr></thead>#end
+</tr></thead>
+#end
 <tbody>
 <td>
 <input type="hidden" name="cmd" value="edit" />
@@ -84,14 +85,14 @@ Codice Doganale : <select name="codicenc" class="{required:true}">
 </select><br>
 <br>
 
-Tasso di Cambio : <input name="tassocambio" size="4" value="$!tools.Number.format('##0.000000', $!obj.TassoCambio).replaceAll(',','.')"><br>
+Tasso di Cambio ($/&euro;) : <input name="tassocambio" size="12" value="$!tools.Number.format('##0.000000000', $!obj.TassoCambio).replaceAll(',','.')"><br>
 
 Valuta : <select name="isvalutaeuro">
 <option value="0" #if(! $!obj.getIsValutaEuro()) selected #end>Dollari</option>
 <option value="true" #if($!obj.getIsValutaEuro()) selected #end>Euro</option>
 </select>
 - 
-Valore unitario : <input name="valoreunitario" size="8" value="$!tools.Number.format('##0.000000', $!obj.ValoreUnitario).replaceAll(',','.')" class="{required:true,number:true}" > <input type="button" value="Calcola" onclick="calcolaValoreUnitario(this)" />
+Valore di un Kilogrammo di materiale : <input name="valoreunitario" size="12" value="$!tools.Number.format('##0.000000000', $!obj.ValoreUnitario).replaceAll(',','.')" class="{required:true,number:true}" > <input type="button" value="Calcola" onclick="calcolaValoreUnitario(this)" />
 
 ##Aggiorna Peso secco dei Movimenti: <input type="checkbox"><br>
 <br><br>
@@ -272,7 +273,13 @@ href=".consegne?cmd=list"><img src="$!images/action-ico-elimina.png" /> Annulla<
 </ul>
 </div>
 
-
+#set($im7=false)
+#set($im4=false)
+#if($obj.Iter.Regdoganale)
+#set($im7=true)
+#else
+#set($im4=true)
+#end
 <div id="dlg_OpenC" class="flora" style="text-align:center;">
 Inserire la data del carico in ingresso :
 <form action=".consegne" id="openC">
@@ -281,12 +288,14 @@ Inserire la data del carico in ingresso :
 <input type="hidden" name="id" value="" />
 <input name="data" type="text" size="10" maxlength="10" id="dataOpenC" /><br />
 <fieldset><legend>Documento di Ingresso</legend>
-Tipo: <select name="doc"><option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option></select>
-Numero: <input type="text" name="doc_num" size="8" />
+Tipo: <select name="doc"><option value=""></option>
+<option value="IM7" #if($im7)selected="selected"#end>IM7</option><option value="IM4"#if($im4) selected="selected"#end>IM4</option><option value="COM">COM</option></select>
+Numero: <input type="text" name="doc_num" size="4" />
 Data:  <input type="text" name="doc_data" id="doc_data" size="10" maxlength="10"/></fieldset>
 <fieldset><legend>Documento di Ingresso (Portovesme)</legend>
-Tipo: <select name="docPV"><option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option></select>
-Numero: <input type="text" name="docPV_num" size="8"/>
+Tipo: <select name="docPV"><option value=""></option><option value="IM7">IM7</option>
+<option value="IM4">IM4</option><option value="COM">COM</option></select>
+Numero: <input type="text" name="docPV_num" size="4"/>
 Data:  <input type="text" id="docPV_data" name="docPV_data" size="10" maxlength="10" /></fieldset>
 <br />
 Note :<br />
