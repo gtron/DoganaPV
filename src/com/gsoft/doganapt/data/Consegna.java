@@ -1,5 +1,6 @@
 package com.gsoft.doganapt.data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -16,7 +17,7 @@ import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.common.ModelBean2;
 import com.gtsoft.utils.sql.IDatabase2;
 
-public class Consegna extends ModelBean2 {
+public class Consegna extends ModelBean2 implements Serializable {
 
 	Integer id ;
 	Integer numero;
@@ -190,7 +191,10 @@ public class Consegna extends ModelBean2 {
 		if ( getValoreUnitario() == null ) return ;
 		if ( m.getSecco() == null ) return ;
 
-		double valore = new Double( m.getSecco().doubleValue() * getValoreUnitario().doubleValue() ) ;
+		// VERIFICARE !!!
+		double valore = new Double(
+				Math.round( 100000000 * m.getSecco().doubleValue() * getValoreUnitario().doubleValue() ) / 100000000
+				) ;
 
 		if ( ! isValutaEuro.booleanValue() ) {
 			m.setValoreDollari( valore );
