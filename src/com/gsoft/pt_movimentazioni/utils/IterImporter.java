@@ -19,6 +19,23 @@ import com.gtsoft.utils.common.FormattedDate;
 
 public abstract class IterImporter {
 
+	/**
+	 * NUOVA SQL OUT Iter 1:
+
+SELECT data, sum(peso) as PesoNetto, merce, '%S%' as fornitore, 0 as destinazione
+FROM (
+SELECT data, sum( IIF(fornitore = '0', - netto, netto)) as peso, merce
+FROM `archivio corretto` WHERE
+merce = '%M%' and `num consegna` = '%C%'  and
+(  fornitore = '%S%' or ( cliente =  '%S%'  and destinazione = 8 ) )
+and data =  #%D%#
+group by  data , fornitore ,  merce, `num consegna` , `num documento`
+) TMP
+GROUP BY data, merce
+
+	 * 
+	 * 
+	 */
 
 	MovimentoIvaAdapter registroIVA = null ;
 	MovimentoDoganaleAdapter registroDoganale = null ;
@@ -298,7 +315,6 @@ public abstract class IterImporter {
 
 		Movimento m = null ;
 		//		double sommaPesoUmido = 0 ;
-
 		if ( listCarichi != null ) {
 			for ( final Iterator i = listCarichi.iterator() ; i.hasNext();) {
 
@@ -311,7 +327,10 @@ public abstract class IterImporter {
 
 				registro.create(m);
 
-				m.getStallo().notifyMovimento(m, ! i.hasNext() );
+				Stallo stallo = m.getStallo();
+				if ( stallo != null ) {
+					stallo.notifyMovimento(m, ! i.hasNext() );
+				}
 
 				//				sommaPesoUmido += m.getUmido().doubleValue() ;
 			}
@@ -343,21 +362,36 @@ public abstract class IterImporter {
 			m.setNote("Errore al stabilire se il movimento è una rettifica: \n" + nota );
 		}
 
-		if ( isRettifica ) {
-			isScarico = "0".equals( q.getCodiceFornitore() );
-		}
+		/*
+		 * Attenzione:
+			In caso di rettifica il fornitore nella tabella è 0 e il valore dei pesi è reso negativo dalla query !
+			Tolgo questo codice che quindi non dovrebbe aver senso.
+		 */
+		//		if ( isRettifica ) {
+		//			isScarico = ! ( "0".equals( q.getCodiceFornitore() ) );
+		//		}
 
 		m.setIsLocked(false);
 
 
 		m.setIsRettifica(isRettifica);
 		m.setUmido(q.getNetto());
+		if ( m.getUmido() < 0 ) {
+			isScarico = !isScarico ;
+
+			m.setUmido( -1 * m.getUmido() );
+		}
+
+		m.setIsScarico( isScarico );
+
+
+
 		m.setSecco( c.calcolaSecco(m.getUmido()) );
 		m.setData(q.getData()) ;
 		m.setIdMerce( c.getIdmerce() );
 		m.setIdConsegna( c.getId()) ;
 
-		m.setIsScarico( isScarico );
+
 
 		Stallo s = null ;
 		if ( isScarico ) {
