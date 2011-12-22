@@ -3,20 +3,39 @@
 #parse('header.vm')
 
 <br />
-
 <form action="?" method="post" >
+<input type="hidden" name="cmd" value="recover" />
 <input type="hidden" name="exec" value="1" />
 <div style="text-align:center">
 <h1>Ripristino Database</h1>
-
+<div style="width:80%; margin:0 auto">
 <br />
-<h2>Punti di ripristino disponibili: </h2>
-<select size="10" name="toRecover" multiple="false">
+#if ( $list )
+<h2>Punti di ripristino disponibili in $dir: </h2>
+<select size="10" name="toRecover" multiple="false" style="width:100%">
 #foreach( $f in $list ) 
-<option value="$f.Id">$f.Descrizione</option>
+<option value="$f.NomeFile">$f.getData().dmyString() $f.getData().hmsString() ($f.NomeFile) - $f.Descrizione</option>
 #end
 </select> <br /><br />
 <a href="?cmd=main">&laquo; Indietro</a> - <input type="submit" value="Recupera" />
+
+#else
+
+#if ( $outError )
+Errori : <br />
+$!outError<br/>
+----
+#end
+
+Output: <br />
+$!out
+<br/>
+----
+
+
+#end
+</div>
+
 </div>
 </form>
 <br /><br /><br />
