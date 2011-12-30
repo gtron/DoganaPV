@@ -38,9 +38,6 @@ public class ChiudiPFPC extends VelocityCommand {
 
 		if ( c != null && getBooleanParam(Strings.EXEC) ) {
 
-
-
-
 			ArrayList<Object> stalli = c.getStalli();
 			Stallo s = null ;
 			Double giacenza = null ;

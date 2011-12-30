@@ -13,33 +13,33 @@ import com.gtsoft.utils.common.ModelBean2;
 import com.gtsoft.utils.sql.IDatabase2;
 
 public class Stallo extends ModelBean2 {
-	
+
 	Integer id ;
 
-	String nome; 
+	String nome;
 	String parco;
 	Integer numero ;
 	Integer idConsegnaAttuale;
 	Integer idConsegnaPrenotata;
-	Double caricato; 
-	Double attuale; 
+	Double caricato;
+	Double attuale;
 	String codice;
 	Boolean immessoInLiberaPratica ;
-	
+
 	public Integer getId() {
 		return id;
 	}
 	public void setId(Integer id) {
 		this.id = id;
 	}
-	
+
 	public String getCodice() {
 		return codice;
 	}
 	public void setCodice(String c) {
-		this.codice = c;
+		codice = c;
 	}
-	
+
 	public Integer getNumero() {
 		return numero;
 	}
@@ -62,7 +62,7 @@ public class Stallo extends ModelBean2 {
 		return idConsegnaAttuale;
 	}
 	public void setIdConsegnaAttuale(Integer i) {
-		this.idConsegnaAttuale = i;
+		idConsegnaAttuale = i;
 	}
 	public Consegna getConsegna() {
 		return ConsegnaAdapter.get(idConsegnaAttuale);
@@ -71,7 +71,7 @@ public class Stallo extends ModelBean2 {
 		return idConsegnaPrenotata;
 	}
 	public void setIdConsegnaPrenotata(Integer i) {
-		this.idConsegnaPrenotata = i;
+		idConsegnaPrenotata = i;
 	}
 	public Consegna getConsegnaPrenotata() {
 		return ConsegnaAdapter.get(idConsegnaPrenotata);
@@ -96,77 +96,57 @@ public class Stallo extends ModelBean2 {
 		return immessoInLiberaPratica ;
 	}
 	public void setImmessoInLiberaPratica(Boolean i) {
-		this.immessoInLiberaPratica = i;
+		immessoInLiberaPratica = i;
 	}
-	
+
+	@Override
 	public String toString() {
 		return parco + " " + numero ;
 	}
-	
+
 	public boolean isLibero() {
-		return getIdConsegnaAttuale() == null ; 
+		return getIdConsegnaAttuale() == null ;
 	}
-	
-	public Double getGiacenzaIva(boolean secco) throws Exception {
+
+	public Double getGiacenza(MovimentoAdapter registro, boolean secco) throws Exception {
 		double sum = 0 ;
 		double val = 0;
-		Vector v = new MovimentoIvaAdapter().getByConsegna(true, this.idConsegnaAttuale, this.id, null, null );
-		for ( Iterator i = v.iterator() ; i.hasNext() ; ) {
+		@SuppressWarnings("unchecked")
+		Vector<Movimento> v = registro.getByConsegna(true, idConsegnaAttuale, id, null, null );
 
-			Movimento m = (Movimento) i.next(); 
-			
-			if ( secco ) 
+		for (Movimento m : v) {
+			if ( secco ) {
 				val = m.getSecco().doubleValue() ;
-			else
+			} else {
 				val = m.getUmido().doubleValue() ;
-			
-			if ( m.isScarico || m.getSecco().intValue() < 0 ) { 
-				if( m.getSecco().intValue() < 0 ) 
-					sum += val ;
-				else
-					sum -= val ;
 			}
-			else
+			if ( m.isScarico || m.getSecco().intValue() < 0 ) {
+				if( m.getSecco().intValue() < 0 ) {
+					sum += val ;
+				} else {
+					sum -= val ;
+				}
+			} else {
 				sum += val ;
+			}
 		}
-		
 		return sum ;
+	}
+	public Double getGiacenzaIva(boolean secco) throws Exception {
+		return getGiacenza(new MovimentoIvaAdapter(), secco);
 	}
 	public Double getGiacenzaDoganale(boolean secco) throws Exception {
-		double sum = 0 ;
-		double val = 0;
-		Vector v = new MovimentoDoganaleAdapter().getByConsegna(true, this.idConsegnaAttuale, this.id, null, null );
-		for ( Iterator i = v.iterator() ; i.hasNext() ; ) {
-
-			Movimento m = (Movimento) i.next(); 
-			
-			if ( secco ) 
-				val = m.getSecco().doubleValue() ;
-			else
-				val = m.getUmido().doubleValue() ;
-			
-			if ( m.isScarico || m.getSecco().intValue() < 0 ) { 
-				if( m.getSecco().intValue() < 0 ) 
-					sum += val ;
-				else
-					sum -= val ;
-			}
-			else
-				sum += val ;
-				
-		}
-		
-		return sum ;
+		return getGiacenza(new MovimentoDoganaleAdapter(), secco);
 	}
-	
-//	public Vector getMovimenti(String order, String limit) throws Exception {
-//		return Movimento.newAdapter().getByStallo(this.id, order, limit );
-//	}
-	
-	public static synchronized StalloAdapter newAdapter() throws Exception {		
+
+	//	public Vector getMovimenti(String order, String limit) throws Exception {
+	//		return Movimento.newAdapter().getByStallo(this.id, order, limit );
+	//	}
+
+	public static synchronized StalloAdapter newAdapter() throws Exception {
 		return new StalloAdapter() ;
 	}
-	public static synchronized StalloAdapter newAdapter(IDatabase2 db) throws Exception {		
+	public static synchronized StalloAdapter newAdapter(IDatabase2 db) throws Exception {
 		return new StalloAdapter(db) ;
 	}
 	public void notifyMovimento(Movimento m, boolean update) throws Exception {
@@ -178,10 +158,10 @@ public class Stallo extends ModelBean2 {
 			else {
 				amount = m.getUmido() ;
 			}
-			
+
 			attuale = new Double( attuale.doubleValue() + amount ) ;
 		}
-		
+
 		if ( update ) {
 			Stallo.newAdapter().update(this);
 		}
@@ -195,28 +175,29 @@ public class Stallo extends ModelBean2 {
 			else {
 				amount = m.getUmido() ;
 			}
-			
+
 			caricato = new Double( caricato.doubleValue() + amount ) ;
 		}
-		
+
 		if ( update ) {
 			Stallo.newAdapter().update(this);
 		}
 	}
-	public void immettiInLiberaPratica( FormattedDate data, Documento doc, Documento docPV, 
-			MovimentoAdapter registroOut, 
+	public void immettiInLiberaPratica( FormattedDate data, Documento doc, Documento docPV,
+			MovimentoAdapter registroOut,
 			MovimentoAdapter registroIn ) throws Exception {
-		
-		Vector list = registroOut.getByConsegna( false, this.idConsegnaAttuale, this.id, null , null );
-		
+
+		@SuppressWarnings("unchecked")
+		Vector<Movimento> list = registroOut.getByConsegna( false, idConsegnaAttuale, id, null , null );
+
 		double sommaUmido = 0 ;
 		double sommaSecco = 0 ;
 		Movimento m = null;
-		
+
 		if ( list != null && list.size() > 0 ) {
-			for ( Iterator i = list.iterator() ; i.hasNext() ; ) {
-				m = (Movimento) i.next();
-				
+			for ( Iterator<Movimento> i = list.iterator() ; i.hasNext() ; ) {
+				m = i.next();
+
 				if ( m.getIsScarico() ) {
 					sommaUmido -= m.getUmido().doubleValue() ;
 					sommaSecco -= m.getSecco().doubleValue() ;
@@ -225,10 +206,10 @@ public class Stallo extends ModelBean2 {
 					sommaUmido += m.getUmido().doubleValue() ;
 					sommaSecco += m.getSecco().doubleValue() ;
 				}
-				
+
 			}
-		
-	//		m = m.clone();
+
+			//		m = m.clone();
 			m.setDocumento(doc);
 			m.setDocumentoPV(docPV);
 			m.setSecco(sommaSecco);
@@ -238,12 +219,12 @@ public class Stallo extends ModelBean2 {
 			m.setIsRettifica(false);
 			m.setData( data ) ;
 			m.setId(null);
-			
+
 			registroOut.create(m);
-			
+
 			Movimento miva = registroIn.newMovimento();
-			
-			
+
+
 			miva.setDocumento(doc);
 			miva.setDocumentoPV(docPV);
 			miva.setIsScarico(false);
@@ -257,10 +238,11 @@ public class Stallo extends ModelBean2 {
 			miva.setData( data ) ;
 			miva.setId(null);
 			miva.setIsLocked(Boolean.FALSE);
-			
-			if( miva instanceof MovimentoIVA )
+
+			if( miva instanceof MovimentoIVA ) {
 				m.getConsegna().updateValore((MovimentoIVA )miva);
-			
+			}
+
 			registroIn.create(miva);
 		}
 
