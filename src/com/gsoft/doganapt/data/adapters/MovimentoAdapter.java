@@ -499,7 +499,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		}
 		sql.append(" GROUP BY ");
 
-		if ( c == null  ) {
+		if ( c == null  || ! soloRegistrati ) {
 			sql.append(" numregistro, ");
 		}
 
