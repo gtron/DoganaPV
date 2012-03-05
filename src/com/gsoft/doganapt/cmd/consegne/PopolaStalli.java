@@ -176,7 +176,8 @@ public class PopolaStalli extends VelocityCommand {
 				if ( carico.getId() != null ) {
 					registro.update(carico);
 				} else {
-					registro.create(carico);
+					Long id = (Long) registro.create(carico);
+					carico.setId( new Integer( id.intValue()  )  );
 				}
 			}
 
