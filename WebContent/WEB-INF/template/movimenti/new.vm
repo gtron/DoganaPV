@@ -17,7 +17,7 @@ catch (e) { alert ( 'Errore  : ' + e.message) ; }
 }
 </script>
 <h2>
-Nuovo Movimento
+Nuovo Movimento #if($isIva)IVA#else Doganale#end
 </h2>
 #set( $m = $obj )
 
@@ -38,15 +38,12 @@ Nuovo Movimento
 <input type="hidden" name="valoreeuro" value="0" />
 #end
 <br />
-Registro : <select  name="iva">
-<option value="0">Doganale</option>
-<option value="1">IVA</option>
-</select>
+Registro : <strong>#if($isIva)IVA#else Doganale#end</strong>
 <br />
 <br />
 Tipo Movimento : <select  name="isrettifica">
-<option value="0">Carico/Scarico</option>
 <option value="1">Rettifica</option>
+<option value="0">Carico/Scarico</option>
 </select>
 ## <input type="hidden" name="isrettifica" value="0" />
 <br />
@@ -164,4 +161,3 @@ $param_error.ParamName
 
 
 #parse('footer.vm')
-
