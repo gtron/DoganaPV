@@ -6,7 +6,7 @@
 Valore Unitario: <strong>$!tools.Number.format('##0.00000', $!obj.ValoreUnitario) #if($!obj.IsValutaEuro)&euro;#else $ #end</strong><br /><br />
 </caption>
 <tr>
-<th rowspan="2">Num.Registro<br /><a  href=".consegne?cmd=newmovimento&idC=$obj.Id&iva=1">[Nuovo]</a></th>
+<th rowspan="2">Num.Registro<br /><a  href=".consegne?cmd=newmovimento&idC=$obj.Id&iva=1">[Nuovo IVA]</a></th>
 ##<th  rowspan="2" width="6%">Tipo&nbsp;&nbsp;</th>
 <th rowspan="2">Data</th>
 <th rowspan="2">Documento</th>
