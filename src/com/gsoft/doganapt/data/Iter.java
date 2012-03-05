@@ -18,6 +18,14 @@ import com.gtsoft.utils.sql.IDatabase2;
 
 public class Iter extends ModelBean2 {
 
+	public static final int ITER_Extacomunitarie = 1;
+
+	public static final int ITER_Comunitario = 2;
+
+	public static final int ITER_Glencore = 3;
+
+	public static final int ITER_NOGlencor = 4;
+
 	Integer id ;
 
 	String nome;
@@ -145,16 +153,16 @@ public class Iter extends ModelBean2 {
 			final MovimentoQuadrelliAdapter q) {
 
 		switch ( id ) {
-		case 1 :
+		case ITER_Extacomunitarie :
 			return new IterImporter_EXT(dog, iva, q) ;
 
-		case 2 :
+		case ITER_Comunitario :
 			return new IterImporter_COM(dog, iva, q) ;
 
-		case 3 :
+		case ITER_Glencore :
 			return new IterImporter_GLEN(dog, iva, q) ;
 
-		case 4 :
+		case ITER_NOGlencor :
 			return new IterImporter_NOGLEN(dog, iva, q) ;
 		}
 
