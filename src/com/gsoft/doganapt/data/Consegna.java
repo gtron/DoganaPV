@@ -238,6 +238,43 @@ public class Consegna extends ModelBean2 implements Serializable {
 		return d ;
 	}
 
+	@SuppressWarnings("unchecked")
+	public Documento getPrimoDocumento(final boolean iva, Stallo s) throws Exception {
+
+		final Vector<Movimento> v = getRegistro(iva, false, false) ;
+		Documento d = null ;
+		int idStallo = s.getId().intValue();
+		Stallo stalloMov = null;
+
+		if ( v != null && v.size() > 0 ) {
+			for ( Movimento m : v ) {
+				stalloMov = m.getStallo() ;
+				if ( stalloMov != null && stalloMov.getId().intValue() == idStallo )
+					return m.getDocumento();
+			}
+		}
+
+		return null ;
+	}
+
+	public Documento getDocumentoPrimoMovimento(final boolean iva, Stallo s) throws Exception {
+
+		MovimentoAdapter adp = null ;
+
+		if ( iva ) {
+			adp = new MovimentoIvaAdapter();
+		} else {
+			adp = new MovimentoDoganaleAdapter();
+		}
+
+		Vector list = adp.getByConsegna(true, id, s.getId(), "data" , null );
+
+		for( Object o : list )
+			return ((Movimento) o).getDocumento();
+
+		return null ;
+	}
+
 	//	public Double getGiacenza(boolean iva , boolean secco ) throws Exception {
 	//
 	//		double sum = 0 ;
