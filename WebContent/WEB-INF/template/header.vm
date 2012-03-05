@@ -39,3 +39,22 @@
 <br />
 #if( $msg )<div id="message">$msg</div>#end
 #if( $error )<div id="message">$error.Message<br /><br /></div>#end
+
+#if($err)
+<div style="border:1px solid red;widht:100%;background:#FF8;color:red;">
+<br><b>&nbsp;ATTENZIONE !<br><br>
+&nbsp;&nbsp;&nbsp;Si &egrave; verificato un errore: <br>
+$err<br></b>
+<br><br>
+Dettagli dell'errore (da copiare e inviare via mail) :<br><br>
+<textarea cols="80" rows="10" style="border:1px solid #888; width:80%">
+$err
+#set($trace=$err.getStackTrace())
+#foreach($r in $trace)
+#if($velocityCount<6)
+$r
+#end#end
+</textarea>
+<br><br>
+</div>
+#end
