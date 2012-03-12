@@ -48,7 +48,13 @@ $!m.NumRegistro
 ##<label for="registraIVA_$velocityCount">Registra</label>
 ##<a href="?cmd=editmovimento&id=$m.Id&assegnaRegIVA=1&exec=1">Registra</a>
 #end
+
+#if($m.getIsScarico())
+<a  href=".consegne?cmd=editgroup&idC=$m.Consegna.Id&data=$m.Data.ymdString()&t=$m.Tipo&iva=1&id=$m.Id">[Modifica]</a>
+#else
 <a  href=".consegne?cmd=editgroup&idC=$m.Consegna.Id&data=$m.Data.ymdString()&t=$m.Tipo&iva=1">[Modifica]</a>
+#end
+
 </td>
 ##<td>#if($m.getIsScarico()) S#else C#end #if($m.getIsRettifica())(R)#else&nbsp;&nbsp;&nbsp;&nbsp;#end</td>
 <td>$tools.Date.format($dateFormat, $m.Data)</td>
