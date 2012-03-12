@@ -320,6 +320,22 @@ public class Consegna extends ModelBean2 implements Serializable {
 		return stalliRegistrati;
 	}
 
+	public ArrayList<Object> getStalliRelazionati() throws Exception {
+
+		ArrayList<Object> list = new ArrayList<Object>(3);
+
+		list.addAll(getStalliRegistrati());
+
+		for ( Object i : getStalli() ) {
+			if ( ! list.contains(i) ) {
+				list.add(i);
+			}
+		}
+
+		return list;
+	}
+
+
 	public static synchronized ConsegnaAdapter newAdapter() throws Exception {
 		return new ConsegnaAdapter() ;
 	}
