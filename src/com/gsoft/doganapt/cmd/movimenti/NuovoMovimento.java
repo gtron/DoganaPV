@@ -20,95 +20,99 @@ import com.gtsoft.utils.http.servlet.GtServlet;
 
 
 public class NuovoMovimento extends VelocityCommand {
-	
+
 	protected static String TEMPLATE = "movimenti/new.vm";
-	
+
 	String template ;
 	boolean isIva = false ;
-	
+
 	public NuovoMovimento ( GtServlet callerServlet) {
 		super(callerServlet);
 		template = TEMPLATE;
 	}
+	@Override
 	public Template exec(HttpServletRequest req, HttpServletResponse resp, Context ctx) throws Exception  {
-		
+
 		HttpSession sx = req.getSession(false) ;
 		Boolean logged = null ;
-		if ( sx != null )
+		if ( sx != null ) {
 			logged = (Boolean) sx.getAttribute("logged") ;
+		}
 
 		if ( logged != Boolean.TRUE ) {
 			resp.sendRedirect(".main");
 		}
 		ctx.put("isAdmin", sx.getAttribute("admin") ) ;
-		
+
 		Template t = null ;
 		isIva =  "1".equals( getParam("iva", false) ) ;
 		ctx.put("isIva", isIva) ;
 
 		Integer idConsegna = getIntParam("idC", true );
-		
+
 		MovimentoAdapter adp = (MovimentoAdapter) getAdapter() ;
 		Movimento m = adp.newMovimento() ;
 		m.setIdConsegna(idConsegna);
 
-		if ( ! getBooleanParam(Strings.EXEC) ) {
-			
-			m.setData(new FormattedDate());
-			ctx.put("consegna" , ConsegnaAdapter.get(idConsegna) );
-			ctx.put(ContextKeys.OBJECT , m)	;
-		}
-		else {
+		m.setData(new FormattedDate());
+		ctx.put("consegna" , ConsegnaAdapter.get(idConsegna) );
+		ctx.put(ContextKeys.OBJECT , m)	;
+
+		if ( getBooleanParam(Strings.EXEC) ) {
 			adp.fillFromRequest(req, getBooleanParam(Strings.PARTIAL_EDIT)) ;
-		
-			
-			
-			Object id = adp.create(null);
-		
-			m = (Movimento) adp.getByKey(id);
-			
+
+
 			double u = getDoubleParam("u0_"  , true ).doubleValue() ;
-			u -= getDoubleParam("u1_" , true ).doubleValue();
-			
 			double s = getDoubleParam("s0_"  , true ).doubleValue() ;
+
+			double v0 = getDoubleParam("v0_"  , true ).doubleValue() ;
+			double v1 = getDoubleParam("v1_"  , true ).doubleValue() ;
+
+			Object id = adp.create(null);
+
+			m = (Movimento) adp.getByKey(id);
+
+
+			u -= getDoubleParam("u1_" , true ).doubleValue();
+
 			s -= getDoubleParam("s1_" , true ).doubleValue();
-			
+
 			if ( isIva ) {
-				((MovimentoIVA) m).setValoreEuro( 
-						getDoubleParam("v0_"  , true ) )  ;
-				
-				((MovimentoIVA) m).setValoreDollari( 
-						getDoubleParam("v1_"  , false ) )  ;
+				((MovimentoIVA) m).setValoreEuro(v0);
+				((MovimentoIVA) m).setValoreDollari(v1);
 			}
-			
+
 			m.setUmido(new Double(u));
 			m.setSecco(new Double(s));
-		
-			
+
+
 			adp.update(m);
-				
+
 			resp.sendRedirect(".consegne?id=" + idConsegna );
-		
+
 		}
 
 		return t;
 	}
 
 
+	@Override
 	public VelocityCommand clone() {
-		return  new NuovoMovimento(this.callerServlet);
+		return  new NuovoMovimento(callerServlet);
 	}
 	MovimentoAdapter adapter = null ;
 	public BeanAdapter2 getAdapter(  )  {
 		if ( adapter == null ) {
-			if ( isIva )
+			if ( isIva ) {
 				adapter = new MovimentoIvaAdapter();
-			else 
+			} else {
 				adapter = new MovimentoDoganaleAdapter();
+			}
 		}
-		
+
 		return adapter;
 	}
+	@Override
 	public String getTemplateName() {
 		return template;
 	}
