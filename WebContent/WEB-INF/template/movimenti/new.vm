@@ -1,7 +1,18 @@
 #parse('costanti.vm')
+#set( $addJs = ['/js/jquery.ui/ui.calendar.js'])
+#set( $addCss = ['/js/jquery.ui/themes/flora/flora.calendar.css'] )
 #parse('header.vm')
 
 <script type="text/javascript">
+
+$('document').ready( function() {
+popUpCal.regional['it'] = {clearText: 'Svuota', closeText: 'Chiudi', prevText: '&lt;Prec', nextText: 'Succ&gt;', currentText: 'Oggi',
+dayNames: ['Do','Lu','Ma','Me','Gio','Ve','Sa'], monthNames: ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre']};
+popUpCal.setDefaults(popUpCal.regional['it']);
+
+jQuery('.data').calendar();
+} );
+
 function calcolaSecco(btn) {
 var f = btn.form;
 var umido, secco ;
@@ -17,9 +28,11 @@ catch (e) { alert ( 'Errore  : ' + e.message) ; }
 }
 </script>
 <h2>
-Nuovo Movimento #if($isIva)IVA#else Doganale#end
+Nuovo Movimento del Registro #if($isIva)IVA#else Doganale#end
 </h2>
 #set( $m = $obj )
+
+
 
 <form action="?" method="post" id="mainForm">
 <input type="hidden" name="cmd" value="newmovimento" />
@@ -38,59 +51,27 @@ Nuovo Movimento #if($isIva)IVA#else Doganale#end
 <input type="hidden" name="valoreeuro" value="0" />
 #end
 <br />
-Registro : <strong>#if($isIva)IVA#else Doganale#end</strong>
-<br />
-<br />
-Tipo Movimento : <select  name="isrettifica">
-<option value="1">Rettifica</option>
-<option value="0">Carico/Scarico</option>
-</select>
-## <input type="hidden" name="isrettifica" value="0" />
-<br />
-<div style="float:left; width:40%; margin-right:2%;">
-Data: 
-<input type="text" name="data" value="$m.Data.dmyString()" /><br>
-##$tools.Date.format($dateFormat, $obj.Data) 
-
-Merce : $!obj.Consegna.Merce.Nome<br>
-Consegna numero : $!obj.Consegna.Numero</a><br>
-Iter : $!obj.Consegna.Iter.Nome<br>
-<br>
-#if (  $isAdmin  || ( $m.NumRegistro && $m.NumRegistro.length() > 0 ) )
-Numero Registro : #if ( $isAdmin ) ##&& ! ( $m.NumRegistro  || $m.NumRegistro.length() > 0 ) )
-<input type="text" value="$!obj.NumRegistro" name="numregistro" />
-#else
-<strong>$!m.NumRegistro</strong>
-#end<br />
-#end
 
 
-
-<br />
-<fieldset><legend>Documento</legend>
-Tipo: <select name="doctype">#if( $obj.Documento)<option value="$!obj.Documento.Tipo">$!obj.Documento.Tipo</option>#end
-<option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option><option value="R">R</option><option value="FT">FT</option></select>
-Numero: <input type="text" name="docnum" size="4" value="$!obj.Documento.Numero" />
-Data:  <input type="text" name="docdate" id="doc_data" size="8" value="$!obj.Documento.Data.dmyString()"/></fieldset>
-<fieldset ><legend>Documento (Portovesme)</legend>
-Tipo: <select name="docpvtype">#if( $!obj.DocumentoPV)<option value="$!obj.Documento.Tipo">$!obj.DocumentoPV.Tipo</option>#end
-<option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option><option value="R">R</option><option value="FT">FT</option></select>
-Numero: <input type="text" name="docpvnum" size="4" value="$!obj.DocumentoPV.Numero"/>
-Data:  <input type="text" id="docpvdate" name="docpvdate" size="8" value="$!obj.DocumentoPV.Data.dmyString()"/></fieldset>
+#parse('movimenti/pannelli_dettagli.vm')
 
 
-</div>
+<style>
+table{ border-collapse:  colapse; }
+th { text-align: center; background-color: #CCC;}
+td {text-align: center; }
+</style>
 
-
-<table border="1">
+<fieldset><legend>Dettagli Movimento </legend>
+<table border="0" width="100%">
 <thead><tr><th>Stallo</th>
 <th>Umido<br>Ingresso</th><th>Umido<br>Uscita</th>
-<td>&nbsp;</td>
+ 
 <th>Secco<br>Ingresso</th><th>Secco<br>Uscita</th>
 
 #if ( $isIva )
-<th>&euro;</th>
-<th>$</th>
+<th>Valore &euro;</th>
+<th>Valore $</th>
 #end
 </thead>
 <tbody>
@@ -98,15 +79,13 @@ Data:  <input type="text" id="docpvdate" name="docpvdate" size="8" value="$!obj.
 <tr>
 <td>
 <select name="idstallo">
-#foreach( $s in $consegna.Stalli )
+#foreach( $s in $consegna.StalliRelazionati )
 <option value="$s.Id">$s.Parco $!s.Numero</option>
 #end
 </select></td>
 
 <td class="r"><input type="text" value="0" name="u0_" size="10" /></td>
 <td class="r"><input type="text" value="0" name="u1_" size="10"/></td>
-
-<td>&nbsp;</td>
 
 <td class="r"><input type="text" value="0" name="s0_" size="10" /></td>
 <td class="r"><input type="text" value="0" name="s1_" size="10" /></td>
@@ -121,10 +100,9 @@ Data:  <input type="text" id="docpvdate" name="docpvdate" size="8" value="$!obj.
 </tbody>
 </table>
 
+</fieldset>
 
 
-Note :<br />
-<textarea name="note" cols="40" rows="2">$!m.Note</textarea>
 
 <div style="clear:left;">
 <br />
@@ -142,10 +120,11 @@ Note :<br />
 #if( $result ) <div id="result">Modifica effettuata</div> #end
 
 #if( $param_error ) 
-$param_error.ParamName
-##$param_error.printStackTrace()
 <script type="text/javascript">
 
+ var el = $('input[name="$param_error.ParamName"]')
+ el.css('border','1px solid red');
+ 
 </script>
 #end
 

@@ -1,0 +1,54 @@
+<div style="float:left; width:40%; margin-right:2%; ">
+## Registro : <strong>#if($isIva)IVA#else Doganale#end</strong><br />
+
+<fieldset><legend>Dati Consegna</legend>
+Numero : <strong>$!obj.Consegna.Numero</strong><br />
+Merce : <strong>$!obj.Consegna.Merce.Nome</strong><br />
+Iter : <strong>$!obj.Consegna.Iter.Nome</strong><br />
+</fieldset>
+<br />
+<fieldset><legend>Dati Movimento</legend>
+Tipo : <select  name="isrettifica">
+<option value="1">Rettifica</option>
+<option value="0">Carico/Scarico</option>
+</select>
+## <input type="hidden" name="isrettifica" value="0" />
+<br />
+
+Data: <input type="text" name="data" size="10" maxlength="10" value="$m.Data.dmyString()"  class="data" /><br>
+
+#if (  $isAdmin  || ( $m.NumRegistro && $m.NumRegistro.length() > 0 ) )
+Numero Registro : #if ( $isAdmin ) ##&& ! ( $m.NumRegistro  || $m.NumRegistro.length() > 0 ) )
+<input type="text" value="$!obj.NumRegistro" name="numregistro" />
+#else
+<strong>$!m.NumRegistro</strong>
+#end<br />
+#end
+
+</fieldset>
+
+</div>
+
+<div>
+<fieldset><legend>Documento </legend>
+Tipo: <select name="doctype">#if( $obj.Documento)<option value="$!obj.Documento.Tipo">$!obj.Documento.Tipo</option>#end
+<option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option><option value="R">R</option><option value="FT">FT</option></select>
+Numero: <input type="text" name="docnum" size="4" value="$!obj.Documento.Numero" />
+Data:  <input type="text" name="docdate" id="doc_data" size="8" class="data" value="$!obj.Documento.Data.dmyString()"/></fieldset>
+<br />
+<fieldset ><legend>Documento (Portovesme) </legend>
+Tipo: <select name="docpvtype">#if( $!obj.DocumentoPV)<option value="$!obj.Documento.Tipo">$!obj.DocumentoPV.Tipo</option>#end
+<option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option><option value="R">R</option><option value="FT">FT</option></select>
+Numero: <input type="text" name="docpvnum" size="4" value="$!obj.DocumentoPV.Numero"/>
+Data:  <input type="text" id="docpvdate" name="docpvdate" size="8" class="data" value="$!obj.DocumentoPV.Data.dmyString()"/></fieldset>
+
+<br />
+
+<fieldset><legend>Note </legend>
+
+<textarea name="note" cols="40" rows="2" style="width:100%">$!m.Note</textarea>
+</fieldset>
+
+<br />
+<br />
+</div>

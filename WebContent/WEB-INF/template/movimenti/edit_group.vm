@@ -43,46 +43,25 @@ Modifica Movimento
 </select>#end
 *#
 
-<div style="float:left; width:40%; margin-right:2%;">
-Data: 
-<input type="text" name="data" value="$m.Data.dmyString()" /><br>
-##$tools.Date.format($dateFormat, $obj.Data) 
+#parse('movimenti/pannelli_dettagli.vm')
 
-Merce : $!obj.Consegna.Merce.Nome<br>
-Consegna numero : $!obj.Consegna.Numero</a><br>
-Iter : $!obj.Consegna.Iter.Nome<br>
-<br>
-#if (  $isAdmin  || ( $m.NumRegistro && $m.NumRegistro.length() > 0 ) )
-Numero Registro : #if ( $isAdmin ) ##&& ! ( $m.NumRegistro  || $m.NumRegistro.length() > 0 ) )
-<input type="text" value="$!obj.NumRegistro" name="numregistro" />
-#else
-<strong>$!m.NumRegistro</strong>
-#end<br />
-#end
+<style>
+table{ border-collapse:  colapse; }
+th { text-align: center; background-color: #CCC;}
+td {text-align: center; }
+</style>
 
-<br />
-<fieldset><legend>Documento</legend>
-Tipo: <select name="doctype">#if( $obj.Documento)<option value="$!obj.Documento.Tipo">$!obj.Documento.Tipo</option>#end
-<option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option><option value="COM">COM</option><option value="R">R</option><option value="FT">FT</option></select>
-Numero: <input type="text" name="docnum" size="4" value="$!obj.Documento.Numero" />
-Data:  <input type="text" name="docdate" id="doc_data" size="8" value="$!obj.Documento.Data.dmyString()"/></fieldset>
-<fieldset ><legend>Documento (Portovesme)</legend>
-Tipo: <select name="docpvtype">#if( $!obj.DocumentoPV)<option value="$!obj.Documento.Tipo">$!obj.DocumentoPV.Tipo</option>#end
-<option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option><option value="COM">COM</option><option value="R">R</option><option value="FT">FT</option></select>
-Numero: <input type="text" name="docpvnum" size="4" value="$!obj.DocumentoPV.Numero"/>
-Data:  <input type="text" id="docpvdate" name="docpvdate" size="8" value="$!obj.DocumentoPV.Data.dmyString()"/></fieldset>
-</div>
+<fieldset><legend>Dettagli Movimento </legend>
+<table border="0" width="100%">
 
-
-<table border="1">
 <thead><tr><th>Stallo</th>
 <th>Umido<br>Ingresso</th><th>Umido<br>Uscita</th>
 <td>&nbsp;</td>
 <th>Secco<br>Ingresso</th><th>Secco<br>Uscita</th>
 
 #if ( $isIva )
-<th>&euro;</th>
-<th>$</th>
+<th>Valore &euro;</th>
+<th>Valore $</th>
 #end
 </thead>
 <tbody>
@@ -129,23 +108,11 @@ Data:  <input type="text" id="docpvdate" name="docpvdate" size="8" value="$!obj.
 #end
 </tbody>
 </table>
-
-
-
-Note :<br />
-<textarea name="note" cols="40" rows="2">$!m.Note</textarea>
+</fieldset>
 
 <div style="clear:left;">
 <br />
 </div>
-
-#*
-#if( $obj.Stallo.Consegna.Iter.Regiva )
-Numero Registro IVA : <input type="text" value="$!obj.NumRegistroIVA" name="numregiva" /><br>#end
-*#
-
-
-
 
 
 
