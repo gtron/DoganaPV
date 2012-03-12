@@ -1,21 +1,3 @@
-#if($err)
-<div style="border:1px solid red;widht:100%;background:#FF8;color:red;">
-<b>ATTENZIONE:<br>
-$err<br></b>
-<br><br>
-Dettagli dell'errore (da copiare e inviare via mail) :
-$err<br>
-#set($trace=$err.getStackTrace())
-#foreach($r in $trace)
-#if($velocityCount<6)
-$r<br>#end#end
-<br><br>
-</div>
-#end
-
-<style>
-INPUT { text-align : right;}
-</style>
 #set($activeMenu='PARTITARI')
 #set($addJs=['/js/gt_forms.js','/js/jquery.ui/ui.calendar.js','/js/jquery.ui/ui.dialog.js','/js/jquery.ui/ui.dimensions.js','/js/jquery.ui/ui.resizable.js','/js/jquery.ui/ui.mouse.js','/js/jquery.ui/ui.draggable.js'])
 #set($addCss=['/js/jquery.ui/themes/flora/flora.all.css'])
@@ -24,6 +6,9 @@ INPUT { text-align : right;}
 #set($sommaUmido=0)
 #set($totUmido=0)
 #set($totSecco=0)
+<style>
+INPUT { text-align : right;}
+</style>
 <form action="?" name="rettifica" method="POST" id="mainForm">
 <input type="hidden" name="cmd" value="rettifica" />
 <input type="hidden" name="id" value="$obj.Id" />
