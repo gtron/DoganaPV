@@ -1,5 +1,6 @@
 package com.gsoft.doganapt;
 
+//import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -7,7 +8,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.velocity.Template;
 import org.apache.velocity.context.Context;
 
-import com.gsoft.doganapt.cmd.movimenti.DeleteMovimento;
 import com.gsoft.doganapt.cmd.registri.DeregistraMovimento;
 import com.gsoft.doganapt.cmd.registri.PreparaRegistro;
 import com.gsoft.doganapt.cmd.registri.RegistraMovimento;
@@ -16,43 +16,53 @@ import com.gsoft.doganapt.cmd.registri.Stampa;
 import com.gsoft.doganapt.cmd.registri.ViewDaRegistrare;
 import com.gsoft.doganapt.cmd.registri.ViewRegistro;
 import com.gsoft.framework.TooledServlet;
+//import com.gtsoft.utils.LogManager;
 
+@SuppressWarnings("serial")
 public class RegistriServlet extends TooledServlet {
 
-	public RegistriServlet() { 
-		super(); 
-		
+	public RegistriServlet() {
+		super();
+
 		addCommand( Commands.DEFAULT ,
 				new ViewRegistro( this ) ) ;
-		
+
 		addCommand( Commands.DAREGISTRARE ,
 				new ViewDaRegistrare( this ) ) ;
-		
+
 		addCommand( Commands.ASSEGNAREG ,
 				new RegistraMovimento( this ) ) ;
-		
+
 		addCommand( Commands.DEREGISTRA ,
 				new DeregistraMovimento( this ) ) ;
-		
+
 		addCommand( Commands.STAMPA,
 				new Stampa( this ) ) ;
-		
+
 		addCommand( Commands.PREPARA,
 				new PreparaRegistro( this ) ) ;
-		
+
 		addCommand( Commands.CHECK,
 				new SistemaNumerazione( this ) ) ;
-		
+
 	}
-	
+
+//	@Override
+//	public void init() throws ServletException {
+//		super.init();
+//		LogManager.initLog(getServletConfig());
+//	}
+
+	@Override
 	protected Template handleRequest(HttpServletRequest request, HttpServletResponse response, Context ctx) throws Exception {
 
 		HttpSession s =  request.getSession(false);
-		Boolean logged = null ; 
-		
-		if ( s != null )
+		Boolean logged = null ;
+
+		if ( s != null ) {
 			logged = (Boolean) s.getAttribute("logged") ;
-		
+		}
+
 		if ( logged != Boolean.TRUE ) {
 			response.sendRedirect(".main");
 			response.flushBuffer() ;
@@ -60,8 +70,8 @@ public class RegistriServlet extends TooledServlet {
 		}
 		return super.handleRequest(request, response, ctx) ;
 	}
-	
-	
+
+
 	public static interface Commands {
 		public static final String DEFAULT = "" ;
 		public static final String DAREGISTRARE = "dareg" ;

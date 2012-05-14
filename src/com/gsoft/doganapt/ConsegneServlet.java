@@ -1,5 +1,6 @@
 package com.gsoft.doganapt;
 
+//import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -23,6 +24,7 @@ import com.gsoft.doganapt.cmd.movimenti.EditGruppoMovimenti;
 import com.gsoft.doganapt.cmd.movimenti.EditMovimento;
 import com.gsoft.doganapt.cmd.movimenti.NuovoMovimento;
 import com.gsoft.framework.TooledServlet;
+//import com.gtsoft.utils.LogManager;
 
 @SuppressWarnings("serial")
 public class ConsegneServlet extends TooledServlet {
@@ -76,6 +78,12 @@ public class ConsegneServlet extends TooledServlet {
 		addCommand( Commands.RETTIFICA,
 				new Rettifica( this ) ) ;
 	}
+
+//	@Override
+//	public void init() throws ServletException {
+//		super.init();
+//		LogManager.initLog(getServletConfig());
+//	}
 
 	public static interface Commands {
 		public static final String DEFAULT = "" ;
