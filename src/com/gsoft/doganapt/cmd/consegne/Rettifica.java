@@ -126,7 +126,9 @@ public class Rettifica extends VelocityCommand {
 
 
 
-				if ( Math.abs(rettificaUmido) > 0 ) {
+				// Ora non c'è + bisogno di fare l'update
+				// del movimento di carico perchè viene lasciato inalterato dal popola stalli
+				if ( false && Math.abs(rettificaUmido) > 0 ) {
 
 					final Vector<?> list = registro.getByConsegna(false, c.getId(), idStallo , "isscarico asc, id asc" , null ) ;
 					if ( list != null && list.size() > 0 ) {
