@@ -1,12 +1,15 @@
 package com.gsoft.pt_movimentazioni.data;
 
 
+import java.io.Serializable;
+
 import com.gsoft.doganapt.data.Merce;
 import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.sql.IDatabase2;
 
 
-public class MovimentoQuadrelli {
+@SuppressWarnings("serial")
+public class MovimentoQuadrelli implements Serializable {
 
 	Integer id ;
 	Double numeroProgressivo = null ;
