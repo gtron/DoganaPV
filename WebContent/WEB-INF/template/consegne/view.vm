@@ -16,6 +16,10 @@ Iter : <strong>$!obj.Iter.Nome</strong><br>
 
 #if( $!obj.Pesopolizza > 0 )Peso Polizza: <strong>$tools.Number.format($!obj.Pesopolizza) Kg #if($!obj.PesoFinalePortoCarico) (P.Finale Porto di Carico)#end</strong> -#end
 Tasso di Umidit&agrave;: <strong>$!tools.Number.format('##0.0000000', $!obj.TassoUmidita)%</strong>
+
+#if( ! $obj.ValoreUnitario || ! $obj.TassoCambio )
+<br /><span style="color:red;font-weight:bold">Attenzione! Verificare il Valore Unitario e il Tasso di Cambio nel pannello di dettaglio!</span>
+#end
 </div>
 
 <ul id="menuConsegna">
@@ -47,14 +51,13 @@ Tasso di Umidit&agrave;: <strong>$!tools.Number.format('##0.0000000', $!obj.Tass
 </div>
 #end
 
-#if ( $regIVA)
+#if ( $regIVA )
 #if(! $regDog)
 #foreach( $m in $obj.getRegistroIva(false) )
 #if($m.IsRettifica)#set($needRettifica=false)#end
 #if(! $m.getIdStallo())#set($needPopolaStalli=true)#end
 #end
 #end
-
 <div id="iva">
 #parse('consegne/registro_iva.vm')
 </div>
@@ -102,7 +105,9 @@ $("#menuConsegna").tabs();
 #if( ! $s.HasLiberaPratica )#set($immissioneLP=true)#else#set($canImport=true)#end
 #end
 #end
-
+#if( ! $obj.ValoreUnitario || ! $obj.TassoCambio )
+#set($immissioneLP=false)
+#end
 
 ## #if(!$immissioneLP && $regIVA )$("#menuConsegna").tabsClick( 2 );#end
 
