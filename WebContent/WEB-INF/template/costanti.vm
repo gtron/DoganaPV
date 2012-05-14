@@ -1,4 +1,4 @@
-#set( $versione = '0.10' )
+#set( $versione = '0.12' )
 #set( $wwwRoot = '/DoganaPV')
 #set($images = "$wwwRoot/images")
 #set( $dateFormat = 'dd/MM/yyyy')
