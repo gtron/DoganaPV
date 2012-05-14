@@ -19,9 +19,6 @@ import org.apache.velocity.Template;
 import org.apache.velocity.context.Context;
 
 import com.gsoft.doganapt.data.PuntoRipristinoDb;
-import com.gsoft.doganapt.data.adapters.ConsegnaAdapter;
-import com.gsoft.doganapt.data.adapters.MerceAdapter;
-import com.gsoft.doganapt.data.adapters.StalloAdapter;
 import com.gtsoft.utils.common.ConfigManager;
 import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.http.VelocityCommand;
@@ -231,9 +228,7 @@ public class RecoverDb extends VelocityCommand {
 			catch(InterruptedException e2) {}
 
 
-			ConsegnaAdapter.clearCache();
-			StalloAdapter.clearCache();
-			MerceAdapter.clearCache();
+			Homepage.purgeCaches();
 
 		}
 		else {
