@@ -500,6 +500,11 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		sql.append(" GROUP BY ");
 
 		if ( c == null  || ! soloRegistrati ) {
+
+			if ( this instanceof MovimentoIvaAdapter ) {
+				sql.append("if( isscarico, idstallo , numregistro) ,");
+			}
+
 			sql.append(" numregistro, ");
 		}
 
