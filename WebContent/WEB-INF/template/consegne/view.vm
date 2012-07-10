@@ -41,11 +41,10 @@ Tasso di Umidit&agrave;: <strong>$!tools.Number.format('##0.0000000', $!obj.Tass
 #if($obj.Iter.getHasrettifica() && ! $obj.isPesoFinalePortoCarico())#set($needRettifica=true)#end
 
 #if ( $regDog )
-#if($needRettifica)
 #foreach( $m in $obj.getRegistroDoganale(false) )
 #if($m.IsRettifica)#set($needRettifica=false)#end
 #if(! $m.getIdStallo())#set($needPopolaStalli=true)#end
-#end#end
+#end
 <div id="doganale">
 #parse('consegne/registro_doganale.vm')
 </div>
