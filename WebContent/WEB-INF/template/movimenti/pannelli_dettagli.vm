@@ -9,8 +9,8 @@ Iter : <strong>$!obj.Consegna.Iter.Nome</strong><br />
 <br />
 <fieldset><legend>Dati Movimento</legend>
 Tipo : <select  name="isrettifica">
-<option value="1">Rettifica</option>
-<option value="0">Carico/Scarico</option>
+<option value="1" #if($m.Tipo >= 10 )selected="selected"#end>Rettifica</option>
+<option value="0" #if($m.Tipo < 10 )selected="selected"#end>Carico/Scarico</option>
 </select>
 ## <input type="hidden" name="isrettifica" value="0" />
 <br />

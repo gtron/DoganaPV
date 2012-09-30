@@ -1,4 +1,6 @@
 #parse('costanti.vm')
+#set( $addJs = ['/js/jquery.ui/ui.calendar.js'])
+#set( $addCss = ['/js/jquery.ui/themes/flora/flora.calendar.css'] )
 #parse('header.vm')
 
 <script type="text/javascript">
@@ -16,6 +18,14 @@ f.secco.value = umido - ( umido * tasso / 100) ;
 }
 catch (e) { alert ( 'Errore  : ' + e.message) ; }
 }
+
+$('document').ready( function() {
+popUpCal.regional['it'] = {clearText: 'Svuota', closeText: 'Chiudi', prevText: '&lt;Prec', nextText: 'Succ&gt;', currentText: 'Oggi',
+dayNames: ['Do','Lu','Ma','Me','Gio','Ve','Sa'], monthNames: ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre']};
+popUpCal.setDefaults(popUpCal.regional['it']);
+
+jQuery('.data').calendar();
+} );
 </script>
 <h2>
 Modifica Movimento
@@ -134,7 +144,6 @@ $param_error.ParamName
 
 </form>
 
-
 <div class="commands">
 <ul>
 <li><a href="#" onclick="getElementById('mainForm').submit();"><img src="$!images/action-ico-registra.png" />Salva</a></li>
@@ -142,6 +151,4 @@ $param_error.ParamName
 </ul>
 </div>
 
-
 #parse('footer.vm')
-
