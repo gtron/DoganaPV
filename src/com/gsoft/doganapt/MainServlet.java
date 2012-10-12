@@ -1,7 +1,6 @@
 package com.gsoft.doganapt;
 
-import javax.servlet.ServletException;
-
+import com.gsoft.doganapt.cmd.BackupDb;
 import com.gsoft.doganapt.cmd.Homepage;
 import com.gsoft.doganapt.cmd.ImportMovimenti;
 import com.gsoft.doganapt.cmd.LockMdb;
@@ -10,7 +9,6 @@ import com.gsoft.doganapt.cmd.RecoverDb;
 import com.gsoft.doganapt.cmd.ViewStallo;
 import com.gsoft.doganapt.cmd.consegne.ResetImmissioneLPStallo;
 import com.gsoft.framework.TooledServlet;
-import com.gtsoft.utils.LogManager;
 
 @SuppressWarnings("serial")
 public class MainServlet extends TooledServlet {
@@ -32,6 +30,8 @@ public class MainServlet extends TooledServlet {
 				new ViewStallo( this ) ) ;
 		addCommand( Commands.LOCKMDB ,
 				new LockMdb( this ) ) ;
+		addCommand( Commands.BACKUPDB ,
+				new BackupDb( this ) ) ;
 		addCommand( Commands.RECOVERDB ,
 				new RecoverDb( this ) ) ;
 	}
@@ -51,5 +51,6 @@ public class MainServlet extends TooledServlet {
 		public static final String DOIMPORT = "import" ;
 		public static final String LOCKMDB = "lockMdb" ;
 		public static final String RECOVERDB = "recover" ;
+		public static final String BACKUPDB = "backup";
 	}
 }

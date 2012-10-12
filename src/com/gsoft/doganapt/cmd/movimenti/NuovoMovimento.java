@@ -62,12 +62,14 @@ public class NuovoMovimento extends VelocityCommand {
 			adp.fillFromRequest(req, getBooleanParam(Strings.PARTIAL_EDIT)) ;
 
 
-			double u = getDoubleParam("u0_"  , true ).doubleValue() ;
+			double u = getDoubleParam("u0_"  , false ).doubleValue() ;
 			double s = getDoubleParam("s0_"  , true ).doubleValue() ;
 
-			double v0 = getDoubleParam("v0_"  , true ).doubleValue() ;
-			double v1 = getDoubleParam("v1_"  , true ).doubleValue() ;
-
+			double v0 = 0 ,v1  = 0 ;
+			if ( isIva ) {
+				v0 = getDoubleParam("v0_"  , true ).doubleValue() ;
+				v1 = getDoubleParam("v1_"  , true ).doubleValue() ;
+			}
 			Object id = adp.create(null);
 
 			m = (Movimento) adp.getByKey(id);
