@@ -12,8 +12,10 @@ Nuova Merce
 #if( $result ) <div id="result">Modifica effettuata</div> #end
 <center>
 <br>
-Codice Quadrelli :  <input type="text" value="$!obj.CodiceQuadrelli" name="codquadrelli" /> - 
-Nome :  <input type="text" value="$!obj.Nome" name="nome" /><br>
+Codice Quadrelli :  <input type="text" value="$!obj.CodiceQuadrelli" name="codquadrelli" /><br />
+Nome :  <input type="text" value="$!obj.Nome" name="nome" size="40" maxlength="200" /><br />
+Descrizione :  <input type="text" value="$!obj.Descrizione" name="descrizione" size="60" maxlength="200" /><br />
+Codice TARIC :  <input type="text" value="$!obj.CodiceTaric" name="codtaric" /><br />
 
 <input type="hidden" name="cmd" value="edit" />
 <input type="hidden" name="exec" value="1" />

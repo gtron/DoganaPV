@@ -26,18 +26,22 @@ public class MerceAdapter extends BeanAdapter2 {
 		super( db );
 	}
 
-	public void fillFields(Object obj) { 
+	@Override
+	public void fillFields(Object obj) {
 		boolean fill = ( obj != null ) ;
-		
+
 		Merce o = (Merce) obj ;
 
-		if ( fields == null || fields.isDirty() )
+		if ( fields == null || fields.isDirty() ) {
 			fields = new FieldSet(Fields.FIELDSCOUNT);
-		
+		}
+
 		fields.add( Fields.ID, Field.Type.INTEGER , (fill)? o.getId() : null , true );
-		
+
 		fields.add( Fields.NOME, Field.Type.STRING , (fill)? o.getNome() : null );
+		fields.add( Fields.DESCRIZIONE, Field.Type.STRING , (fill)? o.getDescrizione() : null );
 		fields.add( Fields.CODQUADRELLI, Field.Type.STRING , (fill)? o.getCodiceQuadrelli() : null );
+		fields.add( Fields.CODTARIC, Field.Type.STRING , (fill)? o.getCodiceTaric() : null );
 		fields.add( Fields.ITERDEFAULT, Field.Type.INTEGER , (fill)? o.getIdIterDefault() : null );
 		fields.add( Fields.COLORE, Field.Type.STRING , (fill)? o.getColore() : null );
 	}
@@ -47,35 +51,39 @@ public class MerceAdapter extends BeanAdapter2 {
 	}
 	public Object getFromFields ( Object obj ) {
 
-		if ( obj == null ) {
+		if ( obj == null )
 			return null ;
-		}
-		
+
 		Merce o = (Merce) obj ;
-		
+
 		o.setId( (Integer) fields.get( Fields.ID).getValue());
 		o.setNome( (String) fields.get( Fields.NOME).getValue() );
+		o.setDescrizione( (String) fields.get( Fields.DESCRIZIONE).getValue() );
 		o.setCodiceQuadrelli( (String) fields.get( Fields.CODQUADRELLI).getValue() );
+		o.setCodiceTaric( (String) fields.get( Fields.CODTARIC).getValue() );
 		o.setIdIterDefault( (Integer) fields.get( Fields.ITERDEFAULT).getValue() );
 		o.setColore( (String) fields.get( Fields.COLORE).getValue() );
-		
+
 		return o ;
 	}
-	
+
 	public static interface Fields {
 		static final int ID = 0;
 		static final int NOME = 1;
-		static final int CODQUADRELLI = 2 ;
-		static final int ITERDEFAULT = 3;
-		static final int COLORE = 4 ;
-		
-		static final int FIELDSCOUNT = 5;
+		static final int DESCRIZIONE = 2;
+		static final int CODQUADRELLI = 3;
+		static final int CODTARIC = 4;
+		static final int ITERDEFAULT = 5;
+		static final int COLORE = 6 ;
+
+		static final int FIELDSCOUNT = 7;
 	}
-	
+
 	private static final String TABLE = "merci" ;
 	private static final String[] fieldNames = {
-		"id","nome","codquadrelli","iterdefault","colore"
+		"id","nome","descrizione","codquadrelli","codtaric","iterdefault","colore"
 	};
+	@Override
 	public int getFieldsCount() {
 		return Fields.FIELDSCOUNT ;
 	}
@@ -85,27 +93,32 @@ public class MerceAdapter extends BeanAdapter2 {
 	public String getTableFieldName(Field f) {
 		return fieldNames[f.getId()] ;
 	}
-	
+
 	public static String getStaticTable() {
 		return TABLE ;
 	}
+	@Override
 	public String getTable() {
 		return TABLE ;
 	}
-	
+
+	@Override
 	public Object create(Object o) throws IOException , SQLException{
 		Object c = super.create(o);
 		clearCache();
 		return c ;
 	}
+	@Override
 	public void update(Object o) throws IOException {
 		super.update(o);
 		clearCache();
 	}
+	@Override
 	public void update() throws IOException {
 		super.update();
 		clearCache();
 	}
+	@Override
 	public Vector getAll(String orderby) throws Exception {
 		Vector list = super.getAll(orderby);
 		Merce a = null ;
@@ -115,32 +128,32 @@ public class MerceAdapter extends BeanAdapter2 {
 		}
 		return list;
 	}
-	
+
 	public void clearTable() throws IOException {
 		Connection c = db.getConnection();
-		
-		try { 
+
+		try {
 			db.executeNonQuery("DROP TABLE zbck_" + getTable(),
-				c );}
+					c );}
 		catch ( Exception e ) {}
-		db.executeNonQuery("CREATE TABLE zbck_" + getTable() + 
-				" SELECT * FROM "  + getTable() , 
+		db.executeNonQuery("CREATE TABLE zbck_" + getTable() +
+				" SELECT * FROM "  + getTable() ,
 				c );
-		db.executeNonQuery("DELETE FROM " + getTable() , 
+		db.executeNonQuery("DELETE FROM " + getTable() ,
 				c);
-		
+
 		clearCache();
 	}
-	
+
 	public static final THashMap cache = new THashMap(101);
 	public static Merce get(Integer id) {
 		return get( id, false ) ;
-	}	
+	}
 	public static Merce get(Integer id, boolean updateCache) {
-		Merce a = null ; 
-		
+		Merce a = null ;
+
 		a = (Merce) cache.get(id) ;
-		
+
 		if ( a == null ) {
 			try {
 				a = (Merce) Merce.newAdapter().getByKey(id);
@@ -160,31 +173,31 @@ public class MerceAdapter extends BeanAdapter2 {
 		}
 		ArrayList<Object> list = new ArrayList<Object>(cache.size());
 		list.addAll(cache.values());
-		
+
 		Collections.reverse(list);
-		
-		return list; 
+
+		return list;
 	}
-	
+
 	public static ArrayList<Object> getAllCachedRegistro(MovimentoAdapter adp ) throws Exception {
 		if ( cache.size() < 1 ) {
 			Merce.newAdapter().getAll("nome");
 		}
-		
+
 		ArrayList<Object> list = new ArrayList<Object>(cache.size());
 		Merce m = null ;
 		Vector<Integer> ids = adp.getIdMerci();
-		
+
 		for( Iterator i = cache.values().iterator() ; i.hasNext() ; ) {
 			m = (Merce)i.next();
-			for ( Iterator<Integer> is = ids.iterator() ; is.hasNext() ;  ) {
-				if ( is.next().equals(m.getId())  ) {
+			for (Integer integer : ids) {
+				if ( integer.equals(m.getId())  ) {
 					list.add(m);
 					continue;
 				}
 			}
 		}
-		
-		return list; 
+
+		return list;
 	}
 }
