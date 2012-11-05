@@ -10,7 +10,7 @@
 <div class="commands">
 <ul>
 #if($isAdmin)<li><a href=".merci"><img src="$!images/action-ico-registra.png" />Merci </a></li>#end
-<li><a href=".main?cmd=recover"><img src="$!images/tab-ico-importazione.png"  height="24" />Ripristino DB </a></li>
+<li><a href=".main?cmd=recover"><img src="$!images/tab-ico-importazione.png"  height="24" />Backups</a></li>
 <li><a href="#" onclick="window.print(); return false;"><img src="$!images/action-ico-registra.png" />Stampa</a></li>
 <li><a href=".main" ><img src="$!images/action-ico-elimina.png" />Esci</a></li>
 </ul>
