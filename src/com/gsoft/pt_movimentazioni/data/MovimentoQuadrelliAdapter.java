@@ -19,7 +19,7 @@ import com.gtsoft.utils.sql.IDatabase2;
 
 public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 
-	static private Boolean readFromCache = true;
+	static private Boolean readFromCache = false;
 	static private Boolean writeCache = false;
 
 	public MovimentoQuadrelliAdapter() {
