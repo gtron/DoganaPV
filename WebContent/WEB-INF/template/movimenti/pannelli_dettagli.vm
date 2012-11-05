@@ -8,7 +8,7 @@ Iter : <strong>$!obj.Consegna.Iter.Nome</strong><br />
 </fieldset>
 <br />
 <fieldset><legend>Dati Movimento</legend>
-Tipo : <select  name="isrettifica">
+Tipo : <select  name="isrettifica" #if($m.Id > 0 )readonly="readonly" disabled="disabled"#end style="background-color:#FFFFFF">
 <option value="1" #if($m.Tipo >= 10 )selected="selected"#end>Rettifica</option>
 <option value="0" #if($m.Tipo < 10 )selected="selected"#end>Carico/Scarico</option>
 </select>
