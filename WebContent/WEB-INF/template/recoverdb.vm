@@ -3,11 +3,18 @@
 #parse('header.vm')
 
 <br />
+<div style="text-align:center">
+<h1>Backup Database</h1>
+<form action=".main" method="post" >
+<input type="hidden" name="cmd" value="backup" />
+<input type="hidden" name="exec" value="1" />
+<input type="submit" value="Nuovo Backup" />
+</form>
+<br />
 <form action="?" method="post" >
 <input type="hidden" name="cmd" value="recover" />
 <input type="hidden" name="exec" value="1" />
-<div style="text-align:center">
-<h1>Ripristino Database</h1>
+<h3>Ripristina Backup:</h3>
 <div style="width:80%; margin:0 auto">
 <br />
 #if ( $list )
@@ -36,8 +43,8 @@ $!out
 #end
 </div>
 
-</div>
 </form>
+</div>
 <br /><br /><br />
 
 #parse('footer.vm')
