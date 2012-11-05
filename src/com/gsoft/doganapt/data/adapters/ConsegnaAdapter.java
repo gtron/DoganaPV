@@ -18,6 +18,9 @@ import com.gtsoft.utils.sql.IDatabase2;
 
 public class ConsegnaAdapter extends BeanAdapter2 {
 
+	static private Boolean readFromCache = false;
+	static private Boolean writeCache = false;
+
 	public ConsegnaAdapter() {
 		super();
 	}
@@ -215,12 +218,15 @@ public class ConsegnaAdapter extends BeanAdapter2 {
 
 	protected Vector getByCachedStatment(PreparedStatement s) throws Exception {
 		String key = FileBasedCacher.getCachedKey(s.toString());
+
 		Vector out = (Vector) FileBasedCacher.get(key);
 
-		if ( out == null ) {
+		if ( out == null || ! readFromCache ) {
 			out = getByStatment(s);
 
-			FileBasedCacher.set(key, out);
+			if ( writeCache ) {
+				FileBasedCacher.set(key, out);
+			}
 		}
 		return out;
 	}
