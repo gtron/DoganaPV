@@ -200,20 +200,30 @@ Inserire la data fino alla quale si desidera importare (compresa):
 #end#end#end
 </div>
 
-<div id="dlg_LiberaPratica" class="flora" style="text-align:center;">
-<form action=".consegne" id="frm_immettiLP">
-Data : <input type="text" name="dataLP" size="10" id="dataLP" /><br>
-##
 
-#foreach( $s in $obj.Stalli )
-#if(! $s.HasLiberaPratica )
-<input type="checkbox" name="list" value="$s.Id" id="libPrat_$velocityCount" />
-<label for="libPrat_$velocityCount">$s.Nome</label><br />
-#end#end
+<div id="dlg_LiberaPratica" class="flora" style="text-align:center;">
+<form action=".consegne" id="frm_immettiLP" method="POST">
 
 <input type="hidden" name="cmd" value="immettiLP" />
 <input type="hidden" name="exec" value="1" />
 <input type="hidden" name="c" value="$obj.Id" />
+
+<fieldset><legend>Selezione degli Stalli</legend>
+#foreach( $s in $obj.Stalli )
+#if(! $s.HasLiberaPratica )
+<input type="radio" name="list" value="$s.Id" id="libPrat_$velocityCount"
+#if($obj.Stalli.size() == 1) checked="checked"#end />
+<label for="libPrat_$velocityCount">$s.Nome</label><br />
+#end#end
+</fieldset>
+
+<fieldset><legend>Dati del Movimento</legend>
+Valore USD: <input type="text" name="valoreEuro" size="10" /> 
+Tasso USD/EUR: <input type="text" name="tasso" size="5" /><br />
+Data : <input type="text" name="dataLP" size="10" id="dataLP" value="$!now" /><br />
+</fieldset>
+
+##
 
 <fieldset><legend>Documento di Ingresso</legend>
 Tipo: <select name="doc"><option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option><option value="COM">COM</option></select>
@@ -225,7 +235,7 @@ Numero: <input type="text" name="docPV_num" size="3"/>
 Data:  <input type="text" id="docPV_data" name="docPV_data" size="9"/></fieldset>
 <br />
 Note :<br />
-<textarea name="note" cols="40" rows="2"></textarea>
+<textarea name="note" cols="40" rows="2" style="width:90%"></textarea>
 <br />
 ##<input type="button" value="Immetti in L.P." onclick="immettiLP();">
 </form>
