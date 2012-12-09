@@ -1,6 +1,5 @@
 package com.gsoft.pt_movimentazioni.utils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
@@ -13,7 +12,6 @@ import com.gsoft.doganapt.data.Stallo;
 import com.gsoft.doganapt.data.adapters.MovimentoAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoDoganaleAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoIvaAdapter;
-import com.gsoft.doganapt.data.adapters.StalloAdapter;
 import com.gsoft.pt_movimentazioni.data.MovimentoQuadrelli;
 import com.gsoft.pt_movimentazioni.data.MovimentoQuadrelliAdapter;
 import com.gtsoft.utils.common.FormattedDate;
@@ -24,6 +22,7 @@ public class IterImporter_EXT extends IterImporter {
 		super(m,i,q);
 	}
 
+	@Override
 	public void apriConsegna( Consegna c, FormattedDate d , Documento documento, Documento documentoPV, String note  ) throws Exception  {
 
 		c.setDataChiusura(null);
@@ -41,88 +40,48 @@ public class IterImporter_EXT extends IterImporter {
 		m.setIsLocked(Boolean.FALSE);
 		m.setIsScarico(Boolean.FALSE);
 		m.setIsRettifica(Boolean.FALSE);
-		
+
 		m.setNote(note);
 
 		registroDoganale.create(m);
 
 	}
 
-	public void immettiLiberaPratica(  ArrayList<Integer> stalli , 
-			FormattedDate data , Documento docDogana, Documento docIVA) throws Exception {
-		Stallo s = null ;
-		Integer id = null ;
-
-		StalloAdapter stAdp= new StalloAdapter();
-
-		for ( Iterator i = stalli.iterator() ; i.hasNext() ; ){
-
-			id = (Integer) i.next() ;
-
-			s = StalloAdapter.get(id) ;
-
-			if (!  s.getHasLiberaPratica() ) {
-				s.immettiInLiberaPratica(data, docDogana, docIVA, registroDoganale, registroIVA ) ;
-
-				s.setImmessoInLiberaPratica(Boolean.TRUE);
-
-				stAdp.update(s);
-			}
-
-		}
-
+	@Override
+	public MovimentoAdapter getRegistroInPerILP() {
+		return registroIVA;
 	}
 
-//	private Movimento getMovimentoRettificaCarico(Consegna c , Stallo s , double pesoCaricoEffettivo , FormattedDate data ) throws Exception {
-//		Movimento m = registroDoganale.newMovimento() ;
-//
-//		double pesoConsegna = c.getPesopolizza() ;
-//
-//		double pesoRettifica = pesoConsegna - pesoCaricoEffettivo ;
-//
-//		if ( pesoRettifica > 0 ) {
-//			m.setIsScarico(false);
-//		}
-//		else {
-//			m.setIsScarico(true);
-//			pesoRettifica *= -1 ;
-//		}
-//
-//		m.setUmido( pesoRettifica );
-//
-//		m.setIsLocked(false);
-//		m.setIsRettifica( true );
-//
-//		m.setData(data) ;
-//		m.setIdMerce( new Integer(c.getIdmerce()));
-//		m.setIdConsegna(c.getId());
-//		m.setStallo( s );
-//
-//		return m ;
-//	}
+	@Override
+	public MovimentoAdapter getRegistroOutPerILP() {
+		return registroDoganale;
+	}
 
+
+
+	@Override
 	public MovimentoAdapter getRegistroPrimoCarico() {
 		return registroDoganale ;
 	}
-	
+
 	public void importaPrimoCarico( Consegna c , FormattedDate d ) throws Exception {
 		Stallo s ;
 		HashMap<Integer, MovimentoQuadrelli> listStalli = new HashMap<Integer, MovimentoQuadrelli>(5) ;
 		Movimento m ;
 		MovimentoQuadrelli mq ;
-//		Movimento rettifica = null ;
+		//		Movimento rettifica = null ;
 		double sommaPesoUmido = 0 ;
 		double scartoUmido = 0 ;
 
-//		FormattedDate data = quadAdp.getMinDataCarico(c) ;
-//		FormattedDate lastData = data ;
+		//		FormattedDate data = quadAdp.getMinDataCarico(c) ;
+		//		FormattedDate lastData = data ;
 
 		Vector list = null ;
 
-		// fetch dei movimenti 
-		for ( Iterator is = c.getStalli().iterator() ; is.hasNext() ; ) {
+		// fetch dei movimenti
+		for (Object element : c.getStalli()) {
 
-			s = (Stallo) is.next() ;
+			s = (Stallo) element ;
 
 			list = quadAdp.get(false, null , s);
 
@@ -134,9 +93,9 @@ public class IterImporter_EXT extends IterImporter {
 
 				sommaPesoUmido += mq.getNetto().doubleValue() ;
 
-//				if ( lastData.before(mq.getData()) ) {
-//				lastData = mq.getData() ;
-//				}
+				//				if ( lastData.before(mq.getData()) ) {
+				//				lastData = mq.getData() ;
+				//				}
 			}
 		}
 
@@ -196,5 +155,33 @@ public class IterImporter_EXT extends IterImporter {
 		}
 	}
 
+
+	//	private Movimento getMovimentoRettificaCarico(Consegna c , Stallo s , double pesoCaricoEffettivo , FormattedDate data ) throws Exception {
+	//		Movimento m = registroDoganale.newMovimento() ;
+	//
+	//		double pesoConsegna = c.getPesopolizza() ;
+	//
+	//		double pesoRettifica = pesoConsegna - pesoCaricoEffettivo ;
+	//
+	//		if ( pesoRettifica > 0 ) {
+	//			m.setIsScarico(false);
+	//		}
+	//		else {
+	//			m.setIsScarico(true);
+	//			pesoRettifica *= -1 ;
+	//		}
+	//
+	//		m.setUmido( pesoRettifica );
+	//
+	//		m.setIsLocked(false);
+	//		m.setIsRettifica( true );
+	//
+	//		m.setData(data) ;
+	//		m.setIdMerce( new Integer(c.getIdmerce()));
+	//		m.setIdConsegna(c.getId());
+	//		m.setStallo( s );
+	//
+	//		return m ;
+	//	}
 
 }

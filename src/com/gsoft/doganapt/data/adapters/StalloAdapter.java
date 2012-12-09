@@ -234,10 +234,6 @@ public class StalloAdapter extends BeanAdapter2 {
 			}
 		}
 
-
 		return list ;
 	}
-
-
-
 }

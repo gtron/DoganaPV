@@ -227,8 +227,7 @@ public class PopolaStalli extends VelocityCommand {
 				list.add(s);
 
 				if ( ! consegna.getId().equals( s.getIdConsegnaAttuale() ) ) {
-					s.setIdConsegnaAttuale(consegna.getId());
-					s.setImmessoInLiberaPratica(Boolean.FALSE);
+					ConsegnaAdapter.assegnaStallo(consegna, s);
 				}
 
 				listMov = quadAdp.get(false, null , s);

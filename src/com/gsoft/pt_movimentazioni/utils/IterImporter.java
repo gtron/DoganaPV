@@ -47,7 +47,10 @@ GROUP BY data, merce
 		quadAdp = q ;
 	}
 
-	public void apriConsegna( final Consegna c, final FormattedDate d , final Documento documento, final Documento documentoPV, final String note ) throws Exception  {
+	public abstract void apriConsegna(Consegna c, FormattedDate d , Documento documento, Documento documentoPV, String note ) throws Exception ;
+
+
+	public void apriConsegna_IVA( final Consegna c, final FormattedDate d , final Documento documento, final Documento documentoPV, final String note ) throws Exception  {
 
 		final MovimentoIVA m = new MovimentoIVA();
 
@@ -65,19 +68,22 @@ GROUP BY data, merce
 
 		m.setNote(note);
 
-		if ( c.getValoreUnitario() != null ) {
-			if ( c.getIsValutaEuro() ) {
-				m.setValoreEuro(c.getValoreUnitario().doubleValue() * m.getSecco().doubleValue() ) ;
-			}
-			else {
-				m.setValoreDollari(c.getValoreUnitario().doubleValue() * m.getSecco().doubleValue() ) ;
-				c.updateValore(m) ;
-			}
-		}
+		//		if ( c.getValoreUnitario() != null ) {
+		//			if ( c.getIsValutaEuro() ) {
+		//				m.setValoreEuro(c.getValoreUnitario().doubleValue() * m.getSecco().doubleValue() ) ;
+		//			}
+		//			else {
+		//				m.setValoreDollari(c.getValoreUnitario().doubleValue() * m.getSecco().doubleValue() ) ;
+		//				c.updateValore(m) ;
+		//			}
+		//		}
 
 		registroIVA.create(m);
 
 	}
+
+	public abstract MovimentoAdapter getRegistroInPerILP();
+	public abstract MovimentoAdapter getRegistroOutPerILP() ;
 
 	/* UNUSED
 	public void apriConsegna_old( Consegna c, FormattedDate d ) throws Exception  {
@@ -216,7 +222,7 @@ GROUP BY data, merce
 	 */
 
 	public void immettiLiberaPratica( final ArrayList<Integer> stalli, final FormattedDate data,
-			final Documento docDogana, final Documento docIVA) throws Exception  {
+			final Documento docDogana, final Documento docIVA, Double valoreDollari, Double cambio) throws Exception  {
 		// TODO Metodo Vuoto xke l'azione non si applica ( rivedere gerarchia oggetti )
 	}
 

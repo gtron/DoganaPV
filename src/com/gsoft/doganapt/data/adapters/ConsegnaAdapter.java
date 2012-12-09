@@ -9,7 +9,8 @@ import java.sql.SQLException;
 import java.util.Vector;
 
 import com.gsoft.doganapt.data.Consegna;
-import com.gsoft.pt_movimentazioni.data.FileBasedCacher;
+import com.gsoft.doganapt.data.Stallo;
+import com.gsoft.doganapt.data.StalloConsegna;
 import com.gtsoft.utils.common.BeanAdapter2;
 import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.data.Field;
@@ -175,6 +176,7 @@ public class ConsegnaAdapter extends BeanAdapter2 {
 		return super.create(o);
 	}
 
+	@SuppressWarnings("rawtypes")
 	public Vector getAperte() throws Exception {
 
 		StringBuilder sql = new StringBuilder(70)
@@ -187,6 +189,7 @@ public class ConsegnaAdapter extends BeanAdapter2 {
 
 	}
 
+	@SuppressWarnings("rawtypes")
 	public Vector getNonChiuse() throws Exception {
 
 		StringBuilder sql = new StringBuilder(70)
@@ -198,10 +201,11 @@ public class ConsegnaAdapter extends BeanAdapter2 {
 		.append(" ORDER BY ").append(fieldNames[Fields.DATACREAZIONE]) ;
 
 		PreparedStatement s = db.getConnection().prepareStatement(sql.toString()) ;
-		return getByCachedStatment(s) ;
+		return getByStatment(s) ;
 
 	}
 
+	@SuppressWarnings("rawtypes")
 	public Vector getChiuse() throws Exception {
 
 		StringBuilder sql = new StringBuilder(70)
@@ -216,20 +220,20 @@ public class ConsegnaAdapter extends BeanAdapter2 {
 
 	}
 
-	protected Vector getByCachedStatment(PreparedStatement s) throws Exception {
-		String key = FileBasedCacher.getCachedKey(s.toString());
-
-		Vector out = (Vector) FileBasedCacher.get(key);
-
-		if ( out == null || ! readFromCache ) {
-			out = getByStatment(s);
-
-			if ( writeCache ) {
-				FileBasedCacher.set(key, out);
-			}
-		}
-		return out;
-	}
+	//	protected Vector getByCachedStatment(PreparedStatement s) throws Exception {
+	//		String key = FileBasedCacher.getCachedKey(s.toString());
+	//
+	//		Vector out = (Vector) FileBasedCacher.get(key);
+	//
+	//		if ( out == null || ! readFromCache ) {
+	//			out = getByStatment(s);
+	//
+	//			if ( writeCache ) {
+	//				FileBasedCacher.set(key, out);
+	//			}
+	//		}
+	//		return out;
+	//	}
 
 	public Object getNextNumPartitario() throws Exception {
 
@@ -276,5 +280,23 @@ public class ConsegnaAdapter extends BeanAdapter2 {
 	}
 	public static void clearCache() {
 		cache.clear();
+	}
+
+	public static void assegnaStallo(Consegna c, Stallo s) throws IOException, SQLException {
+
+		s.setIdConsegnaAttuale(c.getId());
+		s.setIdConsegnaPrenotata(null);
+		s.setImmessoInLiberaPratica(Boolean.FALSE) ;
+
+		s.setAttuale( new Double(0) );
+		s.setCaricato( new Double(0) );
+
+
+		StalloConsegnaAdapter adp = new StalloConsegnaAdapter();
+		StalloConsegna sc = adp.assegnaStallo(c,s);
+		adp.create(sc);
+
+		StalloAdapter sAdp = new StalloAdapter();
+		sAdp.update(s);
 	}
 }

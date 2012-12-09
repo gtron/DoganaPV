@@ -1,6 +1,5 @@
 package com.gsoft.doganapt.data;
 
-import java.util.Iterator;
 import java.util.Vector;
 
 import com.gsoft.doganapt.data.adapters.ConsegnaAdapter;
@@ -8,7 +7,6 @@ import com.gsoft.doganapt.data.adapters.MovimentoAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoDoganaleAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoIvaAdapter;
 import com.gsoft.doganapt.data.adapters.StalloAdapter;
-import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.common.ModelBean2;
 import com.gtsoft.utils.sql.IDatabase2;
 
@@ -183,68 +181,5 @@ public class Stallo extends ModelBean2 {
 			Stallo.newAdapter().update(this);
 		}
 	}
-	public void immettiInLiberaPratica( FormattedDate data, Documento doc, Documento docPV,
-			MovimentoAdapter registroOut,
-			MovimentoAdapter registroIn ) throws Exception {
 
-		@SuppressWarnings("unchecked")
-		Vector<Movimento> list = registroOut.getByConsegna( false, idConsegnaAttuale, id, null , null );
-
-		double sommaUmido = 0 ;
-		double sommaSecco = 0 ;
-		Movimento m = null;
-
-		if ( list != null && list.size() > 0 ) {
-			for ( Iterator<Movimento> i = list.iterator() ; i.hasNext() ; ) {
-				m = i.next();
-
-				if ( m.getIsScarico() ) {
-					sommaUmido -= m.getUmido().doubleValue() ;
-					sommaSecco -= m.getSecco().doubleValue() ;
-				}
-				else {
-					sommaUmido += m.getUmido().doubleValue() ;
-					sommaSecco += m.getSecco().doubleValue() ;
-				}
-
-			}
-
-			//		m = m.clone();
-			m.setDocumento(doc);
-			m.setDocumentoPV(docPV);
-			m.setSecco(sommaSecco);
-			m.setUmido(sommaUmido);
-			m.setIsScarico(true);
-			m.setNumRegistro(null);
-			m.setIsRettifica(false);
-			m.setData( data ) ;
-			m.setId(null);
-
-			registroOut.create(m);
-
-			Movimento miva = registroIn.newMovimento();
-
-
-			miva.setDocumento(doc);
-			miva.setDocumentoPV(docPV);
-			miva.setIsScarico(false);
-			miva.setSecco(sommaSecco);
-			miva.setUmido(sommaUmido);
-			miva.setIdMerce(m.getIdMerce());
-			miva.setNumRegistro(null);
-			miva.setIdStallo(m.getIdStallo());
-			miva.setIsRettifica(false);
-			miva.setIdConsegna(m.getIdConsegna());
-			miva.setData( data ) ;
-			miva.setId(null);
-			miva.setIsLocked(Boolean.FALSE);
-
-			if( miva instanceof MovimentoIVA ) {
-				m.getConsegna().updateValore((MovimentoIVA )miva);
-			}
-
-			registroIn.create(miva);
-		}
-
-	}
 }

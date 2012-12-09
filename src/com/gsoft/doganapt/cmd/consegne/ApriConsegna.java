@@ -1,6 +1,7 @@
 package com.gsoft.doganapt.cmd.consegne;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +21,7 @@ import com.gsoft.pt_movimentazioni.data.MovimentoQuadrelliAdapter;
 import com.gsoft.pt_movimentazioni.utils.PtMovimentazioniImporter;
 import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.http.VelocityCommand;
+import com.gtsoft.utils.http.exception.ParameterException;
 import com.gtsoft.utils.http.servlet.GtServlet;
 
 
@@ -29,105 +31,102 @@ public class ApriConsegna extends VelocityCommand {
 
 	StalloAdapter sAdp = null ;
 
+	Integer idConsegna = null;
+	Consegna consegna = null;
+	FormattedDate data = null;
+
 	public ApriConsegna ( GtServlet callerServlet) {
 		super(callerServlet);
 	}
+
 	@Override
 	public Template exec(HttpServletRequest req, HttpServletResponse resp, Context ctx) throws Exception  {
 
-		Integer id = getIntParam("id", true);
-
-		Consegna c = ConsegnaAdapter.get(id);
+		idConsegna = getIntParam("id", true);
+		consegna = ConsegnaAdapter.get(idConsegna);
+		data = getDateParam("data", true);
 
 		String note = getParam("note", false);
 
-		FormattedDate data = getDateParam("data", true);
-		String doc = getParam("doc", false);
-		String doc_num = getParam("doc_num", false);
-		FormattedDate doc_data = getDateParam("doc_data", false);
+		Documento documento = getDocumento();
+		Documento documentoPV = getDocumentoPV();
 
-		Documento documento = Documento.getDocumento( doc, doc_data , doc_num );
+		ctx.put( ContextKeys.OBJECT , consegna ) ;
 
-		String docPV = getParam("docPV", false);
-		String docPV_num = getParam("docPV_num", false);
-		FormattedDate docPV_data = getDateParam("docPV_data", false);
-
-		Documento documentoPV = Documento.getDocumento( docPV, docPV_data , docPV_num );
-
-
-
-		ctx.put( ContextKeys.OBJECT , c ) ;
-
-		if ( c != null && getBooleanParam(Strings.EXEC) ) {
+		if ( consegna != null && getBooleanParam(Strings.EXEC) ) {
 
 			MovimentoQuadrelliAdapter qAdp = new MovimentoQuadrelliAdapter(PtMovimentazioniImporter.getInstance().getAccessDB());
+			ArrayList<String> codiciStalli = qAdp.getCodiciStalli(consegna, data);
 
-			ArrayList<String> stalli = qAdp.getCodiciStalli(c, data);
 			Stallo s ;
 			sAdp = Stallo.newAdapter() ;
 
-			for (String string : stalli) {
-				s = (Stallo) sAdp.getByCodice( string ) ;
+			for (String codiceStallo : codiciStalli) {
+				s = (Stallo) sAdp.getByCodice( codiceStallo ) ;
 
 				if ( s != null ) {
 					if ( s.getIdConsegnaAttuale() == null) {
-						assegnaStallo(s, id);
+						assegnaStallo(s, consegna);
 					}
 					else {
 						Consegna attuale = ConsegnaAdapter.get(s.getIdConsegnaAttuale());
 
 						if ( attuale == null || attuale.isChiusa() ) {
-							assegnaStallo(s, id);
-						} else {
-							/*
+							assegnaStallo(s, consegna);
+						} else { /*
 							ctx.put( "list" ,  new ConsegnaAdapter().getNonChiuse( ) ) ;
 							throw new UserException("Attenzione, lo stallo " + s  + " non è libero !") ;
-							 */
+						 */
 						}
 					}
 				}
 			}
 
-			if ( c.isChiusa() ) {
+			if ( consegna.isChiusa() ) {
 				//				c.setDataChiusura(null);
 				//				Consegna.newAdapter().update(c);
 			}
 			else {
-				c.getIter()
+				consegna.getIter()
 				.getImporter(
 						new MovimentoDoganaleAdapter(),
 						new MovimentoIvaAdapter(),
 						qAdp
-						)
-
-						.apriConsegna(c, data, documento, documentoPV, note);
+						).apriConsegna(consegna, data, documento, documentoPV, note);
 			}
 
-
-
-
-			c.setDataChiusura(null);
-			Consegna.newAdapter().update(c);
+			consegna.setDataChiusura(null);
+			Consegna.newAdapter().update(consegna);
 
 			ctx.put( "list" ,  new ConsegnaAdapter().getNonChiuse( ) ) ;
 
 			ctx.put("result", Boolean.TRUE ) ;
 
-			response.sendRedirect(".consegne?id=" + id );
+			response.sendRedirect(".consegne?id=" + idConsegna );
 
 		}
 		return null ;
 	}
 
-	protected void assegnaStallo(Stallo s, Integer idConsegna ) throws IOException {
-		s.setIdConsegnaAttuale(idConsegna);
-		s.setIdConsegnaPrenotata(null);
-		s.setImmessoInLiberaPratica(Boolean.FALSE) ;
+	private Documento getDocumento() throws ParameterException {
+		String doc = getParam("doc", false);
+		String doc_num = getParam("doc_num", false);
+		FormattedDate doc_data = getDateParam("doc_data", false);
 
-		s.setAttuale( new Double(0) );
-		s.setCaricato( new Double(0) );
+		return Documento.getDocumento( doc, doc_data , doc_num );
+	}
+	private Documento getDocumentoPV() throws ParameterException {
 
-		sAdp.update(s);
+		String docPV = getParam("docIVA", false);
+		String docPV_num = getParam("docIVA_num", false);
+		FormattedDate docPV_data = getDateParam("docIVA_data", false);
+
+		return Documento.getDocumento( docPV, docPV_data , docPV_num );
+	}
+
+
+	protected void assegnaStallo(Stallo s, Consegna c ) throws IOException, SQLException {
+		ConsegnaAdapter.assegnaStallo(c, s);
 	}
 
 	@Override

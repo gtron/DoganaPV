@@ -13,6 +13,7 @@ import com.gsoft.doganapt.data.adapters.MovimentoAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoDoganaleAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoIvaAdapter;
 import com.gsoft.doganapt.data.adapters.StalloAdapter;
+import com.gsoft.doganapt.data.adapters.StalloConsegnaAdapter;
 import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.common.ModelBean2;
 import com.gtsoft.utils.sql.IDatabase2;
@@ -188,23 +189,14 @@ public class Consegna extends ModelBean2 implements Serializable {
 
 	public void updateValore( final MovimentoIVA m ) {
 
-		if ( getValoreUnitario() == null ) return ;
-		if ( m.getSecco() == null ) return ;
-
-		// VERIFICARE !!!
-		double valore = new Double(
-				Math.round( 100000000 * m.getSecco().doubleValue() * getValoreUnitario().doubleValue() ) / 100000000
-				) ;
-
-		if ( ! isValutaEuro.booleanValue() ) {
-			m.setValoreDollari( valore );
-
-			if ( tassoCambio == null ) return ;
-
-			valore = valore / tassoCambio.doubleValue() ;
+		StalloConsegnaAdapter scAdp = new StalloConsegnaAdapter();
+		try {
+			StalloConsegna sc = scAdp.getByMovimento(m);
+			sc.updateValore(m);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ;
 		}
-
-		m.setValoreEuro(valore);
 	}
 
 	public void setTassoUmidita(Double tassoUmidita) {
