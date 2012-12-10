@@ -2,9 +2,6 @@
 ###set( $rettificaDone = true)
 ###end
 <table border="0" class="movimenti" cellpadding="2" cellspacing="0" id="tablemovimenti">
-<caption>Tasso di Cambio: <strong>$!tools.Number.format('##0.00000', $!obj.TassoCambio)</strong> - 
-Valore Unitario: <strong>$!tools.Number.format('##0.00000', $!obj.ValoreUnitario) #if($!obj.IsValutaEuro)&euro;#else $ #end</strong><br /><br />
-</caption>
 <tr>
 <th rowspan="2">Num.Registro<br /><a  href=".consegne?cmd=newmovimento&idC=$obj.Id&iva=1">[Nuovo IVA]</a></th>
 ##<th  rowspan="2" width="6%">Tipo&nbsp;&nbsp;</th>

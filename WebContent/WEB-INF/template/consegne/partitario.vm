@@ -24,7 +24,21 @@
 #set($oldStallo = $m.Stallo)
 <div id="partitario_$oldStallo.Id">
 <table border="0" class="movimenti" cellpadding="2" cellspacing="0" id="tablemovimenti">
-<caption>Stallo $oldStallo.Nome<br /><br /></caption>
+<caption>Stallo $oldStallo.Nome<br /><br />
+#set( $stalloConsegna = $obj.getStalloConsegna($oldStallo))
+Valore:
+#if($!obj.IsValutaEuro)
+<strong>$!tools.Number.format('##0.00000', $!stalloConsegna.getValoreEuro()) &euro;</strong>
+#else
+<strong>$!tools.Number.format('##0.00', $!stalloConsegna.getValoreEuro()) &euro;</strong> =
+<strong>$!tools.Number.format('##0.00', $!stalloConsegna.getValoreDollari())$</strong>
+($!tools.Number.format('##0.00000', $!stalloConsegna.getTassoEuroDollaro() )</strong>) 
+
+#end
+<br /><br />
+
+
+</caption>
 <tr>
 <th rowspan="2">Registro</th>
 <th rowspan="2">Num.Reg.</th>
