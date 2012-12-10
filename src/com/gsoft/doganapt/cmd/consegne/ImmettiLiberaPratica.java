@@ -98,7 +98,10 @@ public class ImmettiLiberaPratica extends VelocityCommand {
 				stalloConsegna = new StalloConsegna();
 				stalloConsegna.setIdStallo(m.getIdStallo());
 				stalloConsegna.setIdConsegna(idConsegna);
-				stalloConsegnaAdapter.create(stalloConsegna);
+				stalloConsegna.setIsInLiberaPratica(Boolean.FALSE);
+				Long id = (Long) stalloConsegnaAdapter.create(stalloConsegna);
+
+				stalloConsegna.setId(id.intValue());
 			}
 			initStalloConsegna(stalloConsegna, m);
 
@@ -132,7 +135,7 @@ public class ImmettiLiberaPratica extends VelocityCommand {
 			throw new Exception("Il valore della somma dei movimenti non è stato calcolato: possibile errore di programmazione!");
 
 		valoreUnitarioUSD = valoreDollari / sommaSeccoTotale ;
-		valoreUnitarioEuro = valoreDollari * tassoCambio / sommaSeccoTotale ;
+		valoreUnitarioEuro = valoreDollari / tassoCambio / sommaSeccoTotale ;
 	}
 
 	/**

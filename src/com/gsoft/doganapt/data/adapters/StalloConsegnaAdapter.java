@@ -38,7 +38,7 @@ public class StalloConsegnaAdapter extends BeanAdapter2 {
 		fields.add( Fields.VALOREDOLLARI, Field.Type.DOUBLE , (fill)? o.getValoreDollari() : null );
 		fields.add( Fields.VALOREUNITARIOEURO, Field.Type.DOUBLE , (fill)? o.getValoreUnitarioEuro() : null );
 		fields.add( Fields.VALOREUNITARIODOLLARI, Field.Type.DOUBLE , (fill)? o.getValoreUnitarioDollari() : null );
-		fields.add( Fields.TASSOEURODOLLARO, Field.Type.DOUBLE , (fill)? o.getTassoEuroDollaro() : null );
+		fields.add( Fields.TASSOEURODOLLARO, Field.Type.DOUBLE , (fill)? o.getTassoEuroDollaroDB() : null );
 
 		fields.add( Fields.DATAIMMISSIONELP, Field.Type.DATE , (fill)? o.getDataImmissione() : null );
 
@@ -62,7 +62,7 @@ public class StalloConsegnaAdapter extends BeanAdapter2 {
 		o.setValoreDollari( (Double) fields.get( Fields.VALOREDOLLARI).getValue() );
 		o.setValoreUnitarioEuro( (Double) fields.get( Fields.VALOREUNITARIOEURO).getValue() );
 		o.setValoreUnitarioDollari( (Double) fields.get( Fields.VALOREUNITARIODOLLARI).getValue() );
-		o.setTassoEuroDollaro( (Long) fields.get( Fields.TASSOEURODOLLARO).getValue() );
+		o.setTassoEuroDollaroDB( (Long) fields.get( Fields.TASSOEURODOLLARO).getValue() );
 		o.setDataImmissione( (FormattedDate) fields.get( Fields.DATAIMMISSIONELP).getValue() );
 
 		return o ;
@@ -125,16 +125,25 @@ public class StalloConsegnaAdapter extends BeanAdapter2 {
 		sc.setTassoEuroDollaro(c.getTassoCambio());
 
 		if ( c.getIsValutaEuro() ) {
-			sc.setValoreEuro(c.getValoreUnitario());
-			sc.setValoreDollari(c.getValoreUnitario() / c.getTassoCambio() );
+			sc.setValoreUnitarioEuro(c.getValoreUnitario());
+			sc.setValoreUnitarioDollari(c.getValoreUnitario() / c.getTassoCambio() );
 		} else {
-			sc.setValoreDollari(c.getValoreUnitario());
-			sc.setValoreEuro(c.getValoreUnitario() * c.getTassoCambio() );
+			sc.setValoreUnitarioDollari(c.getValoreUnitario());
+			sc.setValoreUnitarioEuro(c.getValoreUnitario() * c.getTassoCambio() );
 		}
 
 		sc.setIsInLiberaPratica(Boolean.FALSE);
 
 		return sc ;
+	}
+
+	public StalloConsegna getByKeyObjects(Consegna c, Stallo s) throws Exception {
+		StalloConsegna stalloConsegna = new StalloConsegna();
+		stalloConsegna.setIdConsegna(c.getId());
+		stalloConsegna.setIdStallo(s.getId());
+
+		return (StalloConsegna) getByKeys(stalloConsegna);
+
 	}
 
 	public StalloConsegna getByStallo(Stallo s) throws Exception {

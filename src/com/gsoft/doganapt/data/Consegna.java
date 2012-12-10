@@ -434,5 +434,9 @@ public class Consegna extends ModelBean2 implements Serializable {
 		registroDoganale = null ;
 		registroIva= null ;
 	}
-}
 
+	public StalloConsegna getStalloConsegna(Stallo s) throws Exception {
+		return StalloConsegna.newAdapter().getByKeyObjects(this, s);
+	}
+
+}

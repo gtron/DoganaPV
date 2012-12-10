@@ -18,7 +18,7 @@ public class StalloConsegna extends ModelBean2 implements Serializable {
 	Double valoreDollari;
 	Double valoreUnitarioEuro;
 	Double valoreUnitarioDollari;
-	Integer tassoEuroDollaro;
+	Double tassoEuroDollaro;
 
 	FormattedDate dataImmissione;
 
@@ -72,16 +72,6 @@ public class StalloConsegna extends ModelBean2 implements Serializable {
 	public void setValoreUnitarioDollari(Double valoreUnitarioDollari) {
 		this.valoreUnitarioDollari = valoreUnitarioDollari;
 	}
-	public Integer getTassoEuroDollaro() {
-		return tassoEuroDollaro;
-	}
-	public void setTassoEuroDollaro(Integer tassoEuroDollaro) {
-		this.tassoEuroDollaro = tassoEuroDollaro;
-	}
-	public void setTassoEuroDollaro(Long tassoEuroDollaro) {
-		this.tassoEuroDollaro =  new Integer( tassoEuroDollaro.intValue() );
-	}
-
 	public FormattedDate getDataImmissione() {
 		return dataImmissione;
 	}
@@ -102,7 +92,28 @@ public class StalloConsegna extends ModelBean2 implements Serializable {
 		miva.setValoreEuro( getValoreUnitarioEuro() * miva.getSecco().doubleValue());
 	}
 	public void setTassoEuroDollaro(Double tassoCambio) {
-		tassoEuroDollaro = new Double( tassoCambio.doubleValue() * PRECISIONE_TASSO_CAMBIO  ).intValue();
+		tassoEuroDollaro = tassoCambio;
+	}
+	public Double getTassoEuroDollaro() {
+		return tassoEuroDollaro;
+	}
+	public void setTassoEuroDollaroDB(Integer tasso) {
+		if ( tasso == null ) {
+			tassoEuroDollaro = null ;
+			return;
+		}
+		tassoEuroDollaro = new Double( tasso / PRECISIONE_TASSO_CAMBIO );
+	}
+	public void setTassoEuroDollaroDB(Long tasso) {
+		if ( tasso == null ) {
+			tassoEuroDollaro = null ;
+			return;
+		}
+		tassoEuroDollaro = new Double( 1.0d * tasso / PRECISIONE_TASSO_CAMBIO );
+	}
+	public Integer getTassoEuroDollaroDB() {
+		if (tassoEuroDollaro == null ) return null;
+		return new Double( tassoEuroDollaro.doubleValue() * PRECISIONE_TASSO_CAMBIO  ).intValue();
 	}
 
 	public void updateValore(MovimentoIVA m) {
