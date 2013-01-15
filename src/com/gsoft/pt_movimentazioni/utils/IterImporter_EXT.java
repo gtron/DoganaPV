@@ -23,7 +23,7 @@ public class IterImporter_EXT extends IterImporter {
 	}
 
 	@Override
-	public void apriConsegna( Consegna c, FormattedDate d , Documento documento, Documento documentoPV, String note  ) throws Exception  {
+	public Movimento apriConsegna( Consegna c, FormattedDate d , Documento documento, Documento documentoPV, String note  ) throws Exception  {
 
 		c.setDataChiusura(null);
 
@@ -44,6 +44,8 @@ public class IterImporter_EXT extends IterImporter {
 		m.setNote(note);
 
 		registroDoganale.create(m);
+
+		return m;
 
 	}
 

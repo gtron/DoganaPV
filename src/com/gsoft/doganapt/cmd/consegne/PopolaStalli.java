@@ -13,11 +13,13 @@ import org.apache.velocity.context.Context;
 import com.gsoft.doganapt.data.Consegna;
 import com.gsoft.doganapt.data.Movimento;
 import com.gsoft.doganapt.data.Stallo;
+import com.gsoft.doganapt.data.StalloConsegna;
 import com.gsoft.doganapt.data.adapters.ConsegnaAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoDoganaleAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoIvaAdapter;
 import com.gsoft.doganapt.data.adapters.StalloAdapter;
+import com.gsoft.doganapt.data.adapters.StalloConsegnaAdapter;
 import com.gsoft.pt_movimentazioni.data.MovimentoQuadrelli;
 import com.gsoft.pt_movimentazioni.data.MovimentoQuadrelliAdapter;
 import com.gsoft.pt_movimentazioni.utils.PtMovimentazioniImporter;
@@ -31,10 +33,16 @@ public class PopolaStalli extends VelocityCommand {
 
 	protected MovimentoQuadrelliAdapter quadAdp = null ;
 
+	private Integer idConsegna = null ;
 	private Consegna consegna = null ;
 	private MovimentoAdapter registro = null;
 
 	private StalloAdapter stalloAdp = null ;
+	private StalloConsegnaAdapter stalloConsegnaAdp = null;
+	private StalloConsegna scValoriUnitari = null;
+
+	double sommaUmido = 0 ;
+	double sommaSecco = 0 ;
 
 	public PopolaStalli ( final GtServlet callerServlet) {
 		super(callerServlet);
@@ -44,9 +52,9 @@ public class PopolaStalli extends VelocityCommand {
 
 		try {
 
-			final Integer id = getIntParam("id", true);
+			idConsegna = getIntParam("id", true);
 
-			consegna = ConsegnaAdapter.get(id);
+			consegna = ConsegnaAdapter.get(idConsegna);
 
 			// this.setConsegna(c);
 			ctx.put( ContextKeys.OBJECT , consegna ) ;
@@ -132,8 +140,12 @@ public class PopolaStalli extends VelocityCommand {
 		}
 
 		Movimento carico = null;
-		double sommaUmido = 0 ;
-		for ( final Stallo s : getStalliFromQuadrelli() ) {
+
+		double secco = 0 ;
+
+		ArrayList<Stallo> stalli = getStalliFromQuadrelli();
+
+		for ( final Stallo s : stalli ) {
 
 			// verifico se c'è già il movimento di carico
 			carico = carichi.get(s.getId());
@@ -149,7 +161,8 @@ public class PopolaStalli extends VelocityCommand {
 				}
 
 				carico.setUmido(s.getAttuale());
-				carico.setSecco( consegna.calcolaSecco(carico.getUmido()) );
+				secco = consegna.calcolaSecco(carico.getUmido());
+				carico.setSecco( secco );
 
 				registro.update(carico);
 
@@ -172,7 +185,8 @@ public class PopolaStalli extends VelocityCommand {
 				carico.setIdStallo(s.getId());
 
 				carico.setUmido(s.getAttuale());
-				carico.setSecco( consegna.calcolaSecco(carico.getUmido()) );
+				secco = consegna.calcolaSecco(carico.getUmido());
+				carico.setSecco( secco );
 
 				if ( carico.getId() != null ) {
 					registro.update(carico);
@@ -185,24 +199,96 @@ public class PopolaStalli extends VelocityCommand {
 			s.setIdConsegnaAttuale(consegna.getId());
 
 			sommaUmido += s.getAttuale();
+			sommaSecco += secco;
 
 			stalloAdp.update(s);
 
 		}
 
 		double umidoRestante = consegna.getPesopolizza().doubleValue() - sommaUmido ;
-		if ( umidoRestante != 0 ) {
+		double seccoRestante = 0d;
+
+		if ( umidoRestante != 0 && carico != null ) {
 			double caricato = carico.getUmido();
 			double nuovoCarico = caricato + umidoRestante ;
 
 			carico.setUmido(nuovoCarico);
-			carico.setSecco( consegna.calcolaSecco(carico.getUmido()) );
+			seccoRestante = consegna.calcolaSecco(carico.getUmido()) ;
+			carico.setSecco( seccoRestante );
+
+			sommaSecco += seccoRestante;
 
 			registro.update(carico);
 		}
 
+		// Sistemiamo gli StalliConsegna
+		stalloConsegnaAdp = StalloConsegna.newAdapter();
+
+
+		if ( consegna.isPesoFinalePortoCarico() ) {
+			sommaSecco = consegna.getPesopolizza();
+		}
+
+		scValoriUnitari = getStalloConsegnaValoriUnitari(sommaSecco);
+
+		if ( scValoriUnitari != null ) {
+			StalloConsegna stalloConsegna = null;
+
+			for ( final Stallo s : stalli ) {
+
+				stalloConsegna = getStalloConsegna(s);
+
+				carico = carichi.get(s.getId());
+				if ( carico != null ) {
+					stalloConsegna.initValori(carico.getSecco());
+				}
+				else {
+					stalloConsegna.initValori(seccoRestante);
+				}
+
+				stalloConsegnaAdp.update(stalloConsegna);
+			}
+		}
 
 		response.sendRedirect(".consegne?id=" + consegna.getId() );
+	}
+
+	private StalloConsegna getStalloConsegnaValoriUnitari( double sommaSecco ) throws Exception {
+		StalloConsegna sc = stalloConsegnaAdp.getByKeysIds( StalloConsegnaAdapter.ID_STALLO_APERTURA, idConsegna);
+
+		if ( sc != null ) {
+			sc.setValoreUnitarioDollari(sc.getValoreDollari().doubleValue() / sommaSecco);
+			sc.setValoreUnitarioTesTp(sc.getValoreTesTp().doubleValue() / sommaSecco);
+			sc.setValoreUnitarioEuro(sc.getValoreUnitarioDollari().doubleValue() / sc.getTassoEuroDollaro().doubleValue() );
+		}
+
+		return sc;
+	}
+
+	private StalloConsegna getStalloConsegna(Stallo s) throws Exception {
+
+		StalloConsegna stalloConsegna = stalloConsegnaAdp.getByKeysIds( s.getId(), idConsegna);
+
+		if ( stalloConsegna == null ) {
+			stalloConsegna = stalloConsegnaAdp.getByKeysIds(StalloConsegnaAdapter.ID_STALLO_APERTURA, idConsegna);
+		}
+
+		if ( stalloConsegna == null ) {
+			if ( scValoriUnitari == null )
+				//		mancano tutti i dati per poterlo creare
+				throw new Exception("Attenzione: Situazione non prevista: StalloConsegna non presente.");
+
+			stalloConsegna = scValoriUnitari.clone();
+			stalloConsegna.setIdStallo(s.getId());
+
+			stalloConsegnaAdp.create(stalloConsegna);
+		}
+
+		stalloConsegna.setValoreUnitarioDollari(scValoriUnitari.getValoreUnitarioDollari());
+		stalloConsegna.setValoreUnitarioEuro(scValoriUnitari.getValoreUnitarioEuro());
+		stalloConsegna.setValoreUnitarioTesTp(scValoriUnitari.getValoreUnitarioTesTp());
+
+		return stalloConsegna;
 	}
 
 	@SuppressWarnings("unchecked")

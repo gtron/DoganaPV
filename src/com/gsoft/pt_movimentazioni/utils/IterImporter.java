@@ -47,12 +47,12 @@ GROUP BY data, merce
 		quadAdp = q ;
 	}
 
-	public abstract void apriConsegna(Consegna c, FormattedDate d , Documento documento, Documento documentoPV, String note ) throws Exception ;
+	public abstract Movimento apriConsegna(Consegna c, FormattedDate d , Documento documento, Documento documentoPV, String note ) throws Exception ;
 
 
-	public void apriConsegna_IVA( final Consegna c, final FormattedDate d , final Documento documento, final Documento documentoPV, final String note ) throws Exception  {
+	public Movimento apriConsegna_IVA( final Consegna c, final FormattedDate d , final Documento documento, final Documento documentoPV, final String note ) throws Exception  {
 
-		final MovimentoIVA m = new MovimentoIVA();
+		MovimentoIVA m = new MovimentoIVA();
 
 		m.setIdConsegna(c.getId());
 		m.setData(d);
@@ -80,6 +80,7 @@ GROUP BY data, merce
 
 		registroIVA.create(m);
 
+		return m;
 	}
 
 	public abstract MovimentoAdapter getRegistroInPerILP();

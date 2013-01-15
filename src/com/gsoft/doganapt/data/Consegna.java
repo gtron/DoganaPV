@@ -192,11 +192,41 @@ public class Consegna extends ModelBean2 implements Serializable {
 		StalloConsegnaAdapter scAdp = new StalloConsegnaAdapter();
 		try {
 			StalloConsegna sc = scAdp.getByMovimento(m);
-			sc.updateValore(m);
+			if ( sc != null ) {
+				sc.updateValore(m);
+			} else {
+				Double z = Double.valueOf(0d);
+
+				m.setValoreDollari(z);
+				m.setValoreEuro(z);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ;
 		}
+	}
+
+	protected void updateValoreDaValoriConsegna( final MovimentoIVA m ) {
+
+		double valore = 0d;
+		Double valUnitario = getValoreUnitario();
+
+		if ( valUnitario  != null &&  m.getSecco() == null ) {
+
+			valore = new Double(
+					Math.round( 100000000 * m.getSecco().doubleValue() * valUnitario.doubleValue() ) / 100000000
+					) ;
+
+			if ( ! isValutaEuro.booleanValue() ) {
+				m.setValoreDollari( valore );
+
+				if ( tassoCambio == null ) return ;
+
+				valore = valore / tassoCambio.doubleValue() ;
+			}
+		}
+
+		m.setValoreEuro(valore);
 	}
 
 	public void setTassoUmidita(Double tassoUmidita) {
@@ -436,7 +466,7 @@ public class Consegna extends ModelBean2 implements Serializable {
 	}
 
 	public StalloConsegna getStalloConsegna(Stallo s) throws Exception {
-		return StalloConsegna.newAdapter().getByKeyObjects(this, s);
+		return StalloConsegna.newAdapter().getByKeysIds(s.getId(), id);
 	}
 
 }

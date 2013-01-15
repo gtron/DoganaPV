@@ -54,9 +54,11 @@ public class ResetImmissioneLPStallo extends VelocityCommand {
 				s.setImmessoInLiberaPratica(false);
 				adp.update(s);
 
-				StalloConsegna sc = scAdp.getByKeyObjects(consegna, s);
+				StalloConsegna sc = scAdp.getByKeysIds(s.getId(), s.getIdConsegnaAttuale());
 				if ( sc != null ) {
 					sc.setIsInLiberaPratica(Boolean.FALSE);
+					sc.setValoreDollari(0d);
+					sc.setValoreEuro(0d);
 					scAdp.update(sc);
 				}
 			}

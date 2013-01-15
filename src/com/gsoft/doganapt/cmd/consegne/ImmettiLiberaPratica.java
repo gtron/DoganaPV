@@ -48,8 +48,8 @@ public class ImmettiLiberaPratica extends VelocityCommand {
 	Double valoreDollari = null;
 	Double tassoCambio = null;
 	Double sommaSeccoTotale = new Double(0);
-	private double valoreUnitarioUSD;
-	private double valoreUnitarioEuro;
+	Double valoreTestp = null;
+	StalloConsegna stalloConsegnaValoriUnitari = null ;
 
 	@Override
 	public Template exec(HttpServletRequest req, HttpServletResponse resp, Context ctx) throws Exception  {
@@ -60,8 +60,9 @@ public class ImmettiLiberaPratica extends VelocityCommand {
 		stalli = getIntParams("list", 1);
 		dataILP = getDateParam("dataLP", true);
 
-		valoreDollari = getDoubleParam("valoreEuro", false);
-		tassoCambio = getDoubleParam("tasso", false);
+		valoreDollari = getDoubleParam("valoreDollari", true);
+		valoreTestp = getDoubleParam("valoreTestp", true);
+		tassoCambio = getDoubleParam("tasso", true);
 
 		documento = getDocumento();
 		documentoPV = getDocumentoPV();
@@ -86,16 +87,17 @@ public class ImmettiLiberaPratica extends VelocityCommand {
 
 		ArrayList<Movimento> movimentiUscita = getMovimentiUscita();
 
-		initValoriUnitari();
+		stalloConsegnaValoriUnitari = StalloConsegna.getNew();
+		stalloConsegnaValoriUnitari.initValoriUnitari(sommaSeccoTotale);
 
 		for ( Movimento m : movimentiUscita ) {
 
 			StalloConsegnaAdapter stalloConsegnaAdapter = new StalloConsegnaAdapter();
-			StalloConsegna stalloConsegna = stalloConsegnaAdapter.getByStallo(m.getStallo());
+			StalloConsegna stalloConsegna = stalloConsegnaAdapter.getByKeysIds(m.getIdStallo(), idConsegna);
 
 			if ( stalloConsegna == null ) {
 				// Non è ancora stato creato ... non dovrebbe succedere, cmq lo creiamo ora
-				stalloConsegna = new StalloConsegna();
+				stalloConsegna = StalloConsegna.getNew();
 				stalloConsegna.setIdStallo(m.getIdStallo());
 				stalloConsegna.setIdConsegna(idConsegna);
 				stalloConsegna.setIsInLiberaPratica(Boolean.FALSE);
@@ -116,27 +118,14 @@ public class ImmettiLiberaPratica extends VelocityCommand {
 			stalloConsegnaAdapter.update(stalloConsegna);
 
 			s.setImmessoInLiberaPratica(Boolean.TRUE);
+			s.setIdConsegnaAttuale(idConsegna);
+
 			stAdp.update(s);
 
 		}
 
 	}
 
-	/**
-	 * @throws Exception
-	 * 
-	 */
-	protected void initValoriUnitari() throws Exception {
-
-		if ( valoreDollari == null || valoreDollari < 1 )
-			throw new Exception("Valore in USD non specificato!");
-
-		if ( sommaSeccoTotale == null || sommaSeccoTotale < 1 )
-			throw new Exception("Il valore della somma dei movimenti non è stato calcolato: possibile errore di programmazione!");
-
-		valoreUnitarioUSD = valoreDollari / sommaSeccoTotale ;
-		valoreUnitarioEuro = valoreDollari / tassoCambio / sommaSeccoTotale ;
-	}
 
 	/**
 	 * Aggiorna i dati dello StalloConsegna con i nuovi valori del movimento di ILP
@@ -146,14 +135,13 @@ public class ImmettiLiberaPratica extends VelocityCommand {
 	protected void initStalloConsegna(StalloConsegna stalloConsegna, Movimento m) {
 		stalloConsegna.setDataImmissione(m.getData());
 		stalloConsegna.setIsInLiberaPratica(true);
-		stalloConsegna.setValoreUnitarioDollari( valoreUnitarioUSD );
-		stalloConsegna.setValoreUnitarioEuro( valoreUnitarioEuro);
+		stalloConsegna.setValoreUnitarioDollari( stalloConsegnaValoriUnitari.getValoreUnitarioDollari() );
+		stalloConsegna.setValoreUnitarioEuro( stalloConsegnaValoriUnitari.getValoreUnitarioEuro() );
+		stalloConsegna.setValoreUnitarioTesTp( stalloConsegnaValoriUnitari.getValoreUnitarioTesTp() );
 
 		stalloConsegna.setTassoEuroDollaro( tassoCambio );
 
-		double secco = m.getSecco().doubleValue();
-		stalloConsegna.setValoreDollari( secco * valoreUnitarioUSD );
-		stalloConsegna.setValoreEuro( secco * valoreUnitarioEuro);
+		stalloConsegna.initValori(m.getSecco());
 	}
 
 	/**

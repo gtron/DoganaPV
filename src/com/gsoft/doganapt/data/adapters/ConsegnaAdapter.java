@@ -291,7 +291,6 @@ public class ConsegnaAdapter extends BeanAdapter2 {
 		s.setAttuale( new Double(0) );
 		s.setCaricato( new Double(0) );
 
-
 		StalloConsegnaAdapter adp = new StalloConsegnaAdapter();
 		StalloConsegna sc = adp.assegnaStallo(c,s);
 		adp.create(sc);

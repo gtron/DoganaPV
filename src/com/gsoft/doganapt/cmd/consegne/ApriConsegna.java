@@ -12,11 +12,15 @@ import org.apache.velocity.context.Context;
 
 import com.gsoft.doganapt.data.Consegna;
 import com.gsoft.doganapt.data.Documento;
+import com.gsoft.doganapt.data.Movimento;
+import com.gsoft.doganapt.data.MovimentoIVA;
 import com.gsoft.doganapt.data.Stallo;
+import com.gsoft.doganapt.data.StalloConsegna;
 import com.gsoft.doganapt.data.adapters.ConsegnaAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoDoganaleAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoIvaAdapter;
 import com.gsoft.doganapt.data.adapters.StalloAdapter;
+import com.gsoft.doganapt.data.adapters.StalloConsegnaAdapter;
 import com.gsoft.pt_movimentazioni.data.MovimentoQuadrelliAdapter;
 import com.gsoft.pt_movimentazioni.utils.PtMovimentazioniImporter;
 import com.gtsoft.utils.common.FormattedDate;
@@ -35,6 +39,21 @@ public class ApriConsegna extends VelocityCommand {
 	Consegna consegna = null;
 	FormattedDate data = null;
 
+	Double valoreDollari = null;
+	Double valoreEuro = null;
+	Double valoreTestp = null;
+	Double tassoCambio = null;
+
+	Double sommaSeccoTotale = null;
+
+	Double valoreUnitarioUSD = null;
+	Double valoreUnitarioEuro = null;
+	Double valoreUnitarioTestp = null;
+
+	private StalloConsegna stalloConsegna;
+
+	private StalloConsegnaAdapter stalloConsegnaAdapter;
+
 	public ApriConsegna ( GtServlet callerServlet) {
 		super(callerServlet);
 	}
@@ -51,6 +70,11 @@ public class ApriConsegna extends VelocityCommand {
 		Documento documento = getDocumento();
 		Documento documentoPV = getDocumentoPV();
 
+		valoreDollari = getDoubleParam("valoreDollari", false);
+		valoreTestp = getDoubleParam("valoreTestp", false);
+		tassoCambio = getDoubleParam("tasso", false);
+
+
 		ctx.put( ContextKeys.OBJECT , consegna ) ;
 
 		if ( consegna != null && getBooleanParam(Strings.EXEC) ) {
@@ -58,7 +82,7 @@ public class ApriConsegna extends VelocityCommand {
 			MovimentoQuadrelliAdapter qAdp = new MovimentoQuadrelliAdapter(PtMovimentazioniImporter.getInstance().getAccessDB());
 			ArrayList<String> codiciStalli = qAdp.getCodiciStalli(consegna, data);
 
-			Stallo s ;
+			Stallo s = null ;
 			sAdp = Stallo.newAdapter() ;
 
 			for (String codiceStallo : codiciStalli) {
@@ -82,18 +106,54 @@ public class ApriConsegna extends VelocityCommand {
 				}
 			}
 
+			Movimento movApertura = null;
+			MovimentoIvaAdapter movimentoIvaAdapter = new MovimentoIvaAdapter();
+
 			if ( consegna.isChiusa() ) {
 				//				c.setDataChiusura(null);
 				//				Consegna.newAdapter().update(c);
 			}
 			else {
-				consegna.getIter()
-				.getImporter(
-						new MovimentoDoganaleAdapter(),
-						new MovimentoIvaAdapter(),
-						qAdp
-						).apriConsegna(consegna, data, documento, documentoPV, note);
+				movApertura = consegna.getIter()
+						.getImporter(
+								new MovimentoDoganaleAdapter(),
+								movimentoIvaAdapter ,
+								qAdp
+								).apriConsegna(consegna, data, documento, documentoPV, note);
 			}
+
+			if ( movApertura instanceof MovimentoIVA ) {
+
+				stalloConsegnaAdapter = new StalloConsegnaAdapter();
+
+				initStalloConsegnaApertura();
+
+				if ( movApertura != null ) {
+
+					System.out.println("Apertura Consegna: " + idConsegna + " - Secco Apertura " + movApertura.getSecco() );
+
+					double seccoTotale = 0d;
+
+
+					Double pesoPolizza = consegna.getPesopolizza();
+					if ( pesoPolizza  != null && pesoPolizza.doubleValue() > 0 ) {
+						// se ho il peso polizza posso usare quello
+						seccoTotale = consegna.calcolaSecco( pesoPolizza.doubleValue() );
+					} else {
+						// se non ce l'ho utilizzo il peso del momento dell'apertura
+						seccoTotale = movApertura.getSecco().doubleValue();
+					}
+
+					stalloConsegna.initValoriUnitari(seccoTotale);
+					stalloConsegnaAdapter.update(stalloConsegna);
+
+					stalloConsegna.assegnaValori((MovimentoIVA) movApertura);
+
+					movimentoIvaAdapter.update(movApertura);
+
+				}
+			}
+
 
 			consegna.setDataChiusura(null);
 			Consegna.newAdapter().update(consegna);
@@ -126,7 +186,25 @@ public class ApriConsegna extends VelocityCommand {
 
 
 	protected void assegnaStallo(Stallo s, Consegna c ) throws IOException, SQLException {
+		// E' necessario nonstante
+		//		verrà fatta anche in fase di popola Stalli
 		ConsegnaAdapter.assegnaStallo(c, s);
+	}
+
+	protected void initStalloConsegnaApertura() throws Exception {
+
+		stalloConsegna = StalloConsegna.getNew();
+		stalloConsegna.setIdConsegna(idConsegna);
+		stalloConsegna.setIsInLiberaPratica(Boolean.FALSE);
+
+		stalloConsegna.setValoreDollari( valoreDollari );
+		stalloConsegna.setValoreTesTp( valoreTestp);
+		stalloConsegna.setTassoEuroDollaro( tassoCambio );
+
+		stalloConsegna.setIdStallo(StalloConsegnaAdapter.ID_STALLO_APERTURA);
+
+		Long id = (Long)  stalloConsegnaAdapter.create(stalloConsegna);
+		stalloConsegna.setId(Integer.valueOf(id.intValue()) );
 	}
 
 	@Override

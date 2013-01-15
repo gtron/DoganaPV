@@ -50,6 +50,9 @@ public class MovimentoIvaAdapter extends MovimentoAdapter {
 		fields.add( Fields.VALORE_EURO, Field.Type.DOUBLE , (fill)? o.getValoreEuro() : null );
 		fields.add( Fields.POSIZIONE_DOGANALE, Field.Type.STRING , (fill)? o.getPosizioneDoganale() : null );
 
+		fields.add( Fields.VALORE_NETTO, Field.Type.DOUBLE , (fill)? o.getValoreNetto() : null );
+		fields.add( Fields.VALORE_TESTP, Field.Type.DOUBLE , (fill)? o.getValoreTestp() : null );
+		fields.add( Fields.VALORE_IVA, Field.Type.DOUBLE , (fill)? o.getValoreIva() : null );
 	}
 
 	@Override
@@ -60,6 +63,10 @@ public class MovimentoIvaAdapter extends MovimentoAdapter {
 		o.setValoreDollari( (Double) fields.get( Fields.VALORE_DOLLARI).getValue() );
 		o.setValoreEuro( (Double) fields.get( Fields.VALORE_EURO).getValue() );
 		o.setPosizioneDoganale( (String) fields.get( Fields.POSIZIONE_DOGANALE).getValue() );
+
+		o.setValoreNetto( (Double) fields.get( Fields.VALORE_NETTO).getValue() );
+		o.setValoreTestp( (Double) fields.get( Fields.VALORE_TESTP).getValue() );
+		o.setValoreIva( (Double) fields.get( Fields.VALORE_IVA).getValue() );
 
 		return o ;
 	}
@@ -72,11 +79,15 @@ public class MovimentoIvaAdapter extends MovimentoAdapter {
 		static final int VALORE_DOLLARI = FIELDSHIFT + 2;
 		static final int POSIZIONE_DOGANALE = FIELDSHIFT + 3;
 
-		static final int FIELDSCOUNT = FIELDSHIFT + 4;
+		static final int VALORE_NETTO = FIELDSHIFT + 4;
+		static final int VALORE_TESTP = FIELDSHIFT + 5;
+		static final int VALORE_IVA = FIELDSHIFT + 6;
+
+		static final int FIELDSCOUNT = FIELDSHIFT + 7;
 	}
 
 	private static final String[] fieldNames = {
-		"valoreeuro","valoredollari", "posdoganale"
+		"valoreeuro","valoredollari", "posdoganale" , "valorenetto", "valoretestp", "valoreiva"
 	};
 
 	@Override
@@ -103,7 +114,8 @@ public class MovimentoIvaAdapter extends MovimentoAdapter {
 
 	@Override
 	protected String getFieldsRegistro(String prefix) {
-		String list = "%id, %idmerce, %idconsegna, %data, %idstallo, %isscarico, %isrettifica, sum(%secco) as secco, sum(%umido) as umido, %numregistro, %doctype, %docnum, %docdate, %docpvtype, %docpvnum, %docpvdate, %note, %posdoganale, %locked, %valoreeuro, %valoredollari ";
+		String list = "%id, %idmerce, %idconsegna, %data, %idstallo, %isscarico, %isrettifica, sum(%secco) as secco, sum(%umido) as umido, %numregistro, %doctype, %docnum, %docdate, %docpvtype, %docpvnum, %docpvdate, %note, %posdoganale, %locked," +
+				" sum(%valoreeuro) as valoreeuro, sum(%valoredollari) as valoredollari, sum(%valorenetto) as valorenetto, sum(%valoretestp) as valoretestp, sum(%valoreiva) as valoreiva ";
 
 		if ( prefix != null ) {
 			list = list.replaceAll("%", prefix) ;
@@ -179,7 +191,14 @@ public class MovimentoIvaAdapter extends MovimentoAdapter {
 				}
 			}
 		}
-		return super.create(m);
+
+
+		Long id = (Long) super.create(m);
+
+		m.setId(Integer.valueOf(id.intValue()));
+
+		return id;
+
 	}
 
 }

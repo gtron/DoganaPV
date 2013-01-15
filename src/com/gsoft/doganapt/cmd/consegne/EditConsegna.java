@@ -25,74 +25,77 @@ import com.gtsoft.utils.http.servlet.GtServlet;
 
 
 public class EditConsegna extends BeanEditor {
-	
+
 	protected static String TEMPLATE = "consegne/" + DEFAULT_TEMPLATE;
-	
+
 	public EditConsegna ( GtServlet callerServlet) {
 		super(callerServlet);
 	}
+	@Override
 	public Template exec(HttpServletRequest req, HttpServletResponse resp, Context ctx) throws Exception  {
-		
+
 		HttpSession s = req.getSession() ;
-		if ( s != null )
+		if ( s != null ) {
 			ctx.put("isAdmin", s.getAttribute("admin") ) ;
-		
+		}
+
 		Collection stalli = StalloAdapter.getAllCached();
 		ctx.put("merci" ,  MerceAdapter.getAllCached());
 		ctx.put("iters" ,  IterAdapter.getAllCached());
 		ctx.put("stalli" ,  stalli);
-		
-//		if ( req.getParameter("pesofinaleportocarico")== null )
-//			req.getParameterMap().put("pesofinaleportocarico", "0");
-		
+
+		//		if ( req.getParameter("pesofinaleportocarico")== null )
+		//			req.getParameterMap().put("pesofinaleportocarico", "0");
+
 		Template t = super.exec(req, resp, ctx) ;
-		
-		
+
+
 		Consegna c = (Consegna) ctx.get( ContextKeys.OBJECT );
 
-		if ( c != null ) { 
+		if ( c != null ) {
 			if ( getBooleanParam(Strings.EXEC) ) {
-				
-				if ( getParam( "pesofinaleportocarico" , false) == null && 
+
+				if ( getParam( "pesofinaleportocarico" , false) == null &&
 						! getBooleanParam(Strings.PARTIAL_EDIT)  ) {
 					c.setPesoFinalePortoCarico(Boolean.FALSE) ;
 					Consegna.newAdapter().update(c);
 				}
-				
-				//if ( ! c.isAperta() && ! c.isChiusa() ) 
-				
-				if ( Boolean.TRUE.equals( s.getAttribute("admin") ) ) 
-						aggiornaStalli(c, stalli);
-				
+
+				//if ( ! c.isAperta() && ! c.isChiusa() )
+
+				if ( Boolean.TRUE.equals( s.getAttribute("admin") ) ) {
+					aggiornaStalli(c, stalli);
+				}
+
 				ctx.put("result", Boolean.TRUE ) ;
-	
+
 			}
 			else if( getBooleanParam("r")) {
 				c.setId(null);
-//				FormattedDate d = new FormattedDate();
-//				c.setDataChiusura(d);
-//				c.setDataCreazione(d);
-				
+				//				FormattedDate d = new FormattedDate();
+				//				c.setDataChiusura(d);
+				//				c.setDataCreazione(d);
+
 			}
 		}
 		else {
 			ctx.put("nextPartitario", Consegna.newAdapter().getNextNumPartitario() ) ;
 		}
-		
+
 		return t ;
 	}
-	
+
 	private void aggiornaStalli(Consegna c , Collection stalli ) throws Exception {
-		
+
 		ArrayList<Integer> idStalliAssegnati = getIntParams("stalli", 0);
-//		ArrayList<Integer> idStalliPrenotati = getIntParams("stalliprenotati", 1);
+		//		ArrayList<Integer> idStalliPrenotati = getIntParams("stalliprenotati", 1);
 		Stallo s = null ;
-		
+
 		HashMap<Integer,Stallo> toUpdate = new HashMap<Integer,Stallo>(3);
-		
+
 		for ( Iterator i = stalli.iterator() ; i.hasNext() ; ){
 			s = ( Stallo ) i.next() ;
-			
+
 			if ( c.isAperta() ) {
 				if ( c.getId().equals( s.getIdConsegnaAttuale() ) ) {
 					s.setIdConsegnaAttuale(null);
@@ -106,21 +109,25 @@ public class EditConsegna extends BeanEditor {
 				}
 			}
 		}
-		
-		if ( idStalliAssegnati != null )
-			for ( Iterator<Integer>  i = idStalliAssegnati.iterator() ; i.hasNext() ; ){
-				s = StalloAdapter.get(i.next()) ;
-				
-				if ( ! c.isAperta() && ! c.isChiusa() )
+
+		if ( idStalliAssegnati != null ) {
+			for (Integer integer : idStalliAssegnati) {
+				s = StalloAdapter.get(integer) ;
+
+				if ( ! c.isAperta() && ! c.isChiusa() ) {
 					s.setIdConsegnaPrenotata(c.getId()) ;
-				else if ( c.isAperta() )
+				} else if ( c.isAperta() ) {
 					s.setIdConsegnaAttuale(c.getId()) ;
-				
+				}
+
 				if ( ! toUpdate.containsKey(s.getId()) )
+				{
 					toUpdate.put(s.getId(), s);
-	//					s.update();
+					//					s.update();
+				}
 			}
-		
+		}
+
 		StalloAdapter adp = Stallo.newAdapter() ;
 		for ( Iterator<Stallo> i = toUpdate.values().iterator() ; i.hasNext() ; ){
 			s = i.next() ;
@@ -128,14 +135,17 @@ public class EditConsegna extends BeanEditor {
 		}
 	}
 
+	@Override
 	public VelocityCommand clone() {
-		return  new EditConsegna(this.callerServlet);
+		return  new EditConsegna(callerServlet);
 	}
-	
+
+	@Override
 	public BeanAdapter2 getAdapter() {
 		return new ConsegnaAdapter();
 	}
 
+	@Override
 	public String getTemplateName() {
 		return TEMPLATE;
 	}

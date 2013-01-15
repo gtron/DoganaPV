@@ -7,6 +7,9 @@ public class MovimentoIVA extends Movimento {
 
 	Double valoreEuro;
 	Double valoreDollari;
+	Double valoreNetto;
+	Double valoreTestp;
+	Double valoreIva;
 
 	String posizioneDoganale ;
 
@@ -24,6 +27,24 @@ public class MovimentoIVA extends Movimento {
 	}
 
 
+	public Double getValoreNetto() {
+		return valoreNetto;
+	}
+	public void setValoreNetto(Double valoreNetto) {
+		this.valoreNetto = valoreNetto;
+	}
+	public Double getValoreTestp() {
+		return valoreTestp;
+	}
+	public void setValoreTestp(Double valoreTestp) {
+		this.valoreTestp = valoreTestp;
+	}
+	public Double getValoreIva() {
+		return valoreIva;
+	}
+	public void setValoreIva(Double valoreIva) {
+		this.valoreIva = valoreIva;
+	}
 	public String getPosizioneDoganale() {
 		return posizioneDoganale;
 	}

@@ -2,6 +2,7 @@ package com.gsoft.pt_movimentazioni.utils;
 
 import com.gsoft.doganapt.data.Consegna;
 import com.gsoft.doganapt.data.Documento;
+import com.gsoft.doganapt.data.Movimento;
 import com.gsoft.doganapt.data.adapters.MovimentoAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoDoganaleAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoIvaAdapter;
@@ -24,8 +25,8 @@ public class IterImporter_GLEN extends IterImporter {
 		return registroIVA;
 	}
 	@Override
-	public void apriConsegna( Consegna c, FormattedDate d , Documento documento, Documento documentoPV, String note  ) throws Exception  {
-		apriConsegna_IVA(c, d, documento, documentoPV, note);
+	public Movimento apriConsegna( Consegna c, FormattedDate d , Documento documento, Documento documentoPV, String note  ) throws Exception  {
+		return apriConsegna_IVA(c, d, documento, documentoPV, note);
 	}
 
 }

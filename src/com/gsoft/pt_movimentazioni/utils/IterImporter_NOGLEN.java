@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import com.gsoft.doganapt.data.Consegna;
 import com.gsoft.doganapt.data.Documento;
+import com.gsoft.doganapt.data.Movimento;
 import com.gsoft.doganapt.data.Stallo;
 import com.gsoft.doganapt.data.adapters.MovimentoAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoDoganaleAdapter;
@@ -51,8 +52,9 @@ public class IterImporter_NOGLEN extends IterImporter {
 	//	}
 
 	@Override
-	public void apriConsegna( Consegna c, FormattedDate d , Documento documento, Documento documentoPV , String note) throws Exception  {
+	public Movimento apriConsegna( Consegna c, FormattedDate d , Documento documento, Documento documentoPV , String note) throws Exception  {
 		c.setDataCreazione(d);
+		return null;
 	}
 
 	@Override
