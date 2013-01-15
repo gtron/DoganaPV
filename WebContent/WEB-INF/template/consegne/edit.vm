@@ -13,6 +13,25 @@ catch(e){alert(e.message);}
 );
 </script>
 
+#set($hasIva = false)
+#if($!obj.Iter.Regiva)
+#set($hasIva = true)
+#end
+
+#set($isReadonly = false )
+#if( $obj.Id && $obj.isAperta() || $obj.isChiusa() )
+#set($isReadonly = true)
+#end
+
+#set($im7=false)
+#set($im4=false)
+#if($obj.Iter.Regdoganale)
+#set($im7=true)
+#else
+#set($im4=true)
+#end
+
+
 #if( $result )<div id="result">#if( $msg ) $msg #else Modifica effettuata#end</div> #end
 
 <h2>
@@ -23,43 +42,55 @@ Nuova Consegna
 #end
 </h2>
 <form action="?" method="post" id="formConsegne">
+<input type="hidden" name="cmd" value="edit" /><input type="hidden" name="exec" value="1" />
+<input type="hidden" name="id" value="$!obj.Id" /><input type="hidden" name="idConsegna" value="$!obj.Id" />
+<input type="hidden" name="codicenc" value="-" /><input type="hidden" name="posizione" value="-" />
+<input type="hidden" name="regimedoganale" value="-" />
 
-<table border="0" width="100%" cellspacing="0" cellpadding="3">
-#if(false && $obj.Id )
-<thead><tr>
-<th>Dettagli</th>
-##<th>Stalli: </th>
-</tr></thead>
-#end
-<tbody>
-<td>
-<input type="hidden" name="cmd" value="edit" />
-<input type="hidden" name="exec" value="1" />
-<input type="hidden" name="id" value="$!obj.Id" />
-<input type="hidden" name="idConsegna" value="$!obj.Id" />
 
-<div class="r">
+<div id="dettagli" style="margin:2px 4px;">
 Numero Consegna: <input name="numero" size="4" value="$!obj.Numero"  class="{required:true,number:true}"> - 
 Numero Partitario : <input name="numpartitario" size="4" class="{required:true,number:true}"
-#if($obj.Id) value="$!obj.NumeroPartitario" #else value="$!nextPartitario"#end><br>
-</div>
-<br>
+#if($obj.Id) value="$!obj.NumeroPartitario" #else value="$!nextPartitario"#end><br />
+
 Merce : <select name="idmerce" class="{required:true}">
+#if($isReadonly)
+<option value="$obj.Idmerce">$obj.Merce.Nome</option>
+#else
 <option value="">- Seleziona -</option>
 #foreach( $i in $merci )<option value="$i.Id" #if($obj.Idmerce == $i.Id) selected #end>$i.Nome</option>#end
-</select><br>
-con Iter : <select name="iter" class="{required:true}">
+#end
+</select> 
+con Iter : <select name="iter" class="{required:true}" id="iter">
+#if($isReadonly)
+<option value="$obj.Iter.Id">$obj.Iter.Nome</option>
+#else
 <option value="">- Seleziona -</option>
-#foreach( $i in $iters )<option value="$i.Id" #if($obj.IdIter == $i.Id) selected #end>$i.Nome</option>#end
-</select><br>
+#foreach( $i in $iters )
+#if($i.Id != 3)
+<option value="$i.Id" #if($obj.IdIter == $i.Id) selected #end>$i.Nome</option>
+#end#end
+#end</select><br>
+
+
+</div>
+
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tbody><tr><td>
 Peso Polizza (Kg): <input name="pesopolizza" size="8" id="pesopolizza" value="$!tools.Number.format( $!obj.Pesopolizza)" class="{required:true,double:true}"> <input type="checkbox" #if($!obj.PesoFinalePortoCarico) checked #end name="pesofinaleportocarico" id="pesofinaleportocarico" value="true" />
 <label for="pesofinaleportocarico">Peso Finale Porto di Carico</label><br>
 Tasso di Umidit&aacute; : <input name="tassoumidita" size="8" class="{required:true,number:true}" value="$!tools.Number.format('##0.000000', $!obj.TassoUmidita).replaceAll(',','.')">% <br>
-<br>
+</td>
+<td valign="top">
+
 Provenienza : <input name="provenienza" value="$!obj.Provenienza" class="{required:true}"><br>
 Origine : <input name="origine" value="$!obj.Origine" class="{required:true}"><br>
 Mezzo : <input name="mezzo" value="$!obj.Mezzo" class="{required:true}"><br>
-<br>
+</td>
+</tr>
+</table><br>
+
+#*
 Posizione Doganale : <select name="posizione" class="{required:true}">
 <option value="">- Seleziona -</option>
 <option value="NAZ" #if($!obj.Posizione.equals('NAZ')) selected #end>Nazionale</option>
@@ -84,7 +115,10 @@ Codice Doganale : <select name="codicenc" class="{required:true}">
 <option value="altro" #if($!obj.Codicenc.equals('altro')) selected #end>altro</option>
 </select><br>
 <br>
+*#
 
+
+#if( false && $hasIva)
 Tasso di Cambio ($/&euro;) : <input name="tassocambio" size="12" value="$!tools.Number.format('##0.000000000', $!obj.TassoCambio).replaceAll(',','.')"><br>
 
 Valuta : <select name="isvalutaeuro">
@@ -95,11 +129,60 @@ Valuta : <select name="isvalutaeuro">
 Valore di un Kilogrammo di materiale : <input name="valoreunitario" size="12" value="$!tools.Number.format('##0.000000000', $!obj.ValoreUnitario).replaceAll(',','.')" class="{required:true,number:true}" > <input type="button" value="Calcola" onclick="calcolaValoreUnitario(this)" />
 
 ##Aggiorna Peso secco dei Movimenti: <input type="checkbox"><br>
-<br><br>
+<br /><br />
+#else
+<input type="hidden" name="valoreunitario" value="1" /><input type="hidden" name="isvalutaeuro" value="0" />
+<input type="hidden" name="tassocambio" value="1" />
+#end
 
+#if ( $obj.Id )#set( $stalliConsegna = $obj.stalli )#end
+#if($hasIva && $!stalliConsegna && $!stalliConsegna.size() > 0 )
+<br />
+
+##<fieldset><legend></legend>
+<table style="border: 1px solid gray;margin:0 auto;">
+<thead><tr>
+<th>&nbsp;Stalli&nbsp;</th>
+<th>&nbsp;Associato&nbsp;</th>
+<th>&nbsp;Immesso in LP&nbsp;</th>
+<th>&nbsp;Valore Totale &euro;&nbsp;</th>
+<th>&nbsp;Valore Totale $&nbsp;</th>
+<th>&nbsp;Valore Unitario &euro;&nbsp;</th>
+<th>&nbsp;Valore Unitario $&nbsp;</th>
+</tr>
+#foreach( $s in $stalliConsegna )
+#set($sc='')
+#set($sc=$obj.getStalloConsegna($s))
+<tr #if($velocityCount %2 == 1)class="odd"#end>
+<td align="center"> $s.Parco $s.Numero</td>
+<td align="center">
+#if( $!s.IdConsegnaAttuale == $!obj.Id) SI #else NO #end
 </td>
-#if( $isAdmin && $obj.Id )
-<td valign="top">
+#if($hasIva)
+<td align="center">
+#if( $!sc.IsInLiberaPratica || $!s.ImmessoInLiberaPratica)
+Si #if($isAdmin)<a href=".main?cmd=resetILP&id=$s.Id&idC=$obj.Id&exec=1">(Reset)</a>#end 
+#else
+No
+#end
+</td>
+#if ( $sc )
+<td align="right">$!tools.Number.format('#,##0.00',$!sc.ValoreEuro)</td>
+<td align="right">$!tools.Number.format('#,##0.00',$!sc.ValoreDollari)</td>
+<td align="right">$!tools.Number.format('#,##0.000000000000',$!sc.ValoreUnitarioEuro)</td>
+<td align="right">$!tools.Number.format('#,##0.000000000000',$!sc.ValoreUnitarioDollari)</td>
+#else
+<td align="center">-</td>
+<td align="center">-</td>
+#end
+#end
+</tr> 
+#end
+</table>
+## </fieldset>
+#end
+
+#if( $false && $isAdmin && $obj.Id )
 #set($parco = "")
 #foreach( $s in $stalli ) 
 #if($parco != $s.Parco)
@@ -154,6 +237,10 @@ while(v.indexOf('.')> 0)v=v.replace('.','');
 return 1 * v ;
 }
 
+function changedIter(select) {
+// alert(select.val());
+}
+
 function calcolaValoreUnitario(btn) {
 var f = btn.form;
 var pesoPolizza = getDouble('pesopolizza') ;
@@ -189,12 +276,12 @@ monthNames: ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
 
 popUpCal.setDefaults(popUpCal.regional['it']);
 
-$("#dlg_ImportTo").dialog({ width:360,
-height:140,buttons:{Importa: function(){importTo(true);} , Annulla : function() { $("#dlg_ImportTo").dialogClose(); } } 
+$("#dlg_ImportTo").dialog({ width:360,height:140,
+buttons:{Importa: function(){importTo(true);} , Annulla : function() { $("#dlg_ImportTo").dialogClose(); } } 
 });
 $("#dlg_ImportTo").dialogClose();
-$("#dlg_OpenC").dialog({ width:400,
-height:370,buttons:{Apri: function(){OpenC(true);} ,Annulla : function() { $("#dlg_OpenC").dialogClose(); } } 
+$("#dlg_OpenC").dialog({ width:480,height:460,
+buttons:{Apri: function(){OpenC(true);} ,Annulla : function() { $("#dlg_OpenC").dialogClose(); } } 
 });
 $("#dlg_OpenC").dialogClose();
 
@@ -202,6 +289,10 @@ jQuery('#dataImport').calendar();
 jQuery('#dataOpenC').calendar();
 jQuery('#doc_data').calendar();
 jQuery('#docPV_data').calendar();
+
+jQuery('#docPV_data').calendar();
+
+jQuery('#iter').change(function(){changedIter(jQuery(this));});
 
 } ) ;
 
@@ -287,16 +378,25 @@ Inserire la data del carico in ingresso :
 <input type="hidden" name="exec" value="1" />
 <input type="hidden" name="id" value="" />
 <input name="data" type="text" size="10" maxlength="10" id="dataOpenC" /><br />
+
+#if($hasIva && ! $im7)
+<fieldset><legend>Valori</legend>
+Valore USD: <input type="text" name="valoreDollari" size="10" id="valoreDollari" />&nbsp;$<br /> 
+Tasso EUR/USD: <input type="text" name="tasso" size="5" id="tasso" /><br />
+Oneri Accessori:&nbsp;&nbsp;<input type="text" name="valoreTestp" size="10" id="valoreTestp" />&nbsp;&euro;
+</fieldset>
+#end
+
 <fieldset><legend>Documento di Ingresso</legend>
 Tipo: <select name="doc"><option value=""></option>
 <option value="IM7" #if($im7)selected="selected"#end>IM7</option><option value="IM4"#if($im4) selected="selected"#end>IM4</option><option value="COM">COM</option></select>
 Numero: <input type="text" name="doc_num" size="4" />
-Data:  <input type="text" name="doc_data" id="doc_data" size="10" maxlength="10"/></fieldset>
+Data:  <input type="text" name="doc_data" id="doc_data" size="9" maxlength="10"/></fieldset>
 <fieldset><legend>Documento di Ingresso (Portovesme)</legend>
 Tipo: <select name="docPV"><option value=""></option><option value="IM7">IM7</option>
 <option value="IM4">IM4</option><option value="COM">COM</option></select>
 Numero: <input type="text" name="docPV_num" size="4"/>
-Data:  <input type="text" id="docPV_data" name="docPV_data" size="10" maxlength="10" /></fieldset>
+Data:  <input type="text" id="docPV_data" name="docPV_data" size="9" maxlength="10" /></fieldset>
 <br />
 Note :<br />
 <textarea name="note" cols="40" rows="4"></textarea>

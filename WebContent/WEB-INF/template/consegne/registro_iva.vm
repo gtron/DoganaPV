@@ -11,7 +11,7 @@
 <th width="20" rowspan="2">&nbsp;</th>
 <th width="10%" colspan="2">Secco</th>
 <th width="20" rowspan="2">&nbsp;</th>
-<th width="10%" colspan="2">Valore</th>
+<th width="10%" colspan="3">Valore</th>
 
 ##<th width="20">Stallo</th>
 ##<th><input type="checkbox" onchange="selectDOG(this);" /></th>
@@ -21,13 +21,17 @@
 <th>Uscita</th>
 <th>Entrata</th>
 <th>Uscita</th>
-<th>&euro;</th>
-<th>$</th>
+<th>Imponibile&nbsp;&euro;</th>
+<th>&nbsp;</th>
+<th>IVA&nbsp;&euro;</th>
+<th>&nbsp;</th>
 </tr>
 <tbody>
 #set($dateFormat = 'dd/MM/yy')
 #set($sumSecco = 0)
 #set($sumUmido = 0)
+#set($sumValoreEuro = 0 )
+#set($sumIvaEuro = 0 )
 #foreach( $m in $obj.getRegistroIva(false) )
 #if( ! $m.getIdStallo() )#set( $rettificaDone = false )#else#set( $rettificaDone = true )#end
 <tr#if($velocityCount%2  == 0) class="odd"#end>
@@ -81,25 +85,33 @@ $!m.NumRegistro
 <td>&nbsp;</td>
 <td class="r">$!tools.Number.format($tools.Math.mul( -1 , $m.Secco))</td>
 #set($sumSecco = $tools.Math.add( $sumSecco , $m.Secco ) )
+#set($sumValoreEuro = $tools.Math.add( $sumValoreEuro , $m.ValoreEuro ) )
+#set($sumIvaEuro = $tools.Math.add( $sumIvaEuro , $m.ValoreIva) )
 #else
 <td>&nbsp;</td>
 <td class="r">$tools.Number.format($m.Secco)</td>
 #set($sumSecco = $tools.Math.sub( $sumSecco , $m.Secco ) )
+#set($sumValoreEuro = $tools.Math.sub( $sumValoreEuro , $m.ValoreEuro ) )
+#set($sumIvaEuro = $tools.Math.sub( $sumIvaEuro , $m.ValoreIva) )
 #end
 #else
 <td class="r">$tools.Number.format($m.Secco)</td>
 <td>&nbsp;</td>
 #set($sumSecco = $tools.Math.add( $sumSecco , $m.Secco ) )
+#set($sumValoreEuro = $tools.Math.add( $sumValoreEuro , $m.ValoreEuro ) )
+#set($sumIvaEuro = $tools.Math.add( $sumIvaEuro , $m.ValoreIva) )
 #end
 
 
 <td>&nbsp;</td>
-<td class="r"><strong>$!tools.Number.format('#,##0.00',$m.ValoreEuro )</strong></td>
-<td class="r">$!tools.Number.format('#,##0.00',$m.ValoreDollari)</td>
+<td class="r"><strong title="Valore Netto: $!tools.Number.format('#,##0.00',$m.ValoreNetto)&euro; = $!tools.Number.format('#,##0.00',$m.ValoreDollari)$
+Oneri: $!tools.Number.format('#,##0.00',$m.ValoreTestp) &euro;">$!tools.Number.format('#,##0.00',$m.ValoreEuro )</strong></td>
+<td>&nbsp;</td>
+<td class="r">$!tools.Number.format('#,##0.00',$m.ValoreIva)</td>
 
 
 ##<td><a #if($velocityCount%25  == 0) id="lnk$m.Id"#end href=".consegne?cmd=editmovimento&iva=1&id=$m.Id">Modifica</a></td>
-
+<td>&nbsp;</td>
 </tr>
 
 #if ( "$sumUmido" == '0.0' )
@@ -114,11 +126,14 @@ $!m.NumRegistro
 <input type="button" value="Registra" onclick="registraIVA();">#end
 &nbsp;</th>
 <th colspan="2"><br /><b>Giacenza Attuale:</b></th>
-<th colspan="2"><br /><b>$tools.Number.format($sumUmido)</b></th>
+<th colspan="2"><br /><b>$tools.Number.format($sumUmido)&nbsp;Kg</b></th>
 <th>&nbsp;</th>
-<th colspan="2"><br /><b>$tools.Number.format($sumSecco)</b></th>
-<th colspan="3">&nbsp;</th>
-
+<th><br /><b>$tools.Number.format($sumSecco)&nbsp;Kg</b></th>
+<th>&nbsp;</th>
+<th><br /><b>$tools.Number.format('#,##0.00',$sumValoreEuro)&nbsp;&euro;</b></th>
+<th>&nbsp;</th>
+<th><br /><b>$tools.Number.format('#,##0.00',$sumIvaEuro)&nbsp;&euro;</b></th>
+<th>&nbsp;</th>
 </tr>
 </tbody></table>
 

@@ -18,7 +18,8 @@ Iter : <strong>$!obj.Iter.Nome</strong><br>
 Tasso di Umidit&agrave;: <strong>$!tools.Number.format('##0.0000000', $!obj.TassoUmidita)%</strong>
 
 #if( ! $obj.ValoreUnitario || ! $obj.TassoCambio )
-<br /><span style="color:red;font-weight:bold">Attenzione! Verificare il Valore Unitario e il Tasso di Cambio nel pannello di dettaglio!</span>
+<br /><span style="color:red;font-weight:bold">Attenzione! Verificare 
+il Valore Unitario e il Tasso di Cambio nel pannello di dettaglio!</span>
 #end
 </div>
 
@@ -211,26 +212,26 @@ Inserire la data fino alla quale si desidera importare (compresa):
 <fieldset><legend>Selezione degli Stalli</legend>
 #foreach( $s in $obj.Stalli )
 #if(! $s.HasLiberaPratica )
-<input type="radio" name="list" value="$s.Id" id="libPrat_$velocityCount"
-#if($obj.Stalli.size() == 1) checked="checked"#end />
+<input name="list" value="$s.Id" id="libPrat_$velocityCount" #if($obj.Stalli.size() == 1)checked="checked"#end type="checkbox" />
 <label for="libPrat_$velocityCount">$s.Nome</label><br />
 #end#end
 </fieldset>
 
 <fieldset><legend>Dati del Movimento</legend>
-Valore USD: <input type="text" name="valoreEuro" size="10" /> 
-Tasso USD/EUR: <input type="text" name="tasso" size="5" /><br />
+Valore USD: <input type="text" name="valoreDollari" size="10" id="valoreDollari" /> 
+Tasso EUR/USD: <input type="text" name="tasso" size="5" id="tasso" /><br />
+Oneri Accessori:&nbsp;&nbsp;<input type="text" name="valoreTestp" size="10" id="valoreTestp" /> &nbsp;&nbsp;
 Data : <input type="text" name="dataLP" size="10" id="dataLP" value="$!now" /><br />
 </fieldset>
 
 ##
 
 <fieldset><legend>Documento di Ingresso</legend>
-Tipo: <select name="doc"><option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option><option value="COM">COM</option></select>
+Tipo: <select name="doc"><option value="IM4" selected="selected">IM4</option><option value="COM">COM</option></select>
 Numero: <input type="text" name="doc_num" size="3"/>
 Data:  <input type="text" name="doc_data" id="doc_data" size="9"/></fieldset>
 <fieldset><legend>Documento di Ingresso (Portovesme)</legend>
-Tipo: <select name="docPV"><option value=""></option><option value="IM7">IM7</option><option value="IM4">IM4</option><option value="COM">COM</option></select>
+Tipo: <select name="docPV"><option value=""></option><option value="IM7">IM7</option><option value="IM4" selected="selected">IM4</option><option value="COM">COM</option></select>
 Numero: <input type="text" name="docPV_num" size="3"/>
 Data:  <input type="text" id="docPV_data" name="docPV_data" size="9"/></fieldset>
 <br />
@@ -261,7 +262,7 @@ height:420,buttons:{'Travasa/Libera Stallo': function(){travasaStallo(true);} ,A
 $("#dlg_Travasa").dialogClose();
 
 $("#dlg_LiberaPratica").dialog({ width:500,
-height:420,buttons:{'Immetti in L.P.': function(){immettiLP(true);} ,Annulla : function() { $("#dlg_LiberaPratica").dialogClose(); } } 
+height:520,buttons:{'Immetti in L.P.': function(){immettiLP(true);} ,Annulla : function() { $("#dlg_LiberaPratica").dialogClose(); } } 
 });
 $("#dlg_LiberaPratica").dialogClose();
 
@@ -322,8 +323,24 @@ function immettiLP() {
 	var list = document.getElementsByTagName('input');
 	var data = document.getElementById('dataLP').value;
 	
+	var valoreDollari = document.getElementById('valoreDollari').value;
+	var tasso = document.getElementById('tasso').value;
+	var valoreTestp = document.getElementById('valoreTestp').value;
+	
 	if ( ! data || data == '' ) {
 		alert ( 'Inserire la data di immissione.') ; 
+		return false ;
+	}
+	if ( ! valoreDollari || valoreDollari == '' ) {
+		alert ( 'Attenzione! Inserire il valore totale in Dollari degli stalli da immettere.') ; 
+		return false ;
+	}
+	if ( ! valoreTestp || valoreTestp == '' ) {
+		alert ( 'Attenzione! Inserire il valore totale del Tes/Tp in Euro degli stalli da immettere.') ; 
+		return false ;
+	}
+	if ( ! tasso || tasso == '' ) {
+		alert ( 'Attenzione! Inserire il tasso di conversione tra Euro e Dollaro.') ; 
 		return false ;
 	}
 	
@@ -338,6 +355,8 @@ function immettiLP() {
 		alert ( 'Selezionare almeno uno stallo per effettuare l\'immissione in Libera Pratica.') ; 
 		return false ;
 	}
+	
+	
 	
 	// location.href='?cmd=immettiLP&exec=1&c=$obj.Id&dataLP=' + data + ids ;
 	
