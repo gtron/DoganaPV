@@ -179,6 +179,25 @@ public class StalloConsegnaAdapter extends BeanAdapter2 {
 
 	}
 
+	public StalloConsegna getFirstByIdConsegna(Integer idConsegna) throws Exception {
+		StalloConsegna stalloConsegna = new StalloConsegna();
+		stalloConsegna.setIdConsegna(idConsegna);
+
+		Field fIdConsegna = new Field(Fields.IDCONSEGNA, Field.Type.INTEGER);
+
+		String w = getTableFieldName(fIdConsegna) + " = " + idConsegna ;
+
+		@SuppressWarnings("unchecked")
+		Vector<Object> ret = getWithWhere(w);
+
+		if ( ret.size() > 0 )
+			return (StalloConsegna) ret.firstElement();
+
+		return null;
+
+	}
+
+
 	public StalloConsegna getByMovimento(Movimento m) throws Exception {
 		StalloConsegna stalloConsegna = new StalloConsegna();
 		stalloConsegna.setIdConsegna(m.getIdConsegna());

@@ -188,7 +188,7 @@ public class ApriConsegna extends VelocityCommand {
 	protected void assegnaStallo(Stallo s, Consegna c ) throws IOException, SQLException {
 		// E' necessario nonstante
 		//		verrà fatta anche in fase di popola Stalli
-		ConsegnaAdapter.assegnaStallo(c, s);
+		ConsegnaAdapter.assegnaStalloAConsegna(c, s);
 	}
 
 	protected void initStalloConsegnaApertura() throws Exception {
@@ -198,6 +198,7 @@ public class ApriConsegna extends VelocityCommand {
 		stalloConsegna.setIsInLiberaPratica(Boolean.FALSE);
 
 		stalloConsegna.setValoreDollari( valoreDollari );
+		stalloConsegna.setValoreEuro( stalloConsegna.getValoreArrotondatoEuro( valoreDollari / tassoCambio ));
 		stalloConsegna.setValoreTesTp( valoreTestp);
 		stalloConsegna.setTassoEuroDollaro( tassoCambio );
 

@@ -206,17 +206,13 @@ public class PopolaStalli extends VelocityCommand {
 		}
 
 		double umidoRestante = consegna.getPesopolizza().doubleValue() - sommaUmido ;
-		double seccoRestante = 0d;
 
 		if ( umidoRestante != 0 && carico != null ) {
 			double caricato = carico.getUmido();
 			double nuovoCarico = caricato + umidoRestante ;
 
 			carico.setUmido(nuovoCarico);
-			seccoRestante = consegna.calcolaSecco(carico.getUmido()) ;
-			carico.setSecco( seccoRestante );
-
-			sommaSecco += seccoRestante;
+			carico.setSecco( consegna.calcolaSecco(carico.getUmido()) );
 
 			registro.update(carico);
 		}
@@ -224,12 +220,7 @@ public class PopolaStalli extends VelocityCommand {
 		// Sistemiamo gli StalliConsegna
 		stalloConsegnaAdp = StalloConsegna.newAdapter();
 
-
-		if ( consegna.isPesoFinalePortoCarico() ) {
-			sommaSecco = consegna.getPesopolizza();
-		}
-
-		scValoriUnitari = getStalloConsegnaValoriUnitari(sommaSecco);
+		scValoriUnitari = getStalloConsegnaValoriUnitari(consegna.calcolaSecco(consegna.getPesopolizza()));
 
 		if ( scValoriUnitari != null ) {
 			StalloConsegna stalloConsegna = null;
@@ -238,13 +229,17 @@ public class PopolaStalli extends VelocityCommand {
 
 				stalloConsegna = getStalloConsegna(s);
 
+				stalloConsegna.setIdStallo(s.getId());
+
 				carico = carichi.get(s.getId());
+
 				if ( carico != null ) {
 					stalloConsegna.initValori(carico.getSecco());
 				}
-				else {
-					stalloConsegna.initValori(seccoRestante);
-				}
+				// se non ho il carico non inizializzo i valori ... non mi serve a nulla no?
+				//				else {
+				//					stalloConsegna.initValori(seccoRestante);
+				//				}
 
 				stalloConsegnaAdp.update(stalloConsegna);
 			}
@@ -256,11 +251,14 @@ public class PopolaStalli extends VelocityCommand {
 	private StalloConsegna getStalloConsegnaValoriUnitari( double sommaSecco ) throws Exception {
 		StalloConsegna sc = stalloConsegnaAdp.getByKeysIds( StalloConsegnaAdapter.ID_STALLO_APERTURA, idConsegna);
 
-		if ( sc != null ) {
-			sc.setValoreUnitarioDollari(sc.getValoreDollari().doubleValue() / sommaSecco);
-			sc.setValoreUnitarioTesTp(sc.getValoreTesTp().doubleValue() / sommaSecco);
-			sc.setValoreUnitarioEuro(sc.getValoreUnitarioDollari().doubleValue() / sc.getTassoEuroDollaro().doubleValue() );
+		if ( sc == null ) {
+			// Se non ho quello ancora non assegnato posso usare uno qualunque per i valori iniziali
+			sc = stalloConsegnaAdp.getFirstByIdConsegna(idConsegna);
 		}
+
+		sc.setValoreUnitarioDollari(sc.getValoreDollari().doubleValue() / sommaSecco);
+		sc.setValoreUnitarioTesTp(sc.getValoreTesTp().doubleValue() / sommaSecco);
+		sc.setValoreUnitarioEuro(sc.getValoreUnitarioDollari().doubleValue() / sc.getTassoEuroDollaro().doubleValue() );
 
 		return sc;
 	}
@@ -271,6 +269,7 @@ public class PopolaStalli extends VelocityCommand {
 
 		if ( stalloConsegna == null ) {
 			stalloConsegna = stalloConsegnaAdp.getByKeysIds(StalloConsegnaAdapter.ID_STALLO_APERTURA, idConsegna);
+			stalloConsegna.setIdStallo(s.getId());
 		}
 
 		if ( stalloConsegna == null ) {
@@ -313,7 +312,7 @@ public class PopolaStalli extends VelocityCommand {
 				list.add(s);
 
 				if ( ! consegna.getId().equals( s.getIdConsegnaAttuale() ) ) {
-					ConsegnaAdapter.assegnaStallo(consegna, s);
+					ConsegnaAdapter.assegnaStalloAConsegna(consegna, s);
 				}
 
 				listMov = quadAdp.get(false, null , s);

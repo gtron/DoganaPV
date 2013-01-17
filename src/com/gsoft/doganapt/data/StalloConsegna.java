@@ -172,37 +172,34 @@ public class StalloConsegna extends ModelBean2 implements Serializable, Cloneabl
 
 	public void assegnaValori(MovimentoIVA miva) {
 
-		double valoreDollari = getValoreArrotondato(
+		double valoreDollari = getValoreArrotondatoDollari(
 				// peso secco in kg * valore di un kg in USD
 				getValoreUnitarioDollari() * miva.getSecco().doubleValue()
-				, PRECISIONE_DOLLARI );
+				);
 
 		miva.setValoreDollari( Double.valueOf(valoreDollari));
 
-		double valoreEuroNetto = getValoreArrotondato(
+		double valoreEuroNetto = getValoreArrotondatoEuro(
 				valoreDollari / getTassoEuroDollaro().doubleValue()
-				, PRECISIONE_EURO);
+				);
 
 		miva.setValoreNetto( Double.valueOf(valoreEuroNetto));
 
-		double valoreTestp = getValoreArrotondato(
+		double valoreTestp = getValoreArrotondatoEuro(
 				getValoreUnitarioTesTp().doubleValue() * miva.getSecco().doubleValue()
-				, PRECISIONE_EURO);
+				);
 
 		miva.setValoreTestp( valoreTestp );
 
 		double sommaNetta = valoreEuroNetto + valoreTestp;
 		miva.setValoreEuro(sommaNetta);
 
-		double iva = getValoreArrotondato( sommaNetta * getAliquotaIva(), PRECISIONE_EURO);
+		double iva = getValoreArrotondatoEuro( sommaNetta * getAliquotaIva() );
 		miva.setValoreIva(iva);
 
 
 	}
 
-	private double getValoreArrotondato(double val , int precisione ) {
-		return 1d * Math.round( precisione * val) / precisione;
-	}
 
 	public static StalloConsegna getNew() {
 		StalloConsegna sc = new StalloConsegna();
@@ -256,8 +253,10 @@ public class StalloConsegna extends ModelBean2 implements Serializable, Cloneabl
 		double valoreDollari = getValoreDollari().doubleValue();
 		double tassoCambio = getTassoEuroDollaro().doubleValue();
 
-		setValoreUnitarioDollari( valoreDollari / sommaSeccoTotale );
-		setValoreUnitarioEuro( valoreDollari / tassoCambio );
+		double valoreUnitarioDollari = valoreDollari / sommaSeccoTotale;
+
+		setValoreUnitarioDollari( valoreUnitarioDollari  );
+		setValoreUnitarioEuro( valoreUnitarioDollari / tassoCambio );
 
 		setValoreUnitarioTesTp( getValoreTesTp().doubleValue() / sommaSeccoTotale );
 	}
@@ -268,5 +267,16 @@ public class StalloConsegna extends ModelBean2 implements Serializable, Cloneabl
 		return (StalloConsegna) super.clone();
 	}
 
+	protected final double getValoreArrotondato(double val , int precisione ) {
+		return 1d * Math.round( precisione * val) / precisione;
+	}
+
+	public Double getValoreArrotondatoEuro(double d) {
+		return ( getValoreArrotondato(d, PRECISIONE_EURO ) );
+	}
+
+	public Double getValoreArrotondatoDollari(double d) {
+		return ( getValoreArrotondato(d, PRECISIONE_DOLLARI ) );
+	}
 }
 

@@ -14,12 +14,15 @@ import org.apache.velocity.context.Context;
 import com.gsoft.doganapt.data.Consegna;
 import com.gsoft.doganapt.data.Documento;
 import com.gsoft.doganapt.data.Movimento;
+import com.gsoft.doganapt.data.MovimentoIVA;
 import com.gsoft.doganapt.data.Stallo;
+import com.gsoft.doganapt.data.StalloConsegna;
 import com.gsoft.doganapt.data.adapters.ConsegnaAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoDoganaleAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoIvaAdapter;
 import com.gsoft.doganapt.data.adapters.StalloAdapter;
+import com.gsoft.doganapt.data.adapters.StalloConsegnaAdapter;
 import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.http.VelocityCommand;
 import com.gtsoft.utils.http.servlet.GtServlet;
@@ -37,6 +40,7 @@ public class TravasaStallo extends VelocityCommand {
 	MovimentoAdapter adp = null ;
 	Stallo destinazione = null;
 	Stallo origine = null;
+	private boolean isIva;
 
 	@Override
 	public Template exec(HttpServletRequest req, HttpServletResponse resp, Context ctx) throws Exception  {
@@ -100,6 +104,12 @@ public class TravasaStallo extends VelocityCommand {
 	}
 
 	void doTravaso(StalloAdapter stalloAdp, Movimento scarico) throws IOException, SQLException, Exception {
+
+		if ( isIva ) {
+			StalloConsegna stalloConsegna = StalloConsegna.newAdapter().getByKeysIds( scarico.getIdStallo(), consegna.getId() );
+			stalloConsegna.assegnaValori((MovimentoIVA) scarico);
+		}
+
 		adp.create(scarico);
 
 		Movimento carico = newMovimento(destinazione, scarico);
@@ -125,11 +135,25 @@ public class TravasaStallo extends VelocityCommand {
 		if ( ultimoMov != null && ultimoMov.getIsScarico() && ! ultimoMov.getIsRettifica() ) {
 			ultimoMov.setUmido( ultimoMov.getUmido().doubleValue() + scarico.getUmido().doubleValue() );
 			ultimoMov.setSecco( consegna.calcolaSecco(ultimoMov.getUmido()) );
+
+			ricalcolaValori(ultimoMov);
+
 			adp.update(ultimoMov);
 		}
 		else {
 			adp.create(scarico);
 		}
+	}
+
+	private void ricalcolaValori(Movimento ultimoMov) throws Exception {
+
+		if ( ultimoMov instanceof MovimentoIVA ) {
+			StalloConsegnaAdapter stalloConsegnaAdp = StalloConsegna.newAdapter();
+			StalloConsegna stalloConsegna = stalloConsegnaAdp.getByKeysIds(ultimoMov.getIdStallo(), ultimoMov.getIdConsegna());
+
+			stalloConsegna.assegnaValori((MovimentoIVA) ultimoMov);
+		}
+
 	}
 
 	private Movimento newMovimento( Stallo s , Movimento scarico) throws Exception {
@@ -155,6 +179,10 @@ public class TravasaStallo extends VelocityCommand {
 			m.setIsScarico(false);
 		}
 
+		if ( isIva ) {
+			// calcolare la giacenza in euro???
+		}
+
 		return m ;
 	}
 
@@ -162,8 +190,10 @@ public class TravasaStallo extends VelocityCommand {
 		if ( adp == null ) {
 			if ( consegna.isIva(s) ) {
 				adp = new MovimentoIvaAdapter();
+				isIva = true;
 			} else {
 				adp = new MovimentoDoganaleAdapter();
+				isIva = false;
 			}
 		}
 	}

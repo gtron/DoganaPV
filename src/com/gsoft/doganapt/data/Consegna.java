@@ -455,8 +455,13 @@ public class Consegna extends ModelBean2 implements Serializable {
 
 	public boolean isIva(final Stallo s) {
 
-		if ( getIter().getRegiva() )
-			return s.getImmessoInLiberaPratica().booleanValue() ;
+		Iter iter = getIter();
+		if ( iter.getRegiva() ) {
+			if ( iter.getRegdoganale() )
+				return s.getImmessoInLiberaPratica().booleanValue() ;
+			else
+				return true;
+		}
 
 		return false;
 	}

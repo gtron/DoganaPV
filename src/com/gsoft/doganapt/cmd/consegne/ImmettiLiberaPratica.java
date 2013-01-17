@@ -88,6 +88,13 @@ public class ImmettiLiberaPratica extends VelocityCommand {
 		ArrayList<Movimento> movimentiUscita = getMovimentiUscita();
 
 		stalloConsegnaValoriUnitari = StalloConsegna.getNew();
+		stalloConsegnaValoriUnitari.setValoreDollari(valoreDollari);
+		stalloConsegnaValoriUnitari.setValoreEuro(
+				stalloConsegnaValoriUnitari.getValoreArrotondatoEuro(valoreDollari/tassoCambio));
+
+		stalloConsegnaValoriUnitari.setValoreTesTp(valoreTestp);
+		stalloConsegnaValoriUnitari.setTassoEuroDollaro(tassoCambio);
+
 		stalloConsegnaValoriUnitari.initValoriUnitari(sommaSeccoTotale);
 
 		for ( Movimento m : movimentiUscita ) {

@@ -282,7 +282,7 @@ public class ConsegnaAdapter extends BeanAdapter2 {
 		cache.clear();
 	}
 
-	public static void assegnaStallo(Consegna c, Stallo s) throws IOException, SQLException {
+	public static void assegnaStalloAConsegna(Consegna c, Stallo s) throws IOException, SQLException {
 
 		s.setIdConsegnaAttuale(c.getId());
 		s.setIdConsegnaPrenotata(null);
@@ -291,11 +291,17 @@ public class ConsegnaAdapter extends BeanAdapter2 {
 		s.setAttuale( new Double(0) );
 		s.setCaricato( new Double(0) );
 
+		StalloAdapter sAdp = new StalloAdapter();
+		sAdp.update(s);
+	}
+
+	public static void assegnaStallo(Consegna c, Stallo s) throws IOException, SQLException {
+
+		assegnaStalloAConsegna(c,s);
+
 		StalloConsegnaAdapter adp = new StalloConsegnaAdapter();
 		StalloConsegna sc = adp.assegnaStallo(c,s);
 		adp.create(sc);
 
-		StalloAdapter sAdp = new StalloAdapter();
-		sAdp.update(s);
 	}
 }
