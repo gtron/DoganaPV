@@ -990,6 +990,8 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 		p.executeUpdate();
 	}
 
+	public abstract Movimento getMovimentoGiacenza(Stallo s, Consegna consegna) throws Exception;
+
 	//	private String getIdsFromNumRegistro( Movimento m ) throws Exception {
 	//
 	//		StringBuilder sql = new StringBuilder()

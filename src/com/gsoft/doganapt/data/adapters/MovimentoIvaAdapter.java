@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import com.gsoft.doganapt.data.Consegna;
 import com.gsoft.doganapt.data.Movimento;
 import com.gsoft.doganapt.data.MovimentoIVA;
+import com.gsoft.doganapt.data.Stallo;
 import com.gtsoft.utils.data.Field;
 import com.gtsoft.utils.sql.IDatabase2;
 
@@ -172,7 +173,23 @@ public class MovimentoIvaAdapter extends MovimentoAdapter {
 
 	@Override
 	public Movimento newMovimento() {
-		return new MovimentoIVA();
+		MovimentoIVA m = new MovimentoIVA();
+
+		m.setIsLocked(Boolean.FALSE);
+		m.setIsScarico(Boolean.FALSE);
+
+		Double zero = Double.valueOf(0);
+
+		m.setUmido(zero);
+		m.setSecco(zero);
+
+		m.setValoreEuro(zero);
+		m.setValoreDollari(zero);
+		m.setValoreTestp(zero);
+		m.setValoreNetto(zero);
+		m.setValoreIva(zero);
+
+		return m;
 	}
 
 	@Override
@@ -193,12 +210,17 @@ public class MovimentoIvaAdapter extends MovimentoAdapter {
 		}
 
 
-		Long id = (Long) super.create(m);
+		Integer id = Integer.valueOf(((Number) super.create(m)).intValue());
 
-		m.setId(Integer.valueOf(id.intValue()));
+		m.setId(id);
 
 		return id;
 
+	}
+
+	@Override
+	public MovimentoIVA getMovimentoGiacenza(Stallo s, Consegna c) throws Exception {
+		return s.getMovimentoGiacenzaIva(this, c);
 	}
 
 }

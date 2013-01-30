@@ -134,6 +134,13 @@ public abstract class Movimento extends ModelBean2 {
 		numRegistro = n;
 	}
 
+	public String getPosizioneDoganale() {
+		return "p";
+	}
+	public String getRegimeDoganale() {
+		return "r";
+	}
+
 	public String getNote() {
 		return note;
 	}
@@ -155,6 +162,34 @@ public abstract class Movimento extends ModelBean2 {
 		return new Integer(tipo);
 	}
 
+	public void aggiungi(Movimento m) {
+		setUmido( Math.round( 100 * getUmido().doubleValue() + 100 * m.getUmido().doubleValue() ) / 100d ) ;
+		setSecco( Math.round( 100 * getSecco().doubleValue() + 100 * m.getSecco().doubleValue() ) / 100d ) ;
+	}
+
+	public void togli(Movimento m) {
+		setUmido( Math.round( 100 * getUmido().doubleValue() - 100 * m.getUmido().doubleValue() ) / 100d ) ;
+		setSecco( Math.round( 100 * getSecco().doubleValue() - 100 * m.getSecco().doubleValue() ) / 100d ) ;
+	}
+
+	public void copiaPesiEValoriInvertiti(Movimento m) {
+		setUmido( -1d * m.getUmido().doubleValue() );
+		setSecco( -1d * m.getSecco().doubleValue() );
+	}
+
 	@Override
 	public abstract Movimento clone() ;
+
+
+	public boolean isScaricoONegativo() {
+		return getIsScarico() || getSecco().doubleValue() < 0;
+	}
+
+	public boolean isEmpty() {
+		double sommaPesi =
+				Math.abs( getSecco().intValue() ) +
+				Math.abs( getUmido().intValue() )
+				;
+		return sommaPesi < 1 ;
+	}
 }

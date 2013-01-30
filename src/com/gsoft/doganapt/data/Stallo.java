@@ -137,9 +137,31 @@ public class Stallo extends ModelBean2 {
 		return getGiacenza(new MovimentoDoganaleAdapter(), secco);
 	}
 
-	//	public Vector getMovimenti(String order, String limit) throws Exception {
-	//		return Movimento.newAdapter().getByStallo(this.id, order, limit );
-	//	}
+	public MovimentoDoganale getMovimentoGiacenzaDoganale(MovimentoDoganaleAdapter registro, Consegna consegna) throws Exception {
+		return (MovimentoDoganale) getMovimentoGiacenza(registro, consegna);
+	}
+	public MovimentoIVA getMovimentoGiacenzaIva(MovimentoIvaAdapter registro, Consegna consegna) throws Exception {
+		return (MovimentoIVA) getMovimentoGiacenza(registro, consegna);
+	}
+
+	private Movimento getMovimentoGiacenza(MovimentoAdapter registro, Consegna consegna) throws Exception {
+
+		Movimento mov = registro.newMovimento();
+
+		@SuppressWarnings("unchecked")
+		Vector<Movimento> v = registro.getByConsegna(true, idConsegnaAttuale, id, null, null );
+
+		for (Movimento m : v) {
+			if ( m.isScaricoONegativo() ) {
+				mov.togli(m);
+			} else {
+				mov.aggiungi(m);
+			}
+		}
+
+		return mov ;
+	}
+
 
 	public static synchronized StalloAdapter newAdapter() throws Exception {
 		return new StalloAdapter() ;

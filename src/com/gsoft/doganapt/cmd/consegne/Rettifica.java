@@ -138,6 +138,8 @@ public class Rettifica extends VelocityCommand {
 					movCarico.setUmido( movCarico.getUmido().doubleValue() - rettificaUmido ) ;
 					movCarico.setSecco( c.calcolaSecco(movCarico.getUmido()) );
 
+
+
 					registro.update(movCarico);
 				}
 

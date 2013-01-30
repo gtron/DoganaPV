@@ -1,4 +1,3 @@
-
 package com.gsoft.doganapt.cmd.consegne;
 
 import java.io.IOException;
@@ -141,7 +140,9 @@ public class TravasaStallo extends VelocityCommand {
 			adp.update(ultimoMov);
 		}
 		else {
-			adp.create(scarico);
+			if ( ! scarico.isEmpty() ) {
+				adp.create(scarico);
+			}
 		}
 	}
 
@@ -151,7 +152,9 @@ public class TravasaStallo extends VelocityCommand {
 			StalloConsegnaAdapter stalloConsegnaAdp = StalloConsegna.newAdapter();
 			StalloConsegna stalloConsegna = stalloConsegnaAdp.getByKeysIds(ultimoMov.getIdStallo(), ultimoMov.getIdConsegna());
 
-			stalloConsegna.assegnaValori((MovimentoIVA) ultimoMov);
+			if ( stalloConsegna != null ) {
+				stalloConsegna.assegnaValori((MovimentoIVA) ultimoMov);
+			}
 		}
 
 	}
@@ -159,29 +162,33 @@ public class TravasaStallo extends VelocityCommand {
 	private Movimento newMovimento( Stallo s , Movimento scarico) throws Exception {
 
 		Movimento m = adp.newMovimento() ;
-		m.setIdConsegna( consegna.getId() );
-		m.setIdMerce( consegna.getIdmerce() );
 
-		m.setIsLocked(false);
-		m.setIsRettifica( false );
-		m.setData(data) ;
-		m.setDocumento(documento);
-		m.setStallo( s );
-
+		Movimento mGiacenza = null;
 		if ( scarico == null ) {
-			m.setUmido( s.getGiacenza(adp, false) );
-			m.setSecco( s.getGiacenza(adp, true) );
-			m.setIsScarico(true);
+			// Movimento di svuotamento stallo
+
+			// Ricalcoliamo la giacenza
+			mGiacenza = adp.getMovimentoGiacenza(s, consegna);
+			m.copiaPesiEValoriInvertiti(mGiacenza);
+			// dovrebbe essere sempre uno scarico,
+			// ma se sto svuotando dopo una rettifica
+			// potrebbe essere un carico
+			m.setIsScarico(mGiacenza.getSecco().intValue() < 0);
 		}
 		else {
+			// Sto travasando e questo è il movimento di carico
 			m.setUmido( scarico.getUmido() );
 			m.setSecco( scarico.getSecco() );
 			m.setIsScarico(false);
 		}
 
-		if ( isIva ) {
-			// calcolare la giacenza in euro???
-		}
+		m.setIdConsegna( consegna.getId() );
+		m.setIdMerce( consegna.getIdmerce() );
+		m.setData(data) ;
+		m.setDocumento(documento);
+		m.setStallo( s );
+		m.setIsLocked(Boolean.FALSE);
+		m.setIsRettifica(Boolean.FALSE);
 
 		return m ;
 	}
