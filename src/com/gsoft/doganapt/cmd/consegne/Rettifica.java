@@ -14,6 +14,7 @@ import com.gsoft.doganapt.data.Documento;
 import com.gsoft.doganapt.data.Movimento;
 import com.gsoft.doganapt.data.MovimentoIVA;
 import com.gsoft.doganapt.data.Stallo;
+import com.gsoft.doganapt.data.StalloConsegna;
 import com.gsoft.doganapt.data.adapters.ConsegnaAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoDoganaleAdapter;
@@ -31,54 +32,52 @@ import com.gtsoft.utils.http.servlet.GtServlet;
 public class Rettifica extends VelocityCommand {
 
 	protected static String TEMPLATE = "consegne/rettifica.vm" ;
+	private Consegna consegna = null;
+	private boolean isIva = false ;
+
+	private MovimentoAdapter registro = null ;
 
 	public Rettifica ( final GtServlet callerServlet) {
 		super(callerServlet);
 	}
+
 	@Override
 	public Template exec(final HttpServletRequest req, final HttpServletResponse resp, final Context ctx) throws Exception  {
 
 		MovimentoQuadrelliAdapter quadAdp = null ;
-		Consegna c = null ;
-
 		try {
 			final Integer id = getIntParam("id", true);
-			c = ConsegnaAdapter.get(id);
-			ctx.put( ContextKeys.OBJECT , c ) ;
+			consegna = ConsegnaAdapter.get(id);
+			ctx.put( ContextKeys.OBJECT , consegna ) ;
 
 			quadAdp = new MovimentoQuadrelliAdapter(
 					PtMovimentazioniImporter.getInstance().getAccessDB());
 
-			if ( c != null ) {
-				if ( c.getIter().getHasrettifica()  ) {
+			if ( consegna != null ) {
+				if ( consegna.getIter().getHasrettifica()  ) {
+
+					initRegistroPrimoCarico();
+
 					if ( getBooleanParam(Strings.EXEC) ) {
-						doRettifica(c);
+						doRettifica();
 					}
 					else {
-						showRettifica(c, quadAdp,  ctx);
+						showRettifica(quadAdp,  ctx);
 					}
 				}
 			}
 
 		} catch ( final Exception e) {
 			ctx.put("err" ,  e );
-			if ( c != null && quadAdp != null) {
-				showRettifica(c, quadAdp,  ctx);
+			if ( consegna != null && quadAdp != null) {
+				showRettifica(quadAdp,  ctx);
 			}
 		}
 
 		return null;
 	}
 
-	protected Documento getDocumentoFromPost( final String fieldPrefix ) throws ParameterException {
-		final String doc = getParam(fieldPrefix, false);
-		final String doc_num = getParam(fieldPrefix + "_num", false);
-		final FormattedDate doc_data = getDateParam(fieldPrefix + "_data", false);
-
-		return Documento.getDocumento( doc, doc_data , doc_num );
-	}
-
-	private void doRettifica(final Consegna c ) throws Exception {
+	private void doRettifica() throws Exception {
 
 		final FormattedDate dataRettifica = getDateParam("data", true);
 
@@ -92,9 +91,7 @@ public class Rettifica extends VelocityCommand {
 		Double rettificaUmido = null ;
 		Double rettificaSecco = null ;
 
-		final MovimentoAdapter registro = c.getIter().getImporter(
-				new MovimentoDoganaleAdapter(),
-				new MovimentoIvaAdapter(), null ).getRegistroPrimoCarico() ;
+		Double rettificaOneri = null;
 
 		Stallo s = null ;
 		Integer idStallo = null;
@@ -104,7 +101,6 @@ public class Rettifica extends VelocityCommand {
 		final ArrayList<Movimento> toCreate = new ArrayList<Movimento>(idStalli.size());
 
 		for (final Integer integer : idStalli) {
-
 
 			s = StalloAdapter.get(integer);
 			idStallo = s.getId();
@@ -120,36 +116,32 @@ public class Rettifica extends VelocityCommand {
 					new Double( getParam("s1_" + idStallo , true) ).doubleValue() ) ;
 
 
-			if ( c.getId().equals(s.getIdConsegnaAttuale())
+			if ( consegna.getId().equals(s.getIdConsegnaAttuale())
 					&&
 					( Math.abs(rettificaSecco) + Math.abs(rettificaUmido)) > 0 ) {
-
 
 
 				// Ora non c'è + bisogno di fare l'update
 				// del movimento di carico perchè viene lasciato inalterato dal popola stalli
 				if ( false && Math.abs(rettificaUmido) > 0 ) {
 
-					final Vector<?> list = registro.getByConsegna(false, c.getId(), idStallo , "isscarico asc, id asc" , null ) ;
+					final Vector<?> list = registro.getByConsegna(false, consegna.getId(), idStallo , "isscarico asc, id asc" , null ) ;
 					if ( list != null && list.size() > 0 ) {
 						movCarico = (Movimento) list.firstElement() ;
 					}
 
 					movCarico.setUmido( movCarico.getUmido().doubleValue() - rettificaUmido ) ;
-					movCarico.setSecco( c.calcolaSecco(movCarico.getUmido()) );
-
-
+					movCarico.setSecco( consegna.calcolaSecco(movCarico.getUmido()) );
 
 					registro.update(movCarico);
 				}
 
 				if ( movCarico == null ) {
-					final Vector<?> list = registro.getByConsegna(false, c.getId(), null , null , null ) ;
+					final Vector<?> list = registro.getByConsegna(false, consegna.getId(), null , null , null ) ;
 					if ( list != null && list.size() > 0 ) {
 						movCarico = (Movimento) list.firstElement() ;
 					}
 				}
-
 
 				mov = registro.newMovimento();
 
@@ -159,7 +151,7 @@ public class Rettifica extends VelocityCommand {
 				mov.setUmido( rettificaUmido ) ;
 				mov.setSecco( rettificaSecco );
 				mov.setIdStallo(idStallo);
-				mov.setIdConsegna(c.getId());
+				mov.setIdConsegna(consegna.getId());
 				mov.setIdMerce(movCarico.getIdMerce());
 				mov.setIsScarico(Boolean.FALSE);
 				mov.setIsRettifica(Boolean.TRUE);
@@ -171,14 +163,26 @@ public class Rettifica extends VelocityCommand {
 					System.out.printf("Stallo: %d , Umido: %f , Secco %f \n",  idStallo , rettificaUmido, rettificaSecco );
 				}
 
-				if (mov instanceof MovimentoIVA) {
-					try {
-						c.updateValore( (MovimentoIVA) mov);
-					}
-					catch ( final Exception e ){
-						((MovimentoIVA) mov).setValoreDollari(0.0);
-						((MovimentoIVA) mov).setValoreEuro(0.0);
-					}
+				if (isIva) {
+
+					MovimentoIVA movIva = (MovimentoIVA) mov;
+
+					//					try {
+					//						// consegna.updateValore( (MovimentoIVA) mov);
+					//					}
+					//					catch ( final Exception e ){
+					//						((MovimentoIVA) mov).setValoreDollari(0.0);
+					//						((MovimentoIVA) mov).setValoreEuro(0.0);
+					//					}
+					rettificaOneri = new Double( getParam("rettificaOneri", true) ).doubleValue();
+					movIva.setValoreTestp( rettificaOneri );
+					movIva.setValoreEuro( rettificaOneri  );
+
+					movIva.setValoreIva( StalloConsegna.calcolaValoreIva(rettificaOneri) );
+
+					movIva.setValoreDollari( Double.valueOf(0d) );
+					movIva.setValoreNetto( movIva.getValoreDollari() );
+
 				}
 				toCreate.add(mov);
 
@@ -204,23 +208,34 @@ public class Rettifica extends VelocityCommand {
 
 		final String umiditaNuova = getParam("umidita", false) ;
 		if ( umiditaNuova != null ) {
-			c.setTassoUmidita(new Double( umiditaNuova )) ;
-			Consegna.newAdapter().update(c);
+			consegna.setTassoUmidita(new Double( umiditaNuova )) ;
+			Consegna.newAdapter().update(consegna);
 		}
 
-		response.sendRedirect(".consegne?id=" + c.getId() );
+		response.sendRedirect(".consegne?id=" + consegna.getId() );
 	}
 
 
-	private void showRettifica(final Consegna c, final MovimentoQuadrelliAdapter quadAdp, final Context ctx) throws Exception {
+	private MovimentoAdapter initRegistroPrimoCarico() {
+		registro = consegna.getIter().getImporter(
+				new MovimentoDoganaleAdapter(),
+				new MovimentoIvaAdapter(), null ).getRegistroPrimoCarico();
+
+		isIva = registro.isIva();
+
+		return registro;
+	}
+
+	private void showRettifica(final MovimentoQuadrelliAdapter quadAdp, final Context ctx) throws Exception {
 		double sommaUmido = 0 ;
 		double totaleUmido = 0 ;
 
 		Vector<?> listMov = null ;
 
-		final ArrayList<String> codiciStalli = quadAdp.getCodiciStalli(c, null);
+		final ArrayList<String> codiciStalli = quadAdp.getCodiciStalli(consegna, null);
 
 		ctx.put("c", codiciStalli );
+		ctx.put("isIva", isIva );
 
 		final ArrayList<ArrayList<Object>> list = new ArrayList<ArrayList<Object>>(codiciStalli.size());
 		ArrayList<Object> row = null;
@@ -234,7 +249,7 @@ public class Rettifica extends VelocityCommand {
 
 			if ( s != null ) {
 				row.add(s);
-				s.setIdConsegnaAttuale(c.getId());
+				s.setIdConsegnaAttuale(consegna.getId());
 				listMov = quadAdp.get(false, null , s);
 
 				sommaUmido = 0 ;
@@ -253,8 +268,16 @@ public class Rettifica extends VelocityCommand {
 		ctx.put("list", list );
 		ctx.put("totaleUmido", totaleUmido );
 
-		final double rettificaUmido = totaleUmido - c.getPesopolizza().doubleValue();
+		final double rettificaUmido = totaleUmido - consegna.getPesopolizza().doubleValue();
 		ctx.put("rUmido", rettificaUmido );
+	}
+
+	protected Documento getDocumentoFromPost( final String fieldPrefix ) throws ParameterException {
+		final String doc = getParam(fieldPrefix, false);
+		final String doc_num = getParam(fieldPrefix + "_num", false);
+		final FormattedDate doc_data = getDateParam(fieldPrefix + "_data", false);
+
+		return Documento.getDocumento( doc, doc_data , doc_num );
 	}
 
 	@Override

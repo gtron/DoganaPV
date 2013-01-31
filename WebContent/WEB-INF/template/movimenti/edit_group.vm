@@ -111,8 +111,8 @@ td {text-align: center; }
 #end
 
 #if ( $isIva )
-<td class="r"><input type="text" value="$!tools.Number.format('###0',$m.ValoreEuro)" name="v0_$m.Id" size="10" /></td>
-<td class="r"><input type="text" value="$!tools.Number.format('###0',$m.ValoreDollari)" name="v1_$m.Id" size="10" /></td>
+<td class="r"><input type="text" value="$!tools.Number.format('###0.00',$m.ValoreEuro)" name="v0_$m.Id" size="10" /></td>
+<td class="r"><input type="text" value="$!tools.Number.format('###0.00',$m.ValoreDollari)" name="v1_$m.Id" size="10" /></td>
 #end
 </tr>
 #end

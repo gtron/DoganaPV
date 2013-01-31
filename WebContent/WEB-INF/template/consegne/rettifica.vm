@@ -83,6 +83,12 @@ Tasso di Umidit&agrave; attuale : <b>$obj.TassoUmidita</b> -
 Nuovo Tasso : <input type="text" name="umidita" value="$obj.TassoUmidita" size="9" onblur="this.value=this.value.replace(',','.');" /> <input type="button" value="ricalcola" onclick="calcola(this);" />
 <br />
 
+#if($isIva)
+<fieldset><legend>Rettifica di Valore :</legend>
+Valore di rettifica Oneri : <input type="text" name="rettificaOneri" value="" size="5" onblur="this.value=this.value.replace(',','.');" />
+</fieldset>
+#end
+
 <br />
 
 ##<label for="docImm">Dogana : </label><input type="text" name="docImm" id="docImm" value="" size="16" /> - 

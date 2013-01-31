@@ -38,6 +38,10 @@ public class MovimentoIvaAdapter extends MovimentoAdapter {
 		return TABLE ;
 	}
 
+	@Override
+	public boolean isIva() {
+		return true;
+	}
 
 	@Override
 	public void fillFields(Object obj) {

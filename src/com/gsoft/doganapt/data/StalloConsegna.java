@@ -267,7 +267,7 @@ public class StalloConsegna extends ModelBean2 implements Serializable, Cloneabl
 		return (StalloConsegna) super.clone();
 	}
 
-	protected final double getValoreArrotondato(double val , int precisione ) {
+	public static final double getValoreArrotondato(double val , int precisione ) {
 		return 1d * Math.round( precisione * val) / precisione;
 	}
 
@@ -277,6 +277,14 @@ public class StalloConsegna extends ModelBean2 implements Serializable, Cloneabl
 
 	public Double getValoreArrotondatoDollari(double d) {
 		return ( getValoreArrotondato(d, PRECISIONE_DOLLARI ) );
+	}
+
+	public static Double calcolaValoreIva(Double valoreNetto) {
+
+		return getValoreArrotondato(
+				valoreNetto.doubleValue() * getAliquotaIvaAttuale().doubleValue()
+				, PRECISIONE_EURO );
+
 	}
 }
 
