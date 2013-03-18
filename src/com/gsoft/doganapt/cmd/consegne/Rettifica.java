@@ -270,6 +270,7 @@ public class Rettifica extends VelocityCommand {
 
 		final double rettificaUmido = totaleUmido - consegna.getPesopolizza().doubleValue();
 		ctx.put("rUmido", rettificaUmido );
+		ctx.put("rUmidoTonnellate", Math.ceil( Math.abs( rettificaUmido / 1000 ) ) );
 	}
 
 	protected Documento getDocumentoFromPost( final String fieldPrefix ) throws ParameterException {

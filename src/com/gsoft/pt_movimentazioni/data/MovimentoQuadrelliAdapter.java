@@ -345,6 +345,9 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 
 		Connection conn = db.getConnection();
 
+		if ( conn == null )
+			throw new Exception("Errore di Connessione con il Database Quadrelli!");
+
 		try {
 			PreparedStatement s = conn.prepareStatement(sql.toString()) ;
 			s.setString( 1 , c.getNumero().toString()) ;

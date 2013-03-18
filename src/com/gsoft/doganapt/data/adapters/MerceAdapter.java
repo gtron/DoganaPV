@@ -44,6 +44,8 @@ public class MerceAdapter extends BeanAdapter2 {
 		fields.add( Fields.CODTARIC, Field.Type.STRING , (fill)? o.getCodiceTaric() : null );
 		fields.add( Fields.ITERDEFAULT, Field.Type.INTEGER , (fill)? o.getIdIterDefault() : null );
 		fields.add( Fields.COLORE, Field.Type.STRING , (fill)? o.getColore() : null );
+		fields.add( Fields.SPECIECOLLI, Field.Type.STRING , (fill)? o.getSpecieColli() : null );
+		fields.add( Fields.COEFFICIENTERETTIFICA, Field.Type.DOUBLE , (fill)? o.getCoefficienteRettificaLong() : null );
 	}
 
 	public Object getFromFields ( ) {
@@ -63,6 +65,8 @@ public class MerceAdapter extends BeanAdapter2 {
 		o.setCodiceTaric( (String) fields.get( Fields.CODTARIC).getValue() );
 		o.setIdIterDefault( (Integer) fields.get( Fields.ITERDEFAULT).getValue() );
 		o.setColore( (String) fields.get( Fields.COLORE).getValue() );
+		o.setSpecieColli( (String) fields.get( Fields.SPECIECOLLI).getValue() );
+		o.setCoefficienteRettifica( (Double) fields.get( Fields.COEFFICIENTERETTIFICA).getValue() );
 
 		return o ;
 	}
@@ -75,13 +79,15 @@ public class MerceAdapter extends BeanAdapter2 {
 		static final int CODTARIC = 4;
 		static final int ITERDEFAULT = 5;
 		static final int COLORE = 6 ;
+		static final int SPECIECOLLI = 7 ;
+		static final int COEFFICIENTERETTIFICA = 8 ;
 
-		static final int FIELDSCOUNT = 7;
+		static final int FIELDSCOUNT = 9;
 	}
 
 	private static final String TABLE = "merci" ;
 	private static final String[] fieldNames = {
-		"id","nome","descrizione","codquadrelli","codtaric","iterdefault","colore"
+		"id","nome","descrizione","codquadrelli","codtaric","iterdefault","colore","speciecolli","coefficienterettifica"
 	};
 	@Override
 	public int getFieldsCount() {

@@ -203,7 +203,8 @@ public class MovimentoIvaAdapter extends MovimentoAdapter {
 		if ( m != null ) {
 			Consegna c = m.getConsegna();
 			if ( c != null ) {
-				if (m.getValoreEuro() == null) {
+				if (m.getValoreEuro() == null ||
+						m.getValoreEuro().intValue() == 0 && m.getSecco().intValue() != 0 ) {
 					c.updateValore(m);
 				}
 

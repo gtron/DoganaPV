@@ -16,6 +16,8 @@ public class Merce extends ModelBean2 {
 	String codiceTaric;
 
 	String specieColli;
+	Double coefficienteRettifica;
+	static final double PRECISIONE_COEFFICIENTE_RETTIFICA = 10E4;
 
 	Boolean hasRegistroIva = null;
 	Boolean hasRegistroDog = null;
@@ -67,9 +69,38 @@ public class Merce extends ModelBean2 {
 	public String getSpecieColli() {
 		return specieColli;
 	}
-
 	public void setSpecieColli(String specieColli) {
 		this.specieColli = specieColli;
+	}
+
+	public Long getCoefficienteRettificaLong() {
+		if ( coefficienteRettifica != null)
+			return Math.round( coefficienteRettifica * PRECISIONE_COEFFICIENTE_RETTIFICA );
+		else
+			return null;
+	}
+	public Double getCoefficienteRettifica() {
+		return coefficienteRettifica;
+	}
+	public Merce setCoefficienteRettifica(Long c) {
+		if ( c == null) {
+			coefficienteRettifica = null;
+		} else {
+			coefficienteRettifica = c / PRECISIONE_COEFFICIENTE_RETTIFICA ;
+		}
+		return this;
+	}
+	public Merce setCoefficienteRettifica(Integer c) {
+		if ( c == null) {
+			coefficienteRettifica = null;
+		} else {
+			coefficienteRettifica = c / PRECISIONE_COEFFICIENTE_RETTIFICA ;
+		}
+		return this;
+	}
+	public Merce setCoefficienteRettifica(Double c) {
+		coefficienteRettifica = c;
+		return  this;
 	}
 
 	@Override
