@@ -26,6 +26,10 @@ popUpCal.setDefaults(popUpCal.regional['it']);
 
 jQuery('.data').calendar();
 } );
+
+function calcolaValori() {
+
+}
 </script>
 <h2>
 Modifica Movimento
@@ -71,13 +75,15 @@ td {text-align: center; }
 
 #if ( $isIva )
 <th>Valore &euro;</th>
+<th><span title="($m.Consegna.getStalloConsegna($m.Stallo).getAliquotaIvaAttuale())">IVA &euro;</span></th>
 <th>Valore $</th>
 #end
+<th>&nbsp;</th>
 </thead>
 <tbody>
 #foreach( $m in $list )
 <tr>
-<td>$!m.Stallo.Parco $!m.Stallo.Numero <a href=".consegne?cmd=delete&exec=1&id=$m.Id&idC=$m.Consegna.Id#if($isIva)&iva=1#end" onclick="doConfirm(this, 'Eliminare questo movimento?') ;return false;">[Elimina]</a><input type="hidden" value="$m.Id" name="id" /></td>
+<td>$!m.Stallo.Parco $!m.Stallo.Numero<input type="hidden" value="$m.Id" name="id" /></td>
 
 #if($m.getIsScarico() ||  $m.Umido.intValue() < 0 )
 #if( $m.Umido.intValue() < 0 )
@@ -111,9 +117,23 @@ td {text-align: center; }
 #end
 
 #if ( $isIva )
-<td class="r"><input type="text" value="$!tools.Number.format('###0.00',$m.ValoreEuro)" name="v0_$m.Id" size="10" /></td>
+<td class="r">
+Netto: <input type="text" value="$!tools.Number.format('###0.00',$m.ValoreNetto)" name="v0_$m.Id" size="10" /><br />
+Oneri: <input type="text" value="$!tools.Number.format('###0.00',$m.ValoreTestp)" name="t0_$m.Id" size="10" /><br />
+</td>
+<td  class="r">
+<input type="text" value="$!tools.Number.format('###0.00',$m.ValoreIva)" name="iva0_$m.Id" size="10" /><br />
+</td>
 <td class="r"><input type="text" value="$!tools.Number.format('###0.00',$m.ValoreDollari)" name="v1_$m.Id" size="10" /></td>
 #end
+
+<td>
+#if( false && $isIva )
+ <a href=".consegne?cmd=delete&exec=1&id=$m.Id&idC=$m.Consegna.Id#if($isIva)&iva=1#end" onclick="doConfirm(this, 'Eliminare questo movimento?') ;return false;">[Ricalcola Valori]</a><br />
+#end
+ <a href=".consegne?cmd=delete&exec=1&id=$m.Id&idC=$m.Consegna.Id#if($isIva)&iva=1#end" onclick="doConfirm(this, 'Eliminare questo movimento?') ;return false;">[Elimina]</a>
+
+ </td>
 </tr>
 #end
 </tbody>

@@ -16,6 +16,8 @@ Codice Quadrelli :  <input type="text" value="$!obj.CodiceQuadrelli" name="codqu
 Nome :  <input type="text" value="$!obj.Nome" name="nome" size="40" maxlength="200" /><br />
 Descrizione :  <input type="text" value="$!obj.Descrizione" name="descrizione" size="60" maxlength="200" /><br />
 Codice TARIC :  <input type="text" value="$!obj.CodiceTaric" name="codtaric" /><br />
+Specie Colli :  <input type="text" value="$!obj.SpecieColli" name="speciecolli" /><br />
+Coefficiente Rettifica IVA:  <input type="text" value="$!tools.Number.format('###0.0000000',$!obj.CoefficienteRettifica)" name="coefficienterettifica" /><br />
 
 <input type="hidden" name="cmd" value="edit" />
 <input type="hidden" name="exec" value="1" />
@@ -23,8 +25,6 @@ Codice TARIC :  <input type="text" value="$!obj.CodiceTaric" name="codtaric" /><
 </center>
 
 <br><br>
-
-
 
 #if( $param_error ) 
 $param_error.ParamName
@@ -34,21 +34,12 @@ $param_error.ParamName
 </script>
 #end
 
-<div align="center">
-
-<br>
-
-</div>
+<div align="center"><br /></div>
 
 <div class="commands">
 <ul>
-
 <li><a href="#" onclick="getElementById('editForm').submit();"><img src="$!images/action-ico-registra.png" />Salva</a></li>
 <li><a href="?"><img src="$!images/action-ico-elimina.png" /> Annulla</a></li>
-
 </ul>
 </div>
-
-
 #parse('footer.vm')
-

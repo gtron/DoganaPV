@@ -25,7 +25,7 @@ INPUT { text-align : right;}
 ##<th width="20">Stallo</th>
 ##<th><input type="checkbox" onchange="selectDOG(this);" /></th>
 </tr>
-<tr>
+<tr style="border-bottom:1px solid red;">
 <th>Parco</th>
 <th>Stallo</th>
 
@@ -33,6 +33,7 @@ INPUT { text-align : right;}
 <th>Uscita</th>
 <th>Entrata</th>
 <th>Uscita</th>
+
 </tr>
 <tbody>
 #foreach($row in $list)
@@ -80,12 +81,20 @@ Peso Polizza: <input type="text" value="$!tools.Number.format($obj.Pesopolizza)"
 #if ( ! $obj.PesoFinalePortoCarico )
 
 Tasso di Umidit&agrave; attuale : <b>$obj.TassoUmidita</b> - 
-Nuovo Tasso : <input type="text" name="umidita" value="$obj.TassoUmidita" size="9" onblur="this.value=this.value.replace(',','.');" /> <input type="button" value="ricalcola" onclick="calcola(this);" />
+Nuovo Tasso : <input type="text" name="umidita" value="$obj.TassoUmidita" size="9" onblur="this.value=this.value.replace(',','.');" />
+<input type="button" value="Ricalcola Pesi" onclick="calcola(this);" />
 <br />
 
 #if($isIva)
 <fieldset><legend>Rettifica di Valore :</legend>
-Valore di rettifica Oneri : <input type="text" name="rettificaOneri" value="" size="5" onblur="this.value=this.value.replace(',','.');" />
+
+Peso Umido (ton) : <input type="text" name="tonnellate" value="$!tools.Number.format($rUmidoTonnellate)" size="4" maxlenght="4" id="tonnellate"/> x
+Coefficiente (&euro;/ton): <input type="text" name="coefficiente" value="$obj.Merce.getCoefficienteRettifica()" size="8" maxlength="10" id="coefficiente" />
+<input type="button" value="Calcola Rettifica Oneri" onclick="$('#rettificaOneri').val(Math.floor(100*$('#tonnellate').val()*$('#coefficiente').val())/100)"/><br />
+
+Valore di rettifica Oneri : 
+<input type="text" name="rettificaOneri" id="rettificaOneri" value="$!tools.Math.div($!tools.Math.floor($!tools.Math.mul($!tools.Math.mul(100,$rUmidoTonnellate), $obj.Merce.getCoefficienteRettifica())),100)" size="5" onblur="this.value=this.value.replace(',','.');" />
+
 </fieldset>
 #end
 
