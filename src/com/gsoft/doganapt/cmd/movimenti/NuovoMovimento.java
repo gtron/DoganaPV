@@ -33,68 +33,84 @@ public class NuovoMovimento extends VelocityCommand {
 	@Override
 	public Template exec(HttpServletRequest req, HttpServletResponse resp, Context ctx) throws Exception  {
 
-		HttpSession sx = req.getSession(false) ;
-		Boolean logged = null ;
-		if ( sx != null ) {
-			logged = (Boolean) sx.getAttribute("logged") ;
-		}
-
-		if ( logged != Boolean.TRUE ) {
-			resp.sendRedirect(".main");
-		}
-		ctx.put("isAdmin", sx.getAttribute("admin") ) ;
-
-		Template t = null ;
-		isIva =  "1".equals( getParam("iva", false) ) ;
-		ctx.put("isIva", isIva) ;
-
-		Integer idConsegna = getIntParam("idC", true );
-
-		MovimentoAdapter adp = (MovimentoAdapter) getAdapter() ;
-		Movimento m = adp.newMovimento() ;
-		m.setIdConsegna(idConsegna);
-
-		m.setData(new FormattedDate());
-		ctx.put("consegna" , ConsegnaAdapter.get(idConsegna) );
-		ctx.put(ContextKeys.OBJECT , m)	;
-
-		if ( getBooleanParam(Strings.EXEC) ) {
-			adp.fillFromRequest(req, getBooleanParam(Strings.PARTIAL_EDIT)) ;
-
-
-			double u = getDoubleParam("u0_"  , false ).doubleValue() ;
-			double s = getDoubleParam("s0_"  , true ).doubleValue() ;
-
-			double v0 = 0 ,v1  = 0 ;
-			if ( isIva ) {
-				v0 = getDoubleParam("v0_"  , true ).doubleValue() ;
-				v1 = getDoubleParam("v1_"  , true ).doubleValue() ;
-			}
-			Object id = adp.create(null);
-
-			m = (Movimento) adp.getByKey(id);
-
-
-			u -= getDoubleParam("u1_" , true ).doubleValue();
-
-			s -= getDoubleParam("s1_" , true ).doubleValue();
-
-			if ( isIva ) {
-				((MovimentoIVA) m).setValoreEuro(v0);
-				((MovimentoIVA) m).setValoreDollari(v1);
+		try {
+			HttpSession sx = req.getSession(false) ;
+			Boolean logged = null ;
+			if ( sx != null ) {
+				logged = (Boolean) sx.getAttribute("logged") ;
 			}
 
-			m.setUmido(new Double(u));
-			m.setSecco(new Double(s));
+			if ( logged != Boolean.TRUE ) {
+				resp.sendRedirect(".main");
+			}
+			ctx.put("isAdmin", sx.getAttribute("admin") ) ;
+
+			Template t = null ;
+			isIva =  "1".equals( getParam("iva", false) ) ;
+			ctx.put("isIva", isIva) ;
+
+			Integer idConsegna = getIntParam("idC", true );
+
+			MovimentoAdapter adp = (MovimentoAdapter) getAdapter() ;
+			Movimento m = adp.newMovimento() ;
+			m.setIdConsegna(idConsegna);
+
+			m.setData(new FormattedDate());
+			ctx.put("consegna" , ConsegnaAdapter.get(idConsegna) );
+			ctx.put(ContextKeys.OBJECT , m)	;
+
+			if ( getBooleanParam(Strings.EXEC) ) {
+				adp.fillFromRequest(req, getBooleanParam(Strings.PARTIAL_EDIT)) ;
 
 
-			adp.update(m);
+				double u = getDoubleParam("u0_", true ).doubleValue() ;
+				u -= getDoubleParam("u1_", true ).doubleValue();
 
-			resp.sendRedirect(".consegne?id=" + idConsegna );
+				double s = getDoubleParam("s0_" , true ).doubleValue() ;
+				s -= getDoubleParam("s1_" , true ).doubleValue();
 
+				double v0 = 0 ,v1  = 0, t0  = 0,iva0  = 0 ;
+				if ( isIva ) {
+					v0 = getDoubleParam("v0_"  , true ).doubleValue() ;
+					v1 = getDoubleParam("v1_"  , true ).doubleValue() ;
+					t0 = getDoubleParam("t0_"  , true ).doubleValue() ;
+
+					iva0 = getDoubleParam("iva0_"  , true ).doubleValue() ;
+
+				}
+				Object id = adp.create(null);
+
+				m = (Movimento) adp.getByKey(id);
+
+				if ( isIva ) {
+					MovimentoIVA miva = ((MovimentoIVA) m);
+
+					miva.setValoreNetto(v0)  ;
+					miva.setValoreTestp(t0)  ;
+					miva.setValoreIva(iva0)  ;
+
+					miva.setValoreEuro(miva.getValoreNetto() + miva.getValoreTestp());
+					miva.setValoreDollari( v1 )  ;
+				}
+
+
+				m.setUmido(new Double(u));
+				m.setSecco(new Double(s));
+
+
+				adp.update(m);
+
+				resp.sendRedirect(".consegne?id=" + idConsegna );
+
+			}
+
+			return t;
+		} catch ( final Exception e) {
+			ctx.put("err" ,  e );
 		}
 
-		return t;
+		return null;
+
 	}
 
 
