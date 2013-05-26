@@ -2,6 +2,9 @@
 #set( $addJs = ['/js/jquery.ui/ui.calendar.js'])
 #set( $addCss = ['/js/jquery.ui/themes/flora/flora.calendar.css'] )
 #parse('header.vm')
+#if ( $err.getClass().toString().equals("RequiredParameterException") ) 
+alert( $err.getParamName() );
+#end
 
 <script type="text/javascript">
 
@@ -64,7 +67,21 @@ td {text-align: center; }
 
 <fieldset><legend>Dettagli Movimento </legend>
 <table border="0" width="100%">
+
 <thead><tr><th>Stallo</th>
+<th>Umido<br>Ingresso</th><th>Umido<br>Uscita</th>
+<td>&nbsp;</td>
+<th>Secco<br>Ingresso</th><th>Secco<br>Uscita</th>
+
+#if ( $isIva )
+<th>Valore &euro;</th>
+<th><span >IVA &euro;</span></th>
+<th>Valore $</th>
+#end
+<th>&nbsp;</th>
+</thead>
+
+#*<thead><tr><th>Stallo</th>
 <th>Umido<br>Ingresso</th><th>Umido<br>Uscita</th>
  
 <th>Secco<br>Ingresso</th><th>Secco<br>Uscita</th>
@@ -73,10 +90,12 @@ td {text-align: center; }
 <th>Valore &euro;</th>
 <th>Valore $</th>
 #end
+*#
 </thead>
 <tbody>
 
 <tr>
+
 <td>
 <select name="idstallo">
 #foreach( $s in $consegna.StalliRelazionati )
@@ -84,18 +103,25 @@ td {text-align: center; }
 #end
 </select></td>
 
-<td class="r"><input type="text" value="0" name="u0_" size="10" /></td>
-<td class="r"><input type="text" value="0" name="u1_" size="10"/></td>
 
-<td class="r"><input type="text" value="0" name="s0_" size="10" /></td>
-<td class="r"><input type="text" value="0" name="s1_" size="10" /></td>
+
+<td class="r"><input type="text" value="$!tools.Number.format('###0',$m.Umido)" name="u0_" size="8" /></td>
+<td class="r"><input type="text" value="0" name="u1_" size="8" /></td>
+<td>&nbsp;</td>
+<td class="r"><input type="text" value="$!tools.Number.format('###0',$m.Secco)" name="s0_" size="8" /></td>
+<td class="r"><input type="text" value="0" name="s1_" size="8" /></td>
 
 #if ( $isIva )
-<td class="r"><input type="text" value="0" name="v0_" size="10" /></td>
-<td class="r"><input type="text" value="0" name="v1_" size="10" /></td>
+<td class="r">
+Netto: <input type="text" value="$!tools.Number.format('###0.00',$m.ValoreNetto)" name="v0_" size="8" /><br />
+Oneri: <input type="text" value="$!tools.Number.format('###0.00',$m.ValoreTestp)" name="t0_" size="8" /><br />
+</td>
+<td  class="r">
+<input type="text" value="$!tools.Number.format('###0.00',$m.ValoreIva)" name="iva0_" size="8" /><br />
+</td>
+<td class="r"><input type="text" value="$!tools.Number.format('###0.00',$m.ValoreDollari)" name="v1_" size="8" /></td>
 #end
 
-</tr>
 
 </tbody>
 </table>
