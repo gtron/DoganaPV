@@ -75,13 +75,13 @@ if ( f + 10 == 10 ) return false;
 // stp.printPages( 1 * n, 1 * f);
 //alert( '.registri?cmd=prepara&f=' + f + '&t=' + ( 1 * f + 1 * n ) );
 $('#ret').load('.registri?cmd=prepara&f=' + f + '&t=' + ( ( 1 * f + 1 * n ) - 1 ) , 
-		{} , function() {$('#dlg_Prepara').dialogClose();window.print();});
+		{} , function() {$('#dlg_Prepara').dialogClose();doPrint(true);});
 //setTimeout( function() { w.printPages(5,102); } , 1000 ) ;
 }
 
 $('document').ready( function() {
 
-$("#dlg_Prepara").dialog({ width:400,
+$("#dlg_Prepara").dialog({ width:500,
 height:120,buttons:{Stampa: function(){preparaPagine();} ,Annulla : function() { $("#dlg_Prepara").dialogClose(); } } 
 });
 $("#dlg_Prepara").dialogClose();
@@ -217,7 +217,8 @@ var from = 0, to = 0;
 function printIFrame(f, t) {
 from = f ; to = t ;
 var iva = #if($isIva || $iva)'true'#else'false'#end ;
-window.print();
+// window.print();
+doPrint(true);
 $('#dlg_Confirm').dialogOpen();
 }
 function confirmedStampa() {
@@ -240,14 +241,16 @@ $('#ret').load('.registri?iva=' + iva + '&cmd=stampa&f=' + from + '&n=' + numpag
 $('#dlg_Print').dialogClose();
 }
 function stampaCopertina() {
+var t = new Date().getTime();
+
 #if($isIva || $iva)
-$('#ret').load('cop_iva.html' );
+$('#ret').load('cop_iva.html?t=' + t);
 #else
-$('#ret').load('cop_dog.html' );
+$('#ret').load('cop_dog.html?t=' + t);
 #end
 
 ## // $('#ret').load('cop_dog.html' ); // , {} , function(){window.print(); } ) ;
-setTimeout( function(){ window.print() } , 1500 );
+setTimeout( function(){ doPrint(true) } , 1500 );
 }
 var stp ;
 
@@ -279,7 +282,7 @@ var iva = #if($isIva || $iva)'1'#else'0'#end ;
 ##alert( '.registri?iva=' + iva + '&cmd=check&exec=1' );
 jQuery.get('.registri?iva=' + iva + '&cmd=check&exec=1', '', 
 function(d,t) { 
-if ( d == 'true') location.href = location.href ; else alert( 'Si è verificato un errore:\n' + d);
+if ( d == 'true') location.href = location.href ; else alert( 'Si Ã¨ verificato un errore:\n' + d);
 });
 }
 </script> 
