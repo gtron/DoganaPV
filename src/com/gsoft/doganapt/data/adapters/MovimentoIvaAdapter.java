@@ -217,7 +217,9 @@ public class MovimentoIvaAdapter extends MovimentoAdapter {
 
 		Integer id = Integer.valueOf(((Number) super.create(m)).intValue());
 
-		m.setId(id);
+		if ( m != null  ) {
+			m.setId(id);
+		}
 
 		return id;
 
