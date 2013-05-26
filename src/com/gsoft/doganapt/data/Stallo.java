@@ -149,7 +149,7 @@ public class Stallo extends ModelBean2 {
 		Movimento mov = registro.newMovimento();
 
 		@SuppressWarnings("unchecked")
-		Vector<Movimento> v = registro.getByConsegna(true, idConsegnaAttuale, id, null, null );
+		Vector<Movimento> v = registro.getByConsegna(true, consegna.getId() , id, null, null );
 
 		for (Movimento m : v) {
 			if ( m.isScaricoONegativo() ) {
