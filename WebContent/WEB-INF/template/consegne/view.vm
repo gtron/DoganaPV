@@ -71,7 +71,7 @@ il Valore Unitario e il Tasso di Cambio nel pannello di dettaglio!</span>
 
 <script>
 function printPartitari() {
-$('#ret').load('?id=$obj.Id&cmd=print', {}, function(){window.print();} );
+$('#ret').load('?id=$obj.Id&cmd=print', {}, function(){doPrint(true);} );
 }
 function initRowHighlighting(){
 var table = document.getElementById('tablemovimenti');
@@ -171,7 +171,7 @@ $("#menuConsegna").tabs();
 
 Stallo di origine : 
 <select size="1" name="from">
-#foreach( $s in $obj.StalliRegistrati )
+#foreach( $s in $obj.StalliRelazionati )
 <option value="$s.Id" >$s.Nome</option>
 #end
 </select>
@@ -221,7 +221,7 @@ Inserire la data fino alla quale si desidera importare (compresa):
 Valore USD: <input type="text" name="valoreDollari" size="10" id="valoreDollari" /> 
 Tasso EUR/USD: <input type="text" name="tasso" size="5" id="tasso" /><br />
 Oneri Accessori:&nbsp;&nbsp;<input type="text" name="valoreTestp" size="10" id="valoreTestp" /> &nbsp;&nbsp;
-Data : <input type="text" name="dataLP" size="10" id="dataLP" value="$!now" /><br />
+Data : <input type="text" name="dataLP" size="10" id="dataLP" value="" /><br />
 </fieldset>
 
 ##

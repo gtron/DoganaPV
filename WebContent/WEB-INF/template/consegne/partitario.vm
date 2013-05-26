@@ -1,5 +1,6 @@
 #set($dateFormat = 'dd/MM/yy')
 #set($oldStallo = '')
+#set($oldStalloIva=false)
 #foreach( $m in $obj.Partitario )
 #if($oldStallo == '' || $oldStallo.Id != $m.Stallo.Id)
 #if( $oldStallo.Id)
@@ -14,7 +15,7 @@
 #set( $sumSeccoCalcolato = $obj.calcolaSecco($sumUmido) )
 <th colspan="2"><br /><b>$tools.Number.format($sumSecco)</b>
 #if( $sumSeccoCalcolato != $sumSecco)<br><small>($tools.Number.format( $sumSeccoCalcolato ))</small>#end</th>
-#if($oldStallo.ImmessoInLiberaPratica)
+#if($oldStalloIva)
 <th><b>$!tools.Number.format($sumValore)</b></th>
 <th><b>$!tools.Number.format($sumIva)</b></th>
 #end
@@ -34,15 +35,22 @@
 #set( $stalloConsegna = $obj.getStalloConsegna($oldStallo))
 #if($stalloConsegna)Valore:
 #if($!obj.IsValutaEuro)
-<strong>$!tools.Number.format('##0.00000', $!stalloConsegna.getValoreEuro()) &euro;</strong>
+<strong>$!tools.Number.format('#,##0.00', $!stalloConsegna.getValoreEuro()) &euro;</strong>
 #else
-<strong>$!tools.Number.format('##0.00', $!stalloConsegna.getValoreEuro()) &euro;</strong> =
-<strong>$!tools.Number.format('##0.00', $!stalloConsegna.getValoreIva())</strong>
+<strong title="Valore Unitario: $stalloConsegna.ValoreUnitarioEuro
+Valore Unitario Oneri Accessori: $stalloConsegna.ValoreUnitarioTesTp"> $!tools.Number.format('#,##0.00', $!stalloConsegna.getValoreEuro()) &euro;</strong> =
+<strong>$!tools.Number.format('#,##0.00', $!stalloConsegna.getValoreDollari()) $</strong>
 (Tasso Eur/Usd : $!tools.Number.format('##0.00000', $!stalloConsegna.getTassoEuroDollaro() )</strong>) 
 - Oneri Accessori: <strong>$!tools.Number.format('##0.00', $!stalloConsegna.getValoreTesTp()) &euro;</strong>
-Valore Unitario: $stalloConsegna.ValoreUnitarioEuro
+#if($obj.isIva($oldStallo) || $stalloConsegna.IsInLiberaPratica)
+#set($oldStalloIva = true)
 #end
+
 #end
+
+#end
+
+
 <br /><br />
 
 
@@ -56,7 +64,7 @@ Valore Unitario: $stalloConsegna.ValoreUnitarioEuro
 <th width="10%" colspan="2">Umido</th>
 <th rowspan="2" width="20">&nbsp;</th>
 <th width="10%" colspan="2">Secco</th>
-#if($m.Stallo.ImmessoInLiberaPratica)
+#if($oldStalloIva)
 <th width="30%" rowspan="2">Imponibile &euro;</th>
 <th width="30%" rowspan="2">IVA &euro;</th>
 #end
@@ -131,7 +139,7 @@ $!m.NumRegistro
 #set($sumSecco = $tools.Math.add( $sumSecco , $m.Secco ) )
 #end
 
-#if($oldStallo.ImmessoInLiberaPratica)
+#if($oldStalloIva)
 #if($m.IsScarico)
 #set($sumValore = $tools.Math.sub( $sumValore , $!m.ValoreEuro ) )
 #set($sumIva = $tools.Math.sub( $sumIva , $!m.ValoreIva ) )
@@ -172,7 +180,7 @@ $!m.NumRegistro
 #if( $sumSeccoCalcolato != $sumSecco)<br><small>($tools.Number.format( $sumSeccoCalcolato ))</small>#end
 </th>
 
-#if($oldStallo.ImmessoInLiberaPratica)
+#if($oldStalloIva)
 <th><b>$!tools.Number.format('#,##0.00',$sumValore)</b></th>
 <th><b>$!tools.Number.format('#,##0.00',$sumIva)</b></th>
 #end
@@ -180,4 +188,4 @@ $!m.NumRegistro
 <th>&nbsp;</th>
 </tr>
 </tbody></table></div>
-#end 
+#end

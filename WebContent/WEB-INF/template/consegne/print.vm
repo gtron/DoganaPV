@@ -8,7 +8,7 @@ font-family : Arial;
 margin:	0;
 padding: 12mm 0 0 0;
 width:270mm;
-height: 180mm;
+height: 190mm;
 color: #000;
 }
 
@@ -76,15 +76,17 @@ Merce : <strong>$!obj.Merce.Nome</strong><br />
 Consegna: <strong>$!obj.Numero</strong><br />
 Peso Polizza: #if( $!obj.Pesopolizza ) <strong>$tools.Number.format($!obj.Pesopolizza) Kg #if( false && $!obj.PesoFinalePortoCarico) (P.Finale Porto di Carico)#end</strong>#end<br />
 ##Tasso di Umidit&agrave;: <strong>$!tools.Number.format('##0.00000', $!obj.TassoUmidita)%</strong>
-Regime Doganale: <strong>$!obj.RegimeDoganale</strong><br />
-Designazione Merce: <strong>$!obj.Merce.Designazione</strong><br />
-Codice N.C.: <strong>$!obj.Merce.CodiceNC</strong><br />
-Posizione Doganale: <strong>$!obj.Posizione</strong><br />
+## Regime Doganale: <strong>$!obj.RegimeDoganale</strong><br />
+Designazione Merce: <strong>$!obj.Merce.SpecieColli</strong><br />
+Codice N.C.: <strong>$!obj.Merce.CodiceTaric</strong><br />
+## Posizione Doganale: <strong>$!obj.Posizione</strong><br />
 </td><td valign="top" style="text-align:left; border:0;">
 Provenienza: <strong>$!obj.Provenienza</strong><br />
 Origine: <strong>$!obj.Origine</strong><br />
 Mezzo di Trasporto: <strong>$!obj.Mezzo</strong><br />
-</td><td valign="top" style="text-align:left; border:0;">
+</td>
+#* NON Li mettiamo più
+<td valign="top" style="text-align:left; border:0;">
 Tasso di cambio: <strong>$!obj.Tassodicambio</strong><br />
 Fattura Provvisoria: <strong>$!obj.Fatturaprovvisoria.Numero</strong>  del: <strong>$!obj.Fatturaprovvisoria.Data</strong><br />
 &euro;: <strong>$!obj.Fatturaprovvisoria.Euro</strong> / 
@@ -92,16 +94,21 @@ $: <strong>$!obj.Fatturaprovvisoria.Euro</strong><br />
 Fattura Definitiva: <strong>$!obj.Fatturadefinitiva.Numero</strong>  del: <strong>$!obj.Fatturadefinitiva.Data</strong><br />
 &euro;: <strong>$!obj.Fatturadefinitiva.Euro</strong> / 
 $: <strong>$!obj.Fatturadefinitiva.Euro</strong><br />
-</td></tr></table>
+</td>
+*#
+</tr></table>
 </div><br />Stallo $m.Stallo.Nome #if($oldStallo.Id == $m.Stallo.Id)(continua)#end<br /><br /></caption>
 <tr>
-<th rowspan="2">Num.Reg.</th>
+<th rowspan="2" style="width:15mm">Numero<br />Registro</th>
 <th rowspan="2" style="width:20mm">Data</th>
-<th rowspan="2" colspan="3" style="width:70mm">Documento</th>
-<th width="10%" colspan="2" style="width:70mm">Umido</th>
-<th rowspan="2" width="20">&nbsp;</th>
-<th width="10%" colspan="2" style="width:70mm">Secco</th>
-<th width="30%" rowspan="2">Note</th>
+<th rowspan="2" colspan="3" style="width:50mm">Documento</th>
+<th colspan="2" style="width:70mm">Umido</th>
+## <th rowspan="2" width="20">&nbsp;</th>
+<th colspan="2" style="width:70mm">Secco</th>
+<th width="5%" rowspan="2">Regime</th>
+<th width="5%" rowspan="2">Posizione</th>
+<th width="10%" rowspan="2">Note</th>
+
 
 ##<th width="20">Stallo</th>
 ##<th><input type="checkbox" onchange="selectDOG(this);" /></th>
@@ -169,7 +176,7 @@ $!m.NumRegistro
 #set($sumUmidoIn = $tools.Math.add( $sumUmidoIn , $m.Umido ) )
 #end
 
-<td>&nbsp;</td>
+##<td>&nbsp;</td>
 
 #if($m.getIsScarico() ||  $m.Secco.intValue() < 0 )
 #if( $m.Secco.intValue() < 0 )
@@ -187,8 +194,9 @@ $!m.NumRegistro
 #set($sumSeccoIn = $tools.Math.add( $sumSeccoIn , $m.Secco ) )
 #end
 
+<td class="c">$!m.PosizioneDoganale</td>
+<td class="c">$!m.RegimeDoganale</td>
 <td class="c">$!m.Note</td>
-
 
 #*
 #if( $m.getIsScarico() )
@@ -214,7 +222,7 @@ $!m.NumRegistro
 <td colspan="5"></td>
 <td>$tools.Number.format($sumUmidoIn)</td>
 <td>$tools.Number.format($sumUmidoOut)</td>
-<td>&nbsp;</td>
+##<td>&nbsp;</td>
 <td>$tools.Number.format($sumSeccoIn)</td>
 <td>$tools.Number.format($sumSeccoOut)</td>
 <td></td>

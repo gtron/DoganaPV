@@ -90,7 +90,7 @@ if ( f + 10 == 10 ) return false;
 // stp.printPages( 1 * n, 1 * f);
 //alert( '.registri?cmd=prepara&f=' + f + '&t=' + ( 1 * f + 1 * n ) );
 $('#ret').load('.registri?cmd=prepara&partitari=true&f=' + f + '&t=' + ( ( 1 * f + 1 * n ) - 1 ) , 
-		{} , function() {$('#dlg_Prepara').dialogClose();window.print();});
+		{} , function() {$('#dlg_Prepara').dialogClose();doPrint(true);});
 //setTimeout( function() { w.printPages(5,102); } , 1000 ) ;
 }
 
@@ -113,7 +113,7 @@ $("#consegne").eq(0).tableFilter();
 
 function stampaCopertina() {
 $('#ret').load('cop_part.html' ); 
-setTimeout( function(){ window.print() } , 1500 );
+setTimeout( function(){ doPrint(true) } , 1500 );
 }
 
 </script>
