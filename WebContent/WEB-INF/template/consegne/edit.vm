@@ -182,6 +182,7 @@ No
 ## </fieldset>
 #end
 
+
 #if( $false && $isAdmin && $obj.Id )
 #set($parco = "")
 #foreach( $s in $stalli ) 
@@ -201,7 +202,40 @@ No
 </td>
 #end
 </tr>
-</table><br>
+
+</table><br />
+
+#if ( $obj.isAperta() && ! $obj.isChiusa() )
+
+<br />
+<fieldset>
+<legend>Stalli associati alla consegna</legend>
+Stalli  associati attualmente: 
+#set($c=0)
+#foreach( $s in $stalli ) #if( $obj.getId().equals( $s.IdConsegnaAttuale ) )
+#set($stalliAssociati="$s.IdConsegnaAttuale")
+#if ( $c > 0 ), #end
+$s
+#set($c=$c+1)
+#end
+#end
+#if ( $c < 1 ) Nessuno #end
+<br />
+#foreach( $s in $stalli ) #if(! $!s.IdConsegnaAttuale)
+#set($options="$options<option value='$s.Id'>$s</option>")
+#end#end
+
+#if($options )
+Associa stallo:
+<select name="idNuovoStallo"> 
+$options
+</select>
+<input type="submit" name="associa" value="Associa" />
+#else
+Non sono disponibili altri stalli liberi da poter associare.
+#end
+</fieldset>
+#end
 
 #if( $param_error ) 
 
