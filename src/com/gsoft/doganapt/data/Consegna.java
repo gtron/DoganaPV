@@ -120,7 +120,11 @@ public class Consegna extends ModelBean2 implements Serializable {
 		return pesofinaleportocarico;
 	}
 	public void setPesoFinalePortoCarico(final Boolean b) {
-		pesofinaleportocarico = b;
+		if ( b == null ) {
+			pesofinaleportocarico = Boolean.FALSE;
+		} else {
+			pesofinaleportocarico = b;
+		}
 	}
 
 	public Double getPesopolizza() {
@@ -457,9 +461,19 @@ public class Consegna extends ModelBean2 implements Serializable {
 
 		Iter iter = getIter();
 		if ( iter.getRegiva() ) {
-			if ( iter.getRegdoganale() )
-				return s.getImmessoInLiberaPratica().booleanValue() ;
-			else
+			if ( iter.getRegdoganale() ) {
+				try {
+					StalloConsegna sc = getStalloConsegna(s);
+					if ( sc != null )
+						return sc.getIsInLiberaPratica().booleanValue() ;
+					else
+						return s.getHasLiberaPratica().booleanValue();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					return false;
+				}
+			} else
 				return true;
 		}
 
