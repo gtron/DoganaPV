@@ -23,6 +23,47 @@
 <link media="screen" href="$wwwRoot/style/main_v2.css" type="text/css" rel="stylesheet" />
 <link media="print" href="$wwwRoot/style/printer.css" type="text/css" rel="stylesheet" />*#
 
+<script type="text/javascript">
+function doPrint(landscape) {
+if (typeof(jsPrintSetup) != 'undefined') {
+
+   // set portrait orientation
+   if ( landscape )
+ 	  jsPrintSetup.setOption('orientation', jsPrintSetup.kLandscapeOrientation);
+   else 
+   	  jsPrintSetup.setOption('orientation', jsPrintSetup.kPortraitOrientation);
+   // set top margins in millimeters
+   jsPrintSetup.setOption('marginTop', 10);
+   jsPrintSetup.setOption('marginBottom', 10);
+   jsPrintSetup.setOption('marginLeft', 10);
+   jsPrintSetup.setOption('marginRight', 10);
+   // set page header
+   jsPrintSetup.setOption('headerStrLeft', '');
+   jsPrintSetup.setOption('headerStrCenter', '');
+   jsPrintSetup.setOption('headerStrRight', ''); // &PT');
+   // set empty page footer
+   jsPrintSetup.setOption('footerStrLeft', '');
+   jsPrintSetup.setOption('footerStrCenter', '');
+   jsPrintSetup.setOption('footerStrRight', '');
+   // clears user preferences always silent print value
+   // to enable using 'printSilent' option
+   jsPrintSetup.clearSilentPrint();
+   // Suppress print dialog (for this context only)
+//    jsPrintSetup.setOption('printSilent', 1);
+   // Do Print 
+   // When print is submitted it is executed asynchronous and
+   // script flow continues after print independently of completetion of print process! 
+   jsPrintSetup.print();
+   // next commands
+} else {
+	if ( confirm('Per poter stampare 衮ecessario installare un plugin di Firefox. Lo si vuole installare adesso?') )
+		window.open( 'http://downloads.mozdev.org/jsprintsetup/jsprintsetup-0.9.2.xpi' );
+	else 
+		window.print();
+}
+}
+</script>
+
 </head>
 
 <body>
@@ -41,6 +82,14 @@
 #if( $error )<div id="message">$error.Message<br /><br /></div>#end
 
 #if($err)
+#if ( $err.getClass().getSimpleName().equals("RequiredParameterException") || $err.getClass().getSimpleName().equals("ParameterException") ) 
+<script type="text/javascript">
+$('document').ready( function() {
+var el = jQuery("[name='$err.getParamName()']");
+el.css('border', '2px solid red');
+});
+</script>
+#else
 <div style="border:1px solid red;widht:100%;background:#FF8;color:red;">
 <br><b>&nbsp;ATTENZIONE !<br><br>
 &nbsp;&nbsp;&nbsp;Si &egrave; verificato un errore: <br>
@@ -57,4 +106,4 @@ $r
 </textarea>
 <br><br>
 </div>
-#end
+#end#end
