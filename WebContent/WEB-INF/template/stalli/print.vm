@@ -8,7 +8,7 @@ TABLE { border: 0 none ; color : #000 ; font-size: 1em ; }
 #if($oldParco != $s.Parco)
 #set($oldParco = $s.Parco)
 #if ( $velocityCount > 1)</tr></table></div><br>#end
-<div class="onepage">
+<div class="onepage" id="riepilogoStalli">
 <table border="0" cellspacing="0" width="100%">
 <tr>
 <td colspan="8" class="head">Parco $s.Parco</td>
@@ -28,7 +28,7 @@ TABLE { border: 0 none ; color : #000 ; font-size: 1em ; }
 #end
 #set($count = $count + 1 )
 <tr>
-<td  width="60" class="c">$count</td>
+<td  width="30" class="c">$s.Numero</td>
 #if( $s.IdConsegnaAttuale )
 #set($c = $!s.Consegna )
 <td class="l">$!c.Merce.Nome</td>
@@ -38,8 +38,9 @@ TABLE { border: 0 none ; color : #000 ; font-size: 1em ; }
 #set( $im7 = $!c.getPrimoDocumento(false, $s) )
 #set( $im4 = '' )
 #set( $im4 = $!c.getPrimoDocumento(true, $s) )
-<td width="60">$!im7.toString().replaceAll('IM7', '')&nbsp;</td>
-<td width="60">$!im4.toString().replaceAll('IM4', '')&nbsp;</td>
+#if( "$im4" != "")#set( $im7 = '' )#end
+<td width="60" class="documento">$!im7.toString().replaceAll('IM7', '')&nbsp;</td>
+<td width="60" class="documento">$!im4.toString().replaceAll('IM4', '')&nbsp;</td>
 #if ( $c.Iter.Id == 1 && ! $s.HasLiberaPratica  )
 <td width="60" class="r">$tools.Number.format($!s.getGiacenzaDoganale(false))&nbsp;</td>
 <td width="60" class="r">$tools.Number.format($!s.getGiacenzaDoganale(true))&nbsp;</td>
