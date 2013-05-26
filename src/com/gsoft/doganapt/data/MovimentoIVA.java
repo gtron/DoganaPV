@@ -5,13 +5,14 @@ import com.gtsoft.utils.sql.IDatabase2;
 
 public class MovimentoIVA extends Movimento {
 
-	Double valoreEuro;
-	Double valoreDollari;
-	Double valoreNetto;
-	Double valoreTestp;
-	Double valoreIva;
 
-	String posizioneDoganale ;
+	Double valoreEuro = null ;
+	Double valoreDollari = null ;
+	Double valoreNetto = null ;
+	Double valoreTestp = null ;
+	Double valoreIva = null ;
+
+	String posizioneDoganale = null ;
 
 	public Double getValoreEuro() {
 		return valoreEuro;
@@ -25,7 +26,6 @@ public class MovimentoIVA extends Movimento {
 	public void setValoreDollari(final Double v) {
 		valoreDollari = v;
 	}
-
 
 	public Double getValoreNetto() {
 		return valoreNetto;
@@ -47,10 +47,32 @@ public class MovimentoIVA extends Movimento {
 	}
 	@Override
 	public String getPosizioneDoganale() {
+		if ( posizioneDoganale == null ) {
+			try {
+				// Stallo s = getStallo();
+				if ( getConsegna().getIter().getRegdoganale() ) {
+					posizioneDoganale = POS_DOGANALE_NAZIONALIZZATA;
+				} else {
+					posizioneDoganale = POS_DOGANALE_COMUNITARIA;
+				}
+			} catch (Exception e) {System.out.println("Error: MovimentoIVA.getPosizioneDoganale");}
+		}
 		return posizioneDoganale;
 	}
 	public void setPosizioneDoganale(final String posizioneDoganale) {
 		this.posizioneDoganale = posizioneDoganale;
+	}
+	@Override
+	public String getRegimeDoganale() {
+		if( POS_DOGANALE_COMUNITARIA.equals( posizioneDoganale ) )
+			return REG_DOGANALE_COMUNITARIA;
+		else if( POS_DOGANALE_NAZIONALIZZATA.equals( posizioneDoganale ) )
+			return REG_DOGANALE_NAZIONALIZZATA;
+		else if( POS_DOGANALE_EXTRACOMUNITARIA.equals( posizioneDoganale ) )
+			return REG_DOGANALE_EXTRACOMUNITARIA;
+		else
+			return "-";
+
 	}
 
 	public static synchronized MovimentoIvaAdapter newAdapter() throws Exception {
@@ -99,21 +121,6 @@ public class MovimentoIVA extends Movimento {
 		setValoreIva(sommaArrotondata(getValoreIva(), mIva.getValoreIva()));
 	}
 
-	protected Double sommaArrotondata(Double a, Double b) {
-
-		double _a = 0d;
-		if ( a != null ) {
-			_a = a.doubleValue();
-		}
-
-		double _b = 0d;
-		if ( b != null ) {
-			_b = b.doubleValue();
-		}
-
-		return Double.valueOf(  Math.round( 100 * _a + 100 * _b) / 100d );
-	}
-
 	@Override
 	public void togli(Movimento m) {
 		super.togli(m);
@@ -145,20 +152,46 @@ public class MovimentoIVA extends Movimento {
 
 	}
 
-	protected Double sottrazioneArrotondata(Double a, Double b) {
 
-		double _a = 0d;
-		if ( a != null ) {
-			_a = a.doubleValue();
+	@Override
+	public void aggiustaGiacenza(Movimento giacenza) {
+		super.aggiustaGiacenza(giacenza);
+
+		MovimentoIVA giacenzaIva = (MovimentoIVA) giacenza;
+
+		if ( sommareValoreGiacente( giacenzaIva.getValoreDollari() ) ) {
+			setValoreDollari(sommaArrotondata(getValoreDollari(), giacenzaIva.getValoreDollari()));
+		} else {
+			setValoreDollari(sottrazioneArrotondata(getValoreDollari(), giacenzaIva.getValoreDollari()));
 		}
 
-		double _b = 0d;
-		if ( b != null ) {
-			_b = b.doubleValue();
+		if ( sommareValoreGiacente( giacenzaIva.getValoreEuro() ) ) {
+			setValoreEuro(sommaArrotondata(getValoreEuro(), giacenzaIva.getValoreEuro()));
+		} else {
+			setValoreEuro(sottrazioneArrotondata(getValoreEuro(), giacenzaIva.getValoreEuro()));
 		}
 
-		return Double.valueOf(  Math.round( 100 * _a - 100 * _b) / 100d );
+		if ( sommareValoreGiacente( giacenzaIva.getValoreTestp() ) ) {
+			setValoreTestp(sommaArrotondata(getValoreTestp(), giacenzaIva.getValoreTestp()));
+		} else {
+			setValoreTestp(sottrazioneArrotondata(getValoreTestp(), giacenzaIva.getValoreTestp()));
+		}
+
+		if ( sommareValoreGiacente( giacenzaIva.getValoreNetto() ) ) {
+			setValoreNetto(sommaArrotondata(getValoreNetto(), giacenzaIva.getValoreNetto()));
+		} else {
+			setValoreNetto(sottrazioneArrotondata(getValoreNetto(), giacenzaIva.getValoreNetto()));
+		}
+
+		if ( sommareValoreGiacente( giacenzaIva.getValoreIva() ) ) {
+			setValoreIva(sommaArrotondata(getValoreIva(), giacenzaIva.getValoreIva()));
+		} else {
+			setValoreIva(sottrazioneArrotondata(getValoreIva(), giacenzaIva.getValoreIva()));
+		}
+
 	}
+
+
 
 	@Override
 	public void copiaPesiEValoriInvertiti(Movimento m) {
@@ -179,6 +212,7 @@ public class MovimentoIVA extends Movimento {
 
 		double sommaValori =
 				Math.abs( 100d * getValoreEuro().doubleValue() ) +
+				Math.abs( 100d * getValoreTestp().doubleValue() ) +
 				Math.abs( 100d * getValoreIva().doubleValue() )
 				;
 

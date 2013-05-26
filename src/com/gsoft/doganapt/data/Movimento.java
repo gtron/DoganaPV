@@ -6,6 +6,14 @@ import com.gtsoft.utils.common.ModelBean2;
 
 public abstract class Movimento extends ModelBean2 {
 
+	public static final String POS_DOGANALE_NAZIONALIZZATA = "NAZ";
+	public static final String POS_DOGANALE_EXTRACOMUNITARIA = "EXT";
+	public static final String POS_DOGANALE_COMUNITARIA = "COM";
+
+	public static final String REG_DOGANALE_NAZIONALIZZATA = "4571";
+	public static final String REG_DOGANALE_EXTRACOMUNITARIA = "7100";
+	public static final String REG_DOGANALE_COMUNITARIA = "4500";
+
 	Integer id ;
 
 	Integer idmerce;
@@ -135,10 +143,10 @@ public abstract class Movimento extends ModelBean2 {
 	}
 
 	public String getPosizioneDoganale() {
-		return "p";
+		return "";
 	}
 	public String getRegimeDoganale() {
-		return "r";
+		return "";
 	}
 
 	public String getNote() {
@@ -192,4 +200,55 @@ public abstract class Movimento extends ModelBean2 {
 				;
 		return sommaPesi < 1 ;
 	}
+
+	public void aggiustaGiacenza(Movimento giacenza) {
+		if ( sommareValoreGiacente( giacenza.getUmido() ) ) {
+			setUmido(sommaArrotondata(getUmido(), giacenza.getUmido()));
+		} else {
+			setUmido(sottrazioneArrotondata(getUmido(), giacenza.getUmido()));
+		}
+
+		if ( sommareValoreGiacente( giacenza.getSecco() ) ) {
+			setSecco(sommaArrotondata(getSecco(), giacenza.getSecco()));
+		} else {
+			setSecco(sottrazioneArrotondata(getSecco(), giacenza.getSecco()));
+		}
+	}
+
+	protected boolean sommareValoreGiacente( Double v ) {
+		return ( v.doubleValue() > 0 && isScaricoONegativo()
+				||
+				v.doubleValue() < 0 && ! isScaricoONegativo() );
+	}
+
+	protected Double sottrazioneArrotondata(Double a, Double b) {
+
+		double _a = 0d;
+		if ( a != null ) {
+			_a = a.doubleValue();
+		}
+
+		double _b = 0d;
+		if ( b != null ) {
+			_b = b.doubleValue();
+		}
+
+		return Double.valueOf(  Math.round( 100 * _a - 100 * _b) / 100d );
+	}
+
+	protected Double sommaArrotondata(Double a, Double b) {
+
+		double _a = 0d;
+		if ( a != null ) {
+			_a = a.doubleValue();
+		}
+
+		double _b = 0d;
+		if ( b != null ) {
+			_b = b.doubleValue();
+		}
+
+		return Double.valueOf(  Math.round( 100 * _a + 100 * _b) / 100d );
+	}
+
 }
