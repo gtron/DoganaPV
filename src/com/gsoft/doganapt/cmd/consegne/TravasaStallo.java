@@ -13,7 +13,6 @@ import org.apache.velocity.context.Context;
 import com.gsoft.doganapt.data.Consegna;
 import com.gsoft.doganapt.data.Documento;
 import com.gsoft.doganapt.data.Movimento;
-import com.gsoft.doganapt.data.MovimentoIVA;
 import com.gsoft.doganapt.data.Stallo;
 import com.gsoft.doganapt.data.StalloConsegna;
 import com.gsoft.doganapt.data.adapters.ConsegnaAdapter;
@@ -37,14 +36,16 @@ public class TravasaStallo extends VelocityCommand {
 	FormattedDate data = null ;
 	Documento documento = null ;
 	MovimentoAdapter adp = null ;
-	Stallo destinazione = null;
-	Stallo origine = null;
+	Stallo stalloDestinazione = null;
+	Stallo stalloOrigine = null;
 	private boolean isIva;
+	private StalloAdapter stalloAdp;
+	private Integer idConsegna;
 
 	@Override
 	public Template exec(HttpServletRequest req, HttpServletResponse resp, Context ctx) throws Exception  {
 
-		Integer idConsegna = getIntParam("idC", true);
+		idConsegna = getIntParam("idC", true);
 		consegna = ConsegnaAdapter.get(idConsegna);
 		ctx.put( ContextKeys.OBJECT , consegna ) ;
 
@@ -60,16 +61,16 @@ public class TravasaStallo extends VelocityCommand {
 					return null;
 				}
 
-				destinazione = StalloAdapter.get(idStalloDestinazione);
+				stalloDestinazione = StalloAdapter.get(idStalloDestinazione);
 
-				if ( destinazione == null ) {
+				if ( stalloDestinazione == null ) {
 					ctx.put(ContextKeys.ERROR, "Stallo di destinazione non valido! (idStallo: " + idStalloDestinazione + ")");
 					return null;
 				}
-				if ( ! destinazione.isLibero() ) {
-					Consegna c = destinazione.getConsegna();
+				if ( ! stalloDestinazione.isLibero() ) {
+					Consegna c = stalloDestinazione.getConsegna();
 
-					ctx.put(ContextKeys.ERROR, "Lo stallo di destinazione ("+destinazione+") è occupato dalla consegna " + c.getNumero()  );
+					ctx.put(ContextKeys.ERROR, "Lo stallo di destinazione ("+stalloDestinazione+") è occupato dalla consegna " + c.getNumero()  );
 					return null;
 				}
 			}
@@ -81,20 +82,19 @@ public class TravasaStallo extends VelocityCommand {
 
 			documento = Documento.getDocumento( getParam("doc", false), getDateParam("doc_data", false) , getParam("doc_num", false) );
 
-			origine = StalloAdapter.get(idStalloOrigine);
-			initAdapter(origine);
+			stalloOrigine = StalloAdapter.get(idStalloOrigine);
+			initAdapter(stalloOrigine);
 
-			StalloAdapter stalloAdp = new StalloAdapter();
+			stalloAdp = new StalloAdapter();
 
-			Movimento scarico = newMovimento( origine , null );
 			if ( isTravaso ) {
-				doTravaso(stalloAdp, scarico);
+				doTravaso();
 			}
 			else {
-				doSvuotamento(scarico);
+				doSvuotamento();
 			}
 
-			stalloAdp.resetStallo(origine);
+			stalloAdp.resetStallo(stalloOrigine);
 
 			response.sendRedirect(".consegne?id=" + idConsegna );
 			response.flushBuffer();
@@ -102,74 +102,112 @@ public class TravasaStallo extends VelocityCommand {
 		return null ;
 	}
 
-	void doTravaso(StalloAdapter stalloAdp, Movimento scarico) throws IOException, SQLException, Exception {
+	void doTravaso() throws IOException, SQLException, Exception {
 
-		if ( isIva ) {
-			StalloConsegna stalloConsegna = StalloConsegna.newAdapter().getByKeysIds( scarico.getIdStallo(), consegna.getId() );
-			stalloConsegna.assegnaValori((MovimentoIVA) scarico);
-		}
+		Movimento giacenza = adp.getMovimentoGiacenza(stalloOrigine, consegna);
 
+		if ( giacenza.isEmpty() )
+			throw new Exception("Attenzione! Lo stallo di partenza è già vuoto!");
+
+		Movimento scarico = newMovimento();
+		scarico.copiaPesiEValoriInvertiti(giacenza);
+		scarico.setIsScarico(Boolean.TRUE);
 		adp.create(scarico);
 
-		Movimento carico = newMovimento(destinazione, scarico);
-		if ( scarico.getUmido() > 0 ) {
-			adp.create(carico);
+		Movimento carico = newMovimento();
+		carico.copiaPesiEValoriInvertiti(scarico);
+		carico.setIsScarico(Boolean.FALSE);
+		carico.setStallo(stalloDestinazione);
+		adp.create(carico);
+
+		if ( isIva ) {
+			StalloConsegnaAdapter stcAdp = StalloConsegna.newAdapter();
+			StalloConsegna stalloConsegna = stcAdp.getByKeysIds(stalloOrigine.getId(), idConsegna);
+
+			if (stalloConsegna != null ) {
+				stalloConsegna.setIdStallo(stalloDestinazione.getId());
+				stalloConsegna.setId(null);
+				stcAdp.create(stalloConsegna);
+			}
 		}
 
-		destinazione.setIdConsegnaAttuale(consegna.getId());
-		destinazione.setIdConsegnaPrenotata(null);
-		destinazione.setImmessoInLiberaPratica( origine.getImmessoInLiberaPratica() );
+		stalloDestinazione.setIdConsegnaAttuale(consegna.getId());
+		stalloDestinazione.setIdConsegnaPrenotata(null);
+		stalloDestinazione.setImmessoInLiberaPratica( stalloOrigine.getImmessoInLiberaPratica() );
 
-		destinazione.setAttuale(carico.getUmido());
-		destinazione.setCaricato(carico.getUmido());
+		stalloDestinazione.setAttuale(carico.getUmido());
+		stalloDestinazione.setCaricato(carico.getUmido());
 
-		stalloAdp.update(destinazione);
+		stalloAdp.update(stalloDestinazione);
 	}
 
-	void doSvuotamento(Movimento scarico) throws Exception, IOException, SQLException {
+	void doSvuotamento() throws Exception, IOException, SQLException {
 		@SuppressWarnings("unchecked")
-		Vector<Movimento> list = adp.getByConsegna(false, consegna.getId(), origine.getId(), "id DESC LIMIT 1" , "");
-		Movimento ultimoMov = list.firstElement();
+		Vector<Movimento> list = adp.getByConsegna(false, consegna.getId(), stalloOrigine.getId(), "id DESC LIMIT 1" , "");
 
-		if ( ultimoMov != null && ultimoMov.getIsScarico() && ! ultimoMov.getIsRettifica() ) {
-			ultimoMov.setUmido( ultimoMov.getUmido().doubleValue() + scarico.getUmido().doubleValue() );
-			ultimoMov.setSecco( consegna.calcolaSecco(ultimoMov.getUmido()) );
+		if ( list != null && ! list.isEmpty() ) {
+			Movimento ultimoMov = list.firstElement();
 
-			ricalcolaValori(ultimoMov);
+			Movimento giacenza = adp.getMovimentoGiacenza(stalloOrigine, consegna);
 
-			adp.update(ultimoMov);
-		}
-		else {
-			if ( ! scarico.isEmpty() ) {
-				adp.create(scarico);
+			if ( ultimoMov != null && ultimoMov.getIsScarico() && ! ultimoMov.getIsRettifica() ) {
+
+				ultimoMov.aggiustaGiacenza(giacenza);
+
+				adp.update(ultimoMov);
+			}
+			else {
+				if ( ! giacenza.isEmpty() ) {
+					Movimento scarico = newMovimento();
+					scarico.copiaPesiEValoriInvertiti(giacenza);
+					adp.create(scarico);
+				}
 			}
 		}
 	}
 
-	private void ricalcolaValori(Movimento ultimoMov) throws Exception {
+	//	private void ricalcolaValori(Movimento ultimoMov) throws Exception {
+	//
+	//		if ( ultimoMov instanceof MovimentoIVA ) {
+	//			StalloConsegnaAdapter stalloConsegnaAdp = StalloConsegna.newAdapter();
+	//			StalloConsegna stalloConsegna = stalloConsegnaAdp.getByKeysIds(ultimoMov.getIdStallo(), ultimoMov.getIdConsegna());
+	//
+	//			if ( stalloConsegna != null ) {
+	//				stalloConsegna.assegnaValori((MovimentoIVA) ultimoMov);
+	//			}
+	//		}
+	//
+	//	}
 
-		if ( ultimoMov instanceof MovimentoIVA ) {
-			StalloConsegnaAdapter stalloConsegnaAdp = StalloConsegna.newAdapter();
-			StalloConsegna stalloConsegna = stalloConsegnaAdp.getByKeysIds(ultimoMov.getIdStallo(), ultimoMov.getIdConsegna());
+	private Movimento newMovimento() throws Exception {
 
-			if ( stalloConsegna != null ) {
-				stalloConsegna.assegnaValori((MovimentoIVA) ultimoMov);
-			}
-		}
+		Movimento m = adp.newMovimento() ;
 
+		m.setIdConsegna( consegna.getId() );
+		m.setIdMerce( consegna.getIdmerce() );
+		m.setData(data) ;
+		m.setDocumento(documento);
+		m.setStallo( stalloOrigine );
+		m.setIsLocked(Boolean.FALSE);
+		m.setIsRettifica(Boolean.FALSE);
+
+		return m ;
 	}
 
-	private Movimento newMovimento( Stallo s , Movimento scarico) throws Exception {
+	private Movimento newMovimento_old( Stallo s , Movimento scarico) throws Exception {
 
 		Movimento m = adp.newMovimento() ;
 
 		Movimento mGiacenza = null;
 		if ( scarico == null ) {
+			//
 			// Movimento di svuotamento stallo
 
 			// Ricalcoliamo la giacenza
 			mGiacenza = adp.getMovimentoGiacenza(s, consegna);
 			m.copiaPesiEValoriInvertiti(mGiacenza);
+			//			m.aggiustaGiacenza(giacenza)
+
 			// dovrebbe essere sempre uno scarico,
 			// ma se sto svuotando dopo una rettifica
 			// potrebbe essere un carico

@@ -12,6 +12,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.velocity.Template;
 import org.apache.velocity.context.Context;
 
+import com.gsoft.doganapt.cmd.Homepage;
 import com.gsoft.doganapt.data.Consegna;
 import com.gsoft.doganapt.data.Stallo;
 import com.gsoft.doganapt.data.adapters.ConsegnaAdapter;
@@ -21,6 +22,7 @@ import com.gsoft.doganapt.data.adapters.StalloAdapter;
 import com.gtsoft.utils.common.BeanAdapter2;
 import com.gtsoft.utils.common.BeanEditor;
 import com.gtsoft.utils.http.VelocityCommand;
+import com.gtsoft.utils.http.exception.ParameterException;
 import com.gtsoft.utils.http.servlet.GtServlet;
 
 
@@ -55,16 +57,41 @@ public class EditConsegna extends BeanEditor {
 		if ( c != null ) {
 			if ( getBooleanParam(Strings.EXEC) ) {
 
-				if ( getParam( "pesofinaleportocarico" , false) == null &&
-						! getBooleanParam(Strings.PARTIAL_EDIT)  ) {
-					c.setPesoFinalePortoCarico(Boolean.FALSE) ;
-					Consegna.newAdapter().update(c);
-				}
+				String associa = getParam("associa",false);
 
-				//if ( ! c.isAperta() && ! c.isChiusa() )
+				if ( associa != null ) {
+					if ( ! c.isAperta() || c.isChiusa() )
+						throw new Exception("Non si può associare uno stallo a una Consegna Chiusa o non ancora Aperta!");
 
-				if ( Boolean.TRUE.equals( s.getAttribute("admin") ) ) {
-					aggiornaStalli(c, stalli);
+					Integer idStallo = getIntParam("idNuovoStallo",false);
+
+					Stallo stallo = StalloAdapter.get(idStallo);
+
+					if ( stallo != null || stallo.getIdConsegnaAttuale() != null ) {
+						stallo.setIdConsegnaAttuale(c.getId());
+						stallo.setIdConsegnaPrenotata(null);
+						stallo.setCaricato(0d);
+						stallo.setImmessoInLiberaPratica(Boolean.FALSE);
+
+						StalloAdapter sAdp = Stallo.newAdapter();
+
+						sAdp.update(stallo);
+
+						Homepage.purgeCaches();
+					} else
+						throw new ParameterException("idNuovoStallo");
+				} else {
+					if ( getParam( "pesofinaleportocarico" , false) == null &&
+							! getBooleanParam(Strings.PARTIAL_EDIT)  ) {
+						c.setPesoFinalePortoCarico(Boolean.FALSE) ;
+						Consegna.newAdapter().update(c);
+					}
+
+					//if ( ! c.isAperta() && ! c.isChiusa() )
+
+					if ( Boolean.TRUE.equals( s.getAttribute("admin") ) ) {
+						aggiornaStalli(c, stalli);
+					}
 				}
 
 				ctx.put("result", Boolean.TRUE ) ;

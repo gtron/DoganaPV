@@ -67,7 +67,7 @@ public class ChiudiConsegna extends VelocityCommand {
 		Stallo s ;
 		StalloAdapter sadp = new StalloAdapter();
 
-		for (Object name : c.getStalli()) {
+		for (Object name : sadp.getAll()) {
 			s = ( Stallo ) name ;
 
 			if ( idStallo == null || idStallo.equals(s.getId()) ) {

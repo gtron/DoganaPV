@@ -256,9 +256,11 @@ public class PopolaStalli extends VelocityCommand {
 			sc = stalloConsegnaAdp.getFirstByIdConsegna(idConsegna);
 		}
 
-		sc.setValoreUnitarioDollari(sc.getValoreDollari().doubleValue() / sommaSecco);
-		sc.setValoreUnitarioTesTp(sc.getValoreTesTp().doubleValue() / sommaSecco);
-		sc.setValoreUnitarioEuro(sc.getValoreUnitarioDollari().doubleValue() / sc.getTassoEuroDollaro().doubleValue() );
+		if ( sc != null ) {
+			sc.setValoreUnitarioDollari(sc.getValoreDollari().doubleValue() / sommaSecco);
+			sc.setValoreUnitarioTesTp(sc.getValoreTesTp().doubleValue() / sommaSecco);
+			sc.setValoreUnitarioEuro(sc.getValoreUnitarioDollari().doubleValue() / sc.getTassoEuroDollaro().doubleValue() );
+		}
 
 		return sc;
 	}
