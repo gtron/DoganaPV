@@ -11,6 +11,7 @@ import org.apache.velocity.context.Context;
 
 import com.gsoft.doganapt.data.Consegna;
 import com.gsoft.doganapt.data.Movimento;
+import com.gsoft.doganapt.data.MovimentoIVA;
 import com.gsoft.doganapt.data.Stallo;
 import com.gsoft.doganapt.data.adapters.ConsegnaAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoIvaAdapter;
@@ -26,8 +27,68 @@ public class ChiudiPFPC extends VelocityCommand {
 	public ChiudiPFPC ( GtServlet callerServlet) {
 		super(callerServlet);
 	}
+
 	@Override
 	public Template exec(HttpServletRequest req, HttpServletResponse resp, Context ctx) throws Exception  {
+
+		Integer idConsegna = getIntParam("id", true);
+
+		ConsegnaAdapter adp = Consegna.newAdapter();
+		Consegna consegna = (Consegna) adp.getByKey(idConsegna);
+
+		ctx.put( ContextKeys.OBJECT , consegna ) ;
+
+		if ( consegna != null && getBooleanParam(Strings.EXEC) ) {
+
+			ArrayList<Object> stalli = consegna.getStalli();
+			Stallo s = null ;
+			Double giacenza = null ;
+			Double giacenzaSecco = null ;
+
+			for (Object object : stalli) {
+				s = (Stallo) object;
+
+				giacenza = s.getGiacenzaIva(false) ;
+
+				if ( giacenza.intValue() != 0 ) {
+					if ( giacenzaSecco != null )
+						throw new UserException("Attenzione, giacenza presente in più di uno stallo!" );
+
+					giacenzaSecco = s.getGiacenzaIva(true);
+				}
+			}
+
+			if (  giacenza != null && giacenza.intValue() != 0 ) {
+				Vector v = consegna.getRegistro(true, false, true );
+
+				MovimentoIVA m = (MovimentoIVA) v.lastElement() ;
+
+				MovimentoIvaAdapter movAdp = new MovimentoIvaAdapter();
+
+				MovimentoIVA mGiacenza = movAdp.getMovimentoGiacenza(s, consegna);
+				//				m.copiaPesiEValoriInvertiti(mGiacenza);
+
+				if ( ! m.getIsScarico() ) {
+					m = m.clone() ;
+					m.setIsScarico(true);
+					m.setUmido(0d);
+					m.setSecco(0d);
+				}
+				m.aggiustaGiacenza(mGiacenza);
+				//				m.togli(mGiacenza);
+
+				movAdp.update(m);
+				resp.sendRedirect(".consegne?id=" + consegna.getId());
+			}
+			else {
+				resp.sendRedirect(".consegne?cmd=chiudi&exec=1&id=" + consegna.getId());
+			}
+			resp.flushBuffer();
+		}
+		return null ;
+	}
+
+	public Template exec_old(HttpServletRequest req, HttpServletResponse resp, Context ctx) throws Exception  {
 
 		Integer id = getIntParam("id", true);
 
