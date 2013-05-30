@@ -53,7 +53,7 @@ public class MovimentoIvaAdapter extends MovimentoAdapter {
 
 		fields.add( Fields.VALORE_DOLLARI, Field.Type.DOUBLE , (fill)? o.getValoreDollari() : null );
 		fields.add( Fields.VALORE_EURO, Field.Type.DOUBLE , (fill)? o.getValoreEuro() : null );
-		fields.add( Fields.POSIZIONE_DOGANALE, Field.Type.STRING , (fill)? o.getPosizioneDoganale() : null );
+		fields.add( Fields.POSIZIONE_DOGANALE, Field.Type.STRING , (fill)? o.getCodPosizioneDoganale() : null );
 
 		fields.add( Fields.VALORE_NETTO, Field.Type.DOUBLE , (fill)? o.getValoreNetto() : null );
 		fields.add( Fields.VALORE_TESTP, Field.Type.DOUBLE , (fill)? o.getValoreTestp() : null );
@@ -67,7 +67,7 @@ public class MovimentoIvaAdapter extends MovimentoAdapter {
 
 		o.setValoreDollari( (Double) fields.get( Fields.VALORE_DOLLARI).getValue() );
 		o.setValoreEuro( (Double) fields.get( Fields.VALORE_EURO).getValue() );
-		o.setPosizioneDoganale( (String) fields.get( Fields.POSIZIONE_DOGANALE).getValue() );
+		o.setCodPosizioneDoganale( (String) fields.get( Fields.POSIZIONE_DOGANALE).getValue() );
 
 		o.setValoreNetto( (Double) fields.get( Fields.VALORE_NETTO).getValue() );
 		o.setValoreTestp( (Double) fields.get( Fields.VALORE_TESTP).getValue() );
@@ -208,9 +208,15 @@ public class MovimentoIvaAdapter extends MovimentoAdapter {
 					c.updateValore(m);
 				}
 
+				/* Sostituito ...
+				 * ora lo specificano manualmente
+				 * Eventualmente si puo' usare il campo per le comunitarie
+				 * ma in questo caso va riabiliato il campo nell'editing della consegna
+				 * 
 				if ( m.getPosizioneDoganale() == null ) {
 					m.setPosizioneDoganale(c.getPosizione());
 				}
+				 */
 			}
 		}
 
