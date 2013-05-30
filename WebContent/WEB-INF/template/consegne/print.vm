@@ -36,20 +36,25 @@ CAPTION {border-bottom: 1px solid #000 ; font-size: 12pt; font-weight: bold;}
 #set($nuovoStallo = ( $oldStallo == '' || $oldStallo.Id != $m.Stallo.Id  ) )
 #if( $nuovoStallo || ( $rigaPartitario  % $righePartitiari ) == 0 )
 #if( $oldStallo.Id )
-#if ( $sumUmidoIn == $sumUmidoOut )
+##if ( $sumUmidoIn == $sumUmidoOut )
 <tr class="tot">
 <td colspan="10" class="f" style="height:1pt;"><img src="$!wwwRoot/images/bgrabber.gif" width="1" height="1" alt=" "/></td>
 </tr>
 <tr class="tot">
-<td colspan="5" class="f"></td>
+<td colspan="5" class="r">Giacenza Attuale:</td>
+#*
 <td>$tools.Number.format($sumUmidoIn)</td>
 <td>$tools.Number.format($sumUmidoOut)</td>
-<td class="f">&nbsp;</td>
-<td>$tools.Number.format($sumSeccoIn)</td>
+*#
+<td class="c" colspan="2">$tools.Number.format($sumUmido)</td>
+##<td>&nbsp;</td>
+#*<td>$tools.Number.format($sumSeccoIn)</td>
 <td>$tools.Number.format($sumSeccoOut)</td>
-<td class="f">&nbsp;</td>
+*#
+<td class="c" colspan="2">$tools.Number.format($sumSecco)</td>
+<td>&nbsp;</td>
 </tr>
-#end
+##end
 </tbody></table></div>
 #end
 #set($sumPagina = $sumPagina + 1)
@@ -77,7 +82,7 @@ Consegna: <strong>$!obj.Numero</strong><br />
 Peso Polizza: #if( $!obj.Pesopolizza ) <strong>$tools.Number.format($!obj.Pesopolizza) Kg #if( false && $!obj.PesoFinalePortoCarico) (P.Finale Porto di Carico)#end</strong>#end<br />
 ##Tasso di Umidit&agrave;: <strong>$!tools.Number.format('##0.00000', $!obj.TassoUmidita)%</strong>
 ## Regime Doganale: <strong>$!obj.RegimeDoganale</strong><br />
-Designazione Merce: <strong>$!obj.Merce.SpecieColli</strong><br />
+Designazione Merce: <strong>$!obj.Merce.Descrizione</strong><br />
 Codice N.C.: <strong>$!obj.Merce.CodiceTaric</strong><br />
 ## Posizione Doganale: <strong>$!obj.Posizione</strong><br />
 </td><td valign="top" style="text-align:left; border:0;">
@@ -101,12 +106,12 @@ $: <strong>$!obj.Fatturadefinitiva.Euro</strong><br />
 <tr>
 <th rowspan="2" style="width:15mm">Numero<br />Registro</th>
 <th rowspan="2" style="width:20mm">Data</th>
-<th rowspan="2" colspan="3" style="width:50mm">Documento</th>
-<th colspan="2" style="width:70mm">Umido</th>
+<th colspan="3" style="width:50mm">Documento</th>
+<th colspan="2" style="width:70mm">Massa Lorda (Kg)</th>
 ## <th rowspan="2" width="20">&nbsp;</th>
-<th colspan="2" style="width:70mm">Secco</th>
-<th width="5%" rowspan="2">Regime</th>
+<th colspan="2" style="width:70mm">Massa Netta (Kg)</th>
 <th width="5%" rowspan="2">Posizione</th>
+<th width="5%" rowspan="2">Regime</th>
 <th width="10%" rowspan="2">Note</th>
 
 
@@ -114,6 +119,9 @@ $: <strong>$!obj.Fatturadefinitiva.Euro</strong><br />
 ##<th><input type="checkbox" onchange="selectDOG(this);" /></th>
 </tr>
 <tr>
+<th>Tipo</th>
+<th>N.</th>
+<th>Data</th>
 <th>Entrata</th>
 <th>Uscita</th>
 <th>Entrata</th>
@@ -163,17 +171,17 @@ $!m.NumRegistro
 <td>&nbsp;</td>
 <td class="r">$!tools.Number.format($tools.Math.mul( -1 , $m.Umido))</td>
 #set($sumUmidoOut = $tools.Math.add( $sumUmidoOut , $tools.Math.mul( -1 , $m.Umido) ) )
-#set($sumUmido = $tools.Math.add( $sumUmido , $m.Umido ) )
 #else
 <td>&nbsp;</td>
 <td class="r">$tools.Number.format($m.Umido)</td>
 #set($sumUmidoOut = $tools.Math.add( $sumUmidoOut , $m.Umido ) )
-#set($sumUmido = $tools.Math.sub( $sumUmido , $m.Umido ) )
 #end
+#set($sumUmido = $tools.Math.sub( $sumUmido , $m.Umido ) )
 #else
 <td class="r">$tools.Number.format($m.Umido)</td>
 <td>&nbsp;</td>
 #set($sumUmidoIn = $tools.Math.add( $sumUmidoIn , $m.Umido ) )
+#set($sumUmido = $tools.Math.add( $sumUmido , $m.Umido ) )
 #end
 
 ##<td>&nbsp;</td>
@@ -188,10 +196,12 @@ $!m.NumRegistro
 <td class="r">$tools.Number.format($m.Secco)</td>
 #set($sumSeccoOut = $tools.Math.add( $sumSeccoOut , $m.Secco ) )
 #end
+#set($sumSecco = $tools.Math.sub( $sumSecco, $m.Secco ) )
 #else
 <td class="r">$tools.Number.format($m.Secco)</td>
 <td>&nbsp;</td>
 #set($sumSeccoIn = $tools.Math.add( $sumSeccoIn , $m.Secco ) )
+#set($sumSecco = $tools.Math.add( $sumSecco, $m.Secco ) )
 #end
 
 <td class="c">$!m.PosizioneDoganale</td>
@@ -217,16 +227,24 @@ $!m.NumRegistro
 #end
 
 #if( $oldStallo.Id)
-#if ( $sumUmidoIn == $sumUmidoOut )
+##if ( $sumUmidoIn == $sumUmidoOut )
 <tr class="tot">
-<td colspan="5"></td>
+<td colspan="10" class="f" style="height:1pt;"><img src="$!wwwRoot/images/bgrabber.gif" width="1" height="1" alt=" "/></td>
+</tr>
+<tr class="tot">
+<td colspan="5" class="r">Giacenza Attuale:</td>
+#*
 <td>$tools.Number.format($sumUmidoIn)</td>
 <td>$tools.Number.format($sumUmidoOut)</td>
+*#
+<td class="c" colspan="2">$tools.Number.format($sumUmido)</td>
 ##<td>&nbsp;</td>
-<td>$tools.Number.format($sumSeccoIn)</td>
+#*<td>$tools.Number.format($sumSeccoIn)</td>
 <td>$tools.Number.format($sumSeccoOut)</td>
-<td></td>
+*#
+<td class="c" colspan="2">$tools.Number.format($sumSecco)</td>
+<td>&nbsp;</td>
 </tr>
-#end
+##end
 </tbody></table></div>
 #end
