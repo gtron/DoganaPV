@@ -12,8 +12,6 @@ public class MovimentoIVA extends Movimento {
 	Double valoreTestp = null ;
 	Double valoreIva = null ;
 
-	String posizioneDoganale = null ;
-
 	public Double getValoreEuro() {
 		return valoreEuro;
 	}
@@ -44,35 +42,6 @@ public class MovimentoIVA extends Movimento {
 	}
 	public void setValoreIva(Double valoreIva) {
 		this.valoreIva = valoreIva;
-	}
-	@Override
-	public String getPosizioneDoganale() {
-		if ( posizioneDoganale == null ) {
-			try {
-				// Stallo s = getStallo();
-				if ( getConsegna().getIter().getRegdoganale() ) {
-					posizioneDoganale = POS_DOGANALE_NAZIONALIZZATA;
-				} else {
-					posizioneDoganale = POS_DOGANALE_COMUNITARIA;
-				}
-			} catch (Exception e) {System.out.println("Error: MovimentoIVA.getPosizioneDoganale");}
-		}
-		return posizioneDoganale;
-	}
-	public void setPosizioneDoganale(final String posizioneDoganale) {
-		this.posizioneDoganale = posizioneDoganale;
-	}
-	@Override
-	public String getRegimeDoganale() {
-		if( POS_DOGANALE_COMUNITARIA.equals( posizioneDoganale ) )
-			return REG_DOGANALE_COMUNITARIA;
-		else if( POS_DOGANALE_NAZIONALIZZATA.equals( posizioneDoganale ) )
-			return REG_DOGANALE_NAZIONALIZZATA;
-		else if( POS_DOGANALE_EXTRACOMUNITARIA.equals( posizioneDoganale ) )
-			return REG_DOGANALE_EXTRACOMUNITARIA;
-		else
-			return "-";
-
 	}
 
 	public static synchronized MovimentoIvaAdapter newAdapter() throws Exception {

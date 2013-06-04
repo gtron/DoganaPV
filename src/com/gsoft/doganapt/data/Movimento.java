@@ -6,13 +6,29 @@ import com.gtsoft.utils.common.ModelBean2;
 
 public abstract class Movimento extends ModelBean2 {
 
-	public static final String POS_DOGANALE_NAZIONALIZZATA = "NAZ";
-	public static final String POS_DOGANALE_EXTRACOMUNITARIA = "EXT";
-	public static final String POS_DOGANALE_COMUNITARIA = "COM";
+	public static final String COD_POSDOGANALE_EXTRACOMUNITARIA = "7100";
+	public static final String COD_POSDOGANALE_EXTNAZIONALIZZATA = "4571";
+	public static final String COD_POSDOGANALE_NAZIONALE = "4500";
+	public static final String COD_POSDOGANALE_COMUNITARIA = "0000";
 
-	public static final String REG_DOGANALE_NAZIONALIZZATA = "4571";
+	public static final String POS_DOGANALE_EXTRACOMUNITARIA = "EXT";
+	public static final String POS_DOGANALE_EXTNAZIONALIZZATA = "ENAZ";
+	public static final String POS_DOGANALE_NAZIONALE = "NAZ";
+	public static final String POS_DOGANALE_COMUNITARIA = "C/NAZ";
+
 	public static final String REG_DOGANALE_EXTRACOMUNITARIA = "7100";
-	public static final String REG_DOGANALE_COMUNITARIA = "4500";
+	public static final String REG_DOGANALE_EXTNAZIONALIZZATA = "4571";
+	public static final String REG_DOGANALE_NAZIONALE = "4500";
+	public static final String REG_DOGANALE_COMUNITARIA = "";
+
+
+	public static final String COD_PROVENIZENZA_PORTOVESME = "PV";
+	public static final String COD_PROVENIZENZA_PORTO = "PORTO";
+	public static final String COD_PROVENIZENZA_MAGAZZINODOGANALE = "MAGDOG";
+
+	public static final String PROVENIZENZA_PORTOVESME = "Portovesme";
+	public static final String PROVENIZENZA_PORTO = "Porto";
+	public static final String PROVENIZENZA_MAGAZZINODOGANALE = "Magazzino Doganale";
 
 	Integer id ;
 
@@ -35,7 +51,9 @@ public abstract class Movimento extends ModelBean2 {
 	Documento documento ;
 	Documento documentoPV ;
 
+	String codPosizioneDoganale = null ;
 
+	String codProvenienza = null ;
 
 	boolean registrazione = false;
 
@@ -142,11 +160,64 @@ public abstract class Movimento extends ModelBean2 {
 		numRegistro = n;
 	}
 
-	public String getPosizioneDoganale() {
-		return "";
+	public void setCodProvenienza(String codProvenienza) {
+		this.codProvenienza = codProvenienza;
 	}
+	public String getCodProvenienza() {
+		return codProvenienza;
+	}
+	public String getProvenienza() {
+		if( COD_PROVENIZENZA_MAGAZZINODOGANALE.equals( codProvenienza ) )
+			return PROVENIZENZA_MAGAZZINODOGANALE;
+		else if( COD_PROVENIZENZA_PORTO.equals( codProvenienza ) )
+			return PROVENIZENZA_PORTO;
+		else if( COD_PROVENIZENZA_PORTOVESME.equals( codProvenienza ) )
+			return PROVENIZENZA_PORTOVESME;
+		else
+			return "-";
+	}
+
+	public void setCodPosizioneDoganale(final String codPosizioneDoganale) {
+		this.codPosizioneDoganale = codPosizioneDoganale;
+	}
+	public String getCodPosizioneDoganale() {
+		return codPosizioneDoganale;
+		//		if ( codPosizioneDoganale == null ) {
+		//			try {
+		//				if ( getConsegna().getIter().getRegdoganale() ) {
+		//					codPosizioneDoganale = COD_POSDOGANALE_EXTNAZIONALIZZATA;
+		//				} else {
+		//					codPosizioneDoganale = COD_POSDOGANALE_NAZIONALE;
+		//				}
+		//			} catch (Exception e) {System.out.println("Silent Error: MovimentoIVA.getCodPosizioneDoganale");}
+		//		}
+	}
+
 	public String getRegimeDoganale() {
-		return "";
+		if( COD_POSDOGANALE_EXTRACOMUNITARIA.equals( codPosizioneDoganale ) )
+			return REG_DOGANALE_EXTRACOMUNITARIA;
+		else if( COD_POSDOGANALE_EXTNAZIONALIZZATA.equals( codPosizioneDoganale ) )
+			return REG_DOGANALE_EXTNAZIONALIZZATA;
+		else if( COD_POSDOGANALE_NAZIONALE.equals( codPosizioneDoganale ) )
+			return REG_DOGANALE_NAZIONALE;
+		else if( COD_POSDOGANALE_COMUNITARIA.equals( codPosizioneDoganale ) )
+			return REG_DOGANALE_COMUNITARIA;
+		else
+			return "-";
+	}
+
+	public String getPosizioneDoganale() {
+
+		if( COD_POSDOGANALE_EXTRACOMUNITARIA.equals( codPosizioneDoganale ) )
+			return POS_DOGANALE_EXTRACOMUNITARIA;
+		else if( COD_POSDOGANALE_EXTNAZIONALIZZATA.equals( codPosizioneDoganale ) )
+			return POS_DOGANALE_EXTNAZIONALIZZATA;
+		else if( COD_POSDOGANALE_NAZIONALE.equals( codPosizioneDoganale ) )
+			return POS_DOGANALE_NAZIONALE;
+		else if( COD_POSDOGANALE_COMUNITARIA.equals( codPosizioneDoganale ) )
+			return POS_DOGANALE_COMUNITARIA;
+		else
+			return "-";
 	}
 
 	public String getNote() {

@@ -53,8 +53,6 @@ public class MovimentoIvaAdapter extends MovimentoAdapter {
 
 		fields.add( Fields.VALORE_DOLLARI, Field.Type.DOUBLE , (fill)? o.getValoreDollari() : null );
 		fields.add( Fields.VALORE_EURO, Field.Type.DOUBLE , (fill)? o.getValoreEuro() : null );
-		fields.add( Fields.POSIZIONE_DOGANALE, Field.Type.STRING , (fill)? o.getCodPosizioneDoganale() : null );
-
 		fields.add( Fields.VALORE_NETTO, Field.Type.DOUBLE , (fill)? o.getValoreNetto() : null );
 		fields.add( Fields.VALORE_TESTP, Field.Type.DOUBLE , (fill)? o.getValoreTestp() : null );
 		fields.add( Fields.VALORE_IVA, Field.Type.DOUBLE , (fill)? o.getValoreIva() : null );
@@ -67,7 +65,6 @@ public class MovimentoIvaAdapter extends MovimentoAdapter {
 
 		o.setValoreDollari( (Double) fields.get( Fields.VALORE_DOLLARI).getValue() );
 		o.setValoreEuro( (Double) fields.get( Fields.VALORE_EURO).getValue() );
-		o.setCodPosizioneDoganale( (String) fields.get( Fields.POSIZIONE_DOGANALE).getValue() );
 
 		o.setValoreNetto( (Double) fields.get( Fields.VALORE_NETTO).getValue() );
 		o.setValoreTestp( (Double) fields.get( Fields.VALORE_TESTP).getValue() );
@@ -82,17 +79,17 @@ public class MovimentoIvaAdapter extends MovimentoAdapter {
 
 		static final int VALORE_EURO = FIELDSHIFT + 1 ;
 		static final int VALORE_DOLLARI = FIELDSHIFT + 2;
-		static final int POSIZIONE_DOGANALE = FIELDSHIFT + 3;
 
-		static final int VALORE_NETTO = FIELDSHIFT + 4;
-		static final int VALORE_TESTP = FIELDSHIFT + 5;
-		static final int VALORE_IVA = FIELDSHIFT + 6;
 
-		static final int FIELDSCOUNT = FIELDSHIFT + 7;
+		static final int VALORE_NETTO = FIELDSHIFT + 3;
+		static final int VALORE_TESTP = FIELDSHIFT + 4;
+		static final int VALORE_IVA = FIELDSHIFT + 5;
+
+		static final int FIELDSCOUNT = FIELDSHIFT + 6;
 	}
 
 	private static final String[] fieldNames = {
-		"valoreeuro","valoredollari", "posdoganale" , "valorenetto", "valoretestp", "valoreiva"
+		"valoreeuro","valoredollari",  "valorenetto", "valoretestp", "valoreiva"
 	};
 
 	@Override
@@ -119,7 +116,7 @@ public class MovimentoIvaAdapter extends MovimentoAdapter {
 
 	@Override
 	protected String getFieldsRegistro(String prefix) {
-		String list = "%id, %idmerce, %idconsegna, %data, %idstallo, %isscarico, %isrettifica, sum(%secco) as secco, sum(%umido) as umido, %numregistro, %doctype, %docnum, %docdate, %docpvtype, %docpvnum, %docpvdate, %note, %posdoganale, %locked," +
+		String list = "%id, %idmerce, %idconsegna, %data, %idstallo, %isscarico, %isrettifica, sum(%secco) as secco, sum(%umido) as umido, %numregistro, %doctype, %docnum, %docdate, %docpvtype, %docpvnum, %docpvdate, %note, %posdoganale, %codprovenienza, %locked," +
 				" sum(%valoreeuro) as valoreeuro, sum(%valoredollari) as valoredollari, sum(%valorenetto) as valorenetto, sum(%valoretestp) as valoretestp, sum(%valoreiva) as valoreiva ";
 
 		if ( prefix != null ) {

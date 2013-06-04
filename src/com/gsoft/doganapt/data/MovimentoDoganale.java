@@ -6,15 +6,6 @@ import com.gtsoft.utils.sql.IDatabase2;
 
 public class MovimentoDoganale extends Movimento {
 
-	@Override
-	public String getPosizioneDoganale() {
-		return POS_DOGANALE_EXTRACOMUNITARIA;
-	}
-	@Override
-	public String getRegimeDoganale() {
-		return REG_DOGANALE_EXTRACOMUNITARIA;
-	}
-
 	public static synchronized MovimentoAdapter newAdapter() throws Exception {
 		return new MovimentoDoganaleAdapter() ;
 	}

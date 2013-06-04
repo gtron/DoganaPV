@@ -76,7 +76,8 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		fields.add( Fields.DOCPV_TIPO, Field.Type.STRING , (myfill)? d.getTipo() : null );
 		fields.add( Fields.DOCPV_DATA, Field.Type.DATE , (myfill)? d.getData() : null );
 		fields.add( Fields.DOCPV_NUMERO, Field.Type.STRING , (myfill)? d.getNumero() : null );
-
+		fields.add( Fields.POSIZIONE_DOGANALE, Field.Type.STRING , (fill)? o.getCodPosizioneDoganale() : null );
+		fields.add( Fields.PROVENIENZA, Field.Type.STRING , (fill)? o.getCodProvenienza() : null );
 	}
 
 	public abstract Object getFromFields ( ) ;
@@ -106,6 +107,10 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 
 		o.setData( (FormattedDate) fields.get( Fields.DATA).getValue() );
 
+		o.setCodPosizioneDoganale( (String) fields.get( Fields.POSIZIONE_DOGANALE).getValue() );
+
+		o.setCodProvenienza( (String) fields.get( Fields.PROVENIENZA).getValue() );
+
 	}
 	public Object getFromFields ( final Object obj ) {
 
@@ -121,6 +126,9 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		o.setIdStallo( (Integer) fields.get( Fields.IDSTALLO).getValue() );
 		o.setSecco( (Double) fields.get( Fields.SECCO).getValue() );
 		o.setUmido( (Double) fields.get( Fields.UMIDO).getValue() );
+
+		o.setCodPosizioneDoganale( (String) fields.get( Fields.POSIZIONE_DOGANALE).getValue() );
+		o.setCodProvenienza( (String) fields.get( Fields.PROVENIENZA).getValue() );
 
 		updateCommonFields(o);
 
@@ -146,8 +154,10 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		static final int DOCPV_NUMERO = 15;
 		static final int DOCPV_DATA = 16;
 		static final int NOTE = 17;
+		static final int POSIZIONE_DOGANALE = 18;
+		static final int PROVENIENZA = 19;
 
-		static final int FIELDSCOUNT = 18;
+		static final int FIELDSCOUNT = 20;
 	}
 
 	private static final String TABLE = "" ;
@@ -156,7 +166,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			"umido","numregistro","locked",
 			"doctype","docnum","docdate",
 			"docpvtype","docpvnum","docpvdate",
-			"note"
+			"note", "posdoganale", "codprovenienza"
 	};
 
 	@Override
@@ -178,7 +188,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 	public abstract String getTable() ;
 
 	protected String getFieldsRegistro(final String prefix) {
-		String list = "%id, %idmerce, %idconsegna, %data, %idstallo, %isscarico, %isrettifica, sum(%secco) as secco, sum(%umido) as umido, %numregistro, %doctype, %docnum, %docdate, %docpvtype, %docpvnum, %docpvdate, %note, %posdoganale, %locked ";
+		String list = "%id, %idmerce, %idconsegna, %data, %idstallo, %isscarico, %isrettifica, sum(%secco) as secco, sum(%umido) as umido, %numregistro, %doctype, %docnum, %docdate, %docpvtype, %docpvnum, %docpvdate, %note, %posdoganale, %codprovenienza, %locked ";
 
 		if ( prefix != null ) {
 			list = list.replaceAll("%", prefix) ;
@@ -548,6 +558,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 
 		final Connection conn = db.getConnection() ;
 		try {
+			//			System.out.println(sql);
 
 			final PreparedStatement s = conn.prepareStatement(sql.toString()) ;
 			if( c != null ) {
@@ -557,6 +568,9 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			list = getByStatment(s);
 
 
+		} catch (Exception e ) {
+
+			e.printStackTrace();
 		}
 		finally {
 			db.freeConnection(conn);

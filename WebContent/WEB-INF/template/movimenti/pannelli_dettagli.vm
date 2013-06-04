@@ -23,6 +23,47 @@ Numero Registro : #if ( $isAdmin ) ##&& ! ( $m.NumRegistro  || $m.NumRegistro.le
 #else
 <strong>$!m.NumRegistro</strong>
 #end<br />
+
+#if("$!obj.CodPosizioneDoganale" == "4500")
+#set($selected_naz = ' selected="selected" ')
+#elseif("$!obj.CodPosizioneDoganale" == "4571")
+#set($selected_enaz = ' selected="selected" ')
+#elseif("$!obj.CodPosizioneDoganale" == "7100")
+#set($selected_ext = ' selected="selected" ')
+#elseif("$!obj.CodPosizioneDoganale" == "0000")
+#set($selected_com = ' selected="selected" ')
+#end
+Posizione Doganale: <br />
+<select name="posdoganale" id="posdoganale">
+## <option value="$!obj.CodPosizioneDoganale">$!obj.CodPosizioneDoganale - $!obj.PosizioneDoganale $!obj.RegimeDoganale</option>
+ <option value="$!obj.CodPosizioneDoganale">---</option>
+<option value="0000" $!selected_com>Comunitaria (0000)</option>
+<option value="7100" $!selected_ext>Extracomunitaria (7100)</option>
+#if($isIva)
+<option value="4571" $!selected_enaz>Extracomunitaria Nazionalizzata (4571)</option>
+<option value="4500" $!selected_naz>Nazionale (4500)</option>
+#end
+
+</select>
+<br />
+
+#if("$!obj.CodProvenienza" == "PV")
+#set($selected_pv = ' selected="selected" ')
+#elseif("$!obj.CodProvenienza" == "PORTO")
+#set($selected_porto = ' selected="selected" ')
+#elseif("$!obj.CodProvenienza" == "MAGDOG")
+#set($selected_magdog = ' selected="selected" ')
+#end
+Provenienza: <br />
+<select name="codprovenienza" id="codprovenienza">
+<option value="$!obj.CodProvenienza">---</option>
+<option value="PV" $!selected_pv>Portovesme</option>
+<option value="MAGDOG" $!selected_magdog>Magazzino Doganale</option>
+<option value="PORTO" $!selected_porto>Porto</option>
+</select>
+<br />
+
+
 #end
 
 </fieldset>
@@ -46,7 +87,21 @@ Data:  <input type="text" id="docpvdate" name="docpvdate" size="8" class="data" 
 
 <fieldset><legend>Note </legend>
 
-<textarea name="note" cols="40" rows="2" style="width:100%">$!m.Note</textarea>
+Note predefinite: <select id="testi_note">
+<option value="Introduzione in Deposito Doganale">Introduzione in Dep.Doganale</option>
+<option value="Estrazione da Deposito Doganale">Estrazione da Dep.Doganale</option>
+<option value="Introduzione in Deposito IVA">Introduzione in Dep.IVA</option>
+<option value="Estrazione da Deposito IVA">Estrazione da Dep.IVA</option>
+<option value="Rettifica Peso">Rettifica Peso</option>
+<option value="Rettifica Valore Finale">Rettifica Valore Finale</option>
+<option value="Rettifica Autofattura">Rettifica Autofattura</option>
+</select> <input type="button" value="Imposta" 
+onclick="var n=jQuery('#note');var newText=jQuery('#testi_note').val();if(n.val() == '' || confirm('Sostituire le note attuali con:\n'+newText+'?')) n.val(newText);"/>
+<br />Note:
+<textarea id="note" name="note" cols="40" rows="2" style="width:530px;height:60px">$!m.Note</textarea>
+
+
+
 </fieldset>
 
 <br />

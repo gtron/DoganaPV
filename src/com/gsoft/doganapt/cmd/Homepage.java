@@ -22,6 +22,11 @@ public class Homepage extends VelocityCommand {
 
 	//	private static final String ID = "id" ;
 
+	protected int getIndex(int max) {
+		return (int) Math.round(( Math.random() * 10000 ) % ( max - 1 ) );
+	}
+
+
 	public Homepage ( GtServlet callerServlet) {
 		super(callerServlet);
 	}
@@ -30,6 +35,98 @@ public class Homepage extends VelocityCommand {
 	public VelocityCommand clone() {
 		return  new Homepage(callerServlet);
 	}
+
+	String[][] hombres = {
+			{"Gianluca", "0" ,"P" },
+			{"Daniele", "0" ,"P"},
+			{"Javi", "0" ,"P"},
+			{"Sam", "0" ,"P"},
+			{"Alex", "0" ,"P"},
+			{"Adam", "0" ,"P"},
+			{"Roman", "0" ,"P"},
+			{"Max", "0" ,"P"},
+			{"Isma", "0" ,"P"},
+			{"Luca", "0" ,"P"},
+			{"Aitor", "0" ,"P"}
+	};
+	String[][] hombres_2 = {
+			{"Ganador 1", "0" ,"P"},
+			{"Ganador 2", "0" ,"P"},
+			{"Ganador 3", "0" ,"P"},
+			{"Ganador 4", "0" ,"P"},
+			{"Ganador 5", "0" ,"P"},
+			{"6", "0" ,"P"}
+	};
+
+	String[][] hombres_3 = {
+			{"Ganador 1", "0" ,"P"},
+			{"Ganador 2", "0" ,"P"},
+			{"Ganador 3", "0" ,"P"},
+	};
+
+
+	String[][] mujeres = {
+			{"Maite", "0" ,"P"},
+			{"Chiara", "0" ,"P"},
+			{"Ilia", "0" ,"P"},
+			{"Neus", "0" ,"P"},
+			{"Julia", "0" ,"P"},
+			{"Elsa", "0" ,"P"},
+			{"Kathy", "0" ,"P"},
+			{"Ali", "0" ,"P"},
+			{"Georgina", "0" ,"P"}
+			//			,{"Meri", "0" }
+	};
+
+	String[][] mujeres_2 = {
+			{"Ganador 1", "0" ,"P"},
+			{"Ganador 2", "0" ,"P"},
+			{"Ganador 3", "0" ,"P"},
+			{"Ganador 4", "0" ,"P"},
+			{"5", "0" ,"P"}
+	};
+
+	String[][] mujeres_3 = {
+			{"Ganador 1", "0" ,"P"},
+			{"Ganador 2", "0" ,"P"},
+			{"Ganador 3", "0" ,"P"}
+	};
+
+	private String[] genera(String[][] in) {
+		// StringBuffer out = new StringBuffer();
+
+		int len = in.length;
+		String[] out = new String[len];
+
+		int i = 0 ;
+		int rand = getIndex(len) ;
+
+		for ( ; i <len ; i++  ) {
+			while ( in[rand][1] == "1" ) {
+				rand = getIndex(len);
+			}
+
+			out[i] = in[rand][0] ;
+
+			in[rand][1] = "1";
+		}
+		return out;
+	}
+
+	public Template exec_torneo(HttpServletRequest req, HttpServletResponse resp, Context ctx) throws Exception  {
+
+		ctx.put("H", genera(hombres));
+		ctx.put("H2", genera(hombres_2));
+		ctx.put("H3", genera(hombres_3));
+
+		ctx.put("M", genera(mujeres));
+		ctx.put("M2", genera(mujeres_2));
+		ctx.put("M3", genera(mujeres_3));
+
+
+		return null;
+	}
+
 
 	@Override
 	public Template exec(HttpServletRequest req, HttpServletResponse resp, Context ctx) throws Exception  {
