@@ -7,8 +7,8 @@ font-size : 7pt ;
 font-family : Arial;
 margin:	0;
 padding: 0;
-width:279mm;
-height: 205mm;
+width:270mm;
+height: 200mm;
 }
 TABLE{
 width:260mm;margin:30mm 0 0 0;
@@ -19,6 +19,7 @@ TD.l { text-align: left; }
 TD.c { text-align: center; }
 .pb {page-break-before: always ;}
 
+.tiny { font-size:6pt;}
 </style>
 
 <script type="text/javascript">
@@ -37,20 +38,21 @@ var to = 0 ;
 <tr>
 <th rowspan="2" style="width:10mm;">
 <script type="text/javascript">from = $m.NumRegistro</script>
-Num.</th>
+Num.<br />Reg.</th>
 <th rowspan="2" style="width:40pt;">Data</th>
 <th colspan="3" style="width:40mm;">Doc. Dogana</th>
 <th colspan="3" style="width:40mm;">Doc. Portovesme</th>
-#if($isIva)<th rowspan="2">Specie Colli</th>#end
+#if($isIva)<th rowspan="2" class="tiny">Specie Colli</th>#end
 <th rowspan="2" style="width:50mm;">Descrizione delle Merci</th>
-<th rowspan="2">N.Cons.</th>
-<th rowspan="2">N.Part.</th>
-#if($isIva)<th rowspan="2" style="width:20mm;">Prov / Dest</th>#end
+<th rowspan="2">Num.<br />Cons.</th>
+<th rowspan="2">Num.<br />Part.</th>
+#if($isIva)<th rowspan="2" style="width:20mm;">Prov.<br />Dest.</th>#end
 ##<th rowspan="2" style="width:10mm;">Pos.<br />Doganale</th>
 <th colspan="2" style="width:40mm;">Massa Lorda (Kg)</th>
 <th colspan="2" style="width:40mm;">Massa Netta (Kg)</th>
 #if ( $isIva )
 <th rowspan="2" style="width:20mm;">Valore (&euro;)</th>
+<th rowspan="2" style="width:20mm;">Iva (&euro;)</th>
 #end
 </tr>
 <tr>
@@ -75,23 +77,23 @@ Num.</th>
 <td class="c">$!m.Documento.Numero</td>
 <td class="c">$!tools.Date.format('dd/MM/yy',$!m.Documento.Data)</td>
 #else
-<td></td><td></td><td></td>
+<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
 #end
 #if($m.DocumentoPV)
-<td class="c">$!m.DocumentoPV.Tipo</td>
-<td class="c">$!m.DocumentoPV.Numero</td>
-<td class="c">$!tools.Date.format('dd/MM/yy',$!m.DocumentoPV.Data)</td>
+<td class="c" class="tiny">$!m.DocumentoPV.Tipo</td>
+<td class="c" class="tiny">$!m.DocumentoPV.Numero</td>
+<td class="c" class="tiny">$!tools.Date.format('dd/MM/yy',$!m.DocumentoPV.Data)</td>
 #else
-<td></td><td></td><td></td>
+<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
 #end
 ###else - #end#if($m.DocumentoPV)<br />($m.DocumentoPV)#end</td>
 
-#if ( $isIva )<td class="c">rinfusa</td>#end
+#if ( $isIva )<td class="c tiny">Rinfusa</td>#end
 <td class="l">$!m.Consegna.Merce.Nome</td>
 <td class="c">$!m.Consegna.Numero</td>
 <td class="c">$!m.Consegna.NumeroPartitario</td>
 
-#if ( $isIva ) <td >&nbsp;</td> #end
+#if ( $isIva ) <td class="c tiny">&nbsp;</td> #end
 #if($m.getIsScarico() ||  $m.Umido.intValue() < 0 )
 <td>&nbsp;</td>
 #if( $m.Umido.intValue() >= 0 )
@@ -118,6 +120,7 @@ Num.</th>
 
 #if ( $isIva )
 <td class="r">$!tools.Number.format('#,##0',$m.ValoreEuro )</td>
+<td class="r">$!tools.Number.format('#,##0',$m.ValoreIva )</td>
 #end
 
 </tr>
