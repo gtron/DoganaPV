@@ -23,6 +23,7 @@ CAPTION {border-bottom: 1px solid #000 ; font-size: 12pt; font-weight: bold;}
 #numPartitario {   top:0; padding-left: 150mm ; font-size:14pt; font-weight: bold ;}
 .tot TD { border : 0 none ;  border-top : 2px solid ; }
 .tot TD.f { border : 0 none ;  }
+.note {font-size:8pt;}
 </style>
 
 
@@ -206,7 +207,7 @@ $!m.NumRegistro
 
 <td class="c">$!m.PosizioneDoganale</td>
 <td class="c">$!m.RegimeDoganale</td>
-<td class="c">$!m.Note</td>
+<td class="c note">$!m.Note</td>
 
 #*
 #if( $m.getIsScarico() )

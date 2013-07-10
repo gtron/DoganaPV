@@ -88,10 +88,10 @@ Data:  <input type="text" id="docpvdate" name="docpvdate" size="8" class="data" 
 <fieldset><legend>Note </legend>
 
 Note predefinite: <select id="testi_note">
-<option value="Introduzione in Deposito Doganale">Introduzione in Dep.Doganale</option>
-<option value="Estrazione da Deposito Doganale">Estrazione da Dep.Doganale</option>
-<option value="Introduzione in Deposito IVA">Introduzione in Dep.IVA</option>
-<option value="Estrazione da Deposito IVA">Estrazione da Dep.IVA</option>
+<option value="Intr. in dep.Dog.">Intr. in dep.Dog.</option>
+<option value="Estr. da dep.Dog.">Estr. da dep.Dog.</option>
+<option value="Intr. in dep.IVA">Intr. in dep.IVA</option>
+<option value="Estr. da dep.IVA">Estr. da dep.IVA</option>
 <option value="Rettifica Peso">Rettifica Peso</option>
 <option value="Rettifica Valore Finale">Rettifica Valore Finale</option>
 <option value="Rettifica Autofattura">Rettifica Autofattura</option>
