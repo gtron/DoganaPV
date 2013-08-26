@@ -1,14 +1,19 @@
 package com.gsoft.doganapt.cmd;
 
+import java.io.File;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.apache.velocity.Template;
 import org.apache.velocity.context.Context;
 
 import com.gsoft.doganapt.data.Utente;
 import com.gsoft.doganapt.data.adapters.UtenteAdapter;
+import com.gtsoft.utils.common.ConfigManager;
 import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.http.VelocityCommand;
 import com.gtsoft.utils.http.servlet.GtServlet;
@@ -120,6 +125,9 @@ public class Login extends VelocityCommand {
 		return (Utente) s.getAttribute("user");
 	}
 
+	static Logger logger = null ;
+	static boolean logToSysOut = false ;
+
 	public static void logAction(String msg, HttpServletRequest req) {
 		String username =  " - ";
 
@@ -128,7 +136,31 @@ public class Login extends VelocityCommand {
 			username = " (" + u.getUsername() + "@" + req.getRemoteAddr() + ") - ";
 		}
 
-		System.out.println(new FormattedDate().toString() + username  + msg  + " |"+ req.getSession().getId());
+		String message = username  + msg  + " |"+ req.getSession().getId();
+
+
+		if ( ! logToSysOut  ) {
+			if ( logger == null ) {
+				logger = Logger.getLogger( "" );
+
+				String sep =  File.separator;
+				File conf = new File(ConfigManager.getWebappRoot()+sep+"WEB-INF"+sep+"conf"+sep+"log4j.properties");
+
+				if ( conf.exists() ) {
+					System.out.println("Configuring Log: " + conf.getAbsolutePath() );
+					PropertyConfigurator.configure(conf.getAbsolutePath()) ;
+				} else {
+					logToSysOut = true;
+					logger = null;
+				}
+			}
+		}
+
+		if ( logger != null ) {
+			logger.info(message);
+		} else {
+			System.out.println(new FormattedDate().toString() + " " + message);
+		}
 
 	}
 }
