@@ -49,6 +49,8 @@ public class BackupDb extends VelocityCommand {
 
 		String mysqlCmd = ConfigManager.getProperty("backups.create_cmd");
 
+		Login.logAction("Creating backup into: " + dir , request);
+
 		try {
 			Process p = Runtime.getRuntime().exec( mysqlCmd );
 

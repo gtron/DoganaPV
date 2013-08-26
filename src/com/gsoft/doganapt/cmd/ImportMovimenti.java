@@ -18,42 +18,55 @@ import com.gtsoft.utils.http.servlet.GtServlet;
 public class ImportMovimenti extends VelocityCommand {
 
 	protected static final String HOMEPAGE = "homepage.vm" ;
-	private static final String ID = "idConsegna" ; 
-	
+	private static final String ID = "idConsegna" ;
+
 	public ImportMovimenti ( GtServlet callerServlet) {
 		super(callerServlet);
 	}
 
+	@Override
 	public VelocityCommand clone() {
-		return  new ImportMovimenti(this.callerServlet);
+		return  new ImportMovimenti(callerServlet);
 	}
 
+	@Override
 	public Template exec(HttpServletRequest req, HttpServletResponse resp, Context ctx) throws Exception  {
-		
+
+		if ( ! Login.isLogged(req) ) {
+			resp.sendRedirect(".main");
+			return null;
+		}
+
 		Integer idConsegna = getIntParam(ID, false);
-		
+
 		ArrayList<Integer> stalli = getIntParams("stalli", 0);
-		
+
 		FormattedDate finoAl = getDateParam("to", false);
 		Consegna c = null ;
-		if ( idConsegna != null ) { 
+		if ( idConsegna != null ) {
 			c = ConsegnaAdapter.get(idConsegna);
+
+			Login.logAction("Importazione della consegna N." + c.getNumero() + " ("+c.getId()+
+					") Fino alla data " + finoAl.dmyString(), req);
+
 			PtMovimentazioniImporter.getInstance().importTo(c, finoAl,stalli);
-		}
-		else 
+		} else {
 			PtMovimentazioniImporter.getInstance().importTo(finoAl);
-		
+		}
+
 		ctx.put(ContextKeys.MESSAGE, "Importazione effettuata");
-		
-		if ( c != null )
+
+		if ( c != null ) {
 			resp.sendRedirect(".consegne?id=" + c.getId());
-		
+		}
+
 		return null;
 	}
 
+	@Override
 	public String getTemplateName() {
 		return HOMEPAGE ;
 	}
 
-	
+
 }

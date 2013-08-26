@@ -1,5 +1,6 @@
 package com.gsoft.doganapt.data.adapters;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -82,6 +83,14 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 
 	public abstract Object getFromFields ( ) ;
 
+	@Override
+	public void update() throws IOException {
+		if( (Boolean) getField(Fields.LOCKED).getValue() ) {
+			System.out.println("Errore: Tentativo di modificare un movimento stampato.");
+			throw new IOException("Il Movimento è stato stampato e non puo' essere modificato!");
+		}
+		super.update();
+	}
 
 	public void updateCommonFields ( final Movimento o ) {
 		o.setIsScarico( (Boolean) fields.get( Fields.ISSCARICO).getValue() );

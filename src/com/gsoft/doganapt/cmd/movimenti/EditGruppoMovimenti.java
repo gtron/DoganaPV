@@ -12,6 +12,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.velocity.Template;
 import org.apache.velocity.context.Context;
 
+import com.gsoft.doganapt.cmd.Login;
 import com.gsoft.doganapt.data.Movimento;
 import com.gsoft.doganapt.data.MovimentoIVA;
 import com.gsoft.doganapt.data.adapters.IterAdapter;
@@ -119,6 +120,7 @@ public class EditGruppoMovimenti extends BeanEditor {
 
 					if( m.getIsLocked() )
 						throw new UserException("Il Movimento è stato stampato e non puo' essere modificato!");
+
 					adp.updateCommonFields(m);
 
 					double u = getDoubleParam("u0_" + m.getId() , true ).doubleValue() ;
@@ -150,7 +152,7 @@ public class EditGruppoMovimenti extends BeanEditor {
 					m.setUmido(new Double(u));
 					m.setSecco(new Double(s));
 
-
+					Login.logAction("Modifica movimento " + m.getId(), req);
 					adp.update(m);
 				}
 

@@ -191,6 +191,8 @@ public class RecoverDb extends VelocityCommand {
 		if ( f.exists() ) {
 
 			String s ;
+
+			Login.logAction("Recovering DB from backup: " + f.getAbsolutePath() , request);
 			System.out.println(mysqlCmd);
 
 			try {

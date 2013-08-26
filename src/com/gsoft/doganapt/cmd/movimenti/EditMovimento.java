@@ -10,6 +10,7 @@ import org.apache.velocity.Template;
 import org.apache.velocity.context.Context;
 
 import com.gsoft.doganapt.ConsegneServlet;
+import com.gsoft.doganapt.cmd.Login;
 import com.gsoft.doganapt.data.Movimento;
 import com.gsoft.doganapt.data.adapters.IterAdapter;
 import com.gsoft.doganapt.data.adapters.MerceAdapter;
@@ -46,9 +47,12 @@ public class EditMovimento extends BeanEditor {
 		ctx.put("iters" ,  IterAdapter.getAllCached());
 		ctx.put("stalli" ,  stalli);
 
+
 		final Template t = super.exec(req, resp, ctx) ;
 
 		final Movimento m = (Movimento) ctx.get(ContextKeys.OBJECT);
+
+		Login.logAction("Modifica2 movimento " + m.getId(), req);
 
 		m.getConsegna().flushRegistri();
 
