@@ -7,11 +7,15 @@
 <form action="?" method="post" >
 <div style="text-align:center">
 <h1>Autenticazione utente</h1>
-Utente : <select size="1" name="user">
-<option value="user">utente</option>
+Utente : 
+<input type="text" size="10" name="user" />
+#*<select size="1" name="user">
 <option value="admin">amministratore</option>
-</select> <br /><br />
-Password: <input type="password" name="pwd" /><br />
+<option value="user">utente</option>
+</select> 
+*#
+<br /><br />
+Password: <input type="password" name="pwd" value="" size="10"/><br />
 <br />
 <input type="submit" value="Entra" />
 </div>

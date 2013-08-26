@@ -1,6 +1,8 @@
 <style type="text/css" media="print">
 TABLE { border: 0 none ; color : #000 ; font-size: 1em ; }
 .head { text-align : center; border: 0 none ; font-weight:bold ; font-size: 1.1em;}
+.documento { width: 7em; font-size:0.9em;}
+.cNumero {width:3em;}
 ## .onepage { page-break-after: always ; page-break-inside : avoid;   }
 </style>
 #set($oldParco = "")
@@ -17,8 +19,8 @@ TABLE { border: 0 none ; color : #000 ; font-size: 1em ; }
 ##<th>$s.Parco</th>
 <th>Stallo</th>
 <th>Merce</th>
-<th>Consegna</th>
-<th>Partitario</th>
+<th>Cons.</th>
+<th>Part.</th>
 <th>IM7</th>
 <th>IM4</th>
 <th>Giacenza WMT</th>
@@ -32,13 +34,13 @@ TABLE { border: 0 none ; color : #000 ; font-size: 1em ; }
 #if( $s.IdConsegnaAttuale )
 #set($c = $!s.Consegna )
 <td class="l">$!c.Merce.Nome</td>
-<td width="60" class="c">$!c.Numero</td>
-<td width="60" class="c">$!c.NumeroPartitario</td>
+<td width="60" class="c cNumero">$!c.Numero</td>
+<td width="60" class="c cNumero">$!c.NumeroPartitario</td>
 #set( $im7 = '' )
-#set( $im7 = $!c.getPrimoDocumento(false, $s) )
+#set( $im7 = $!c.getDocumentoPrimoMovimento(false, $s) )
 #set( $im4 = '' )
-#set( $im4 = $!c.getPrimoDocumento(true, $s) )
-#if( "$im4" != "")#set( $im7 = '' )#end
+#set( $im4 = $!c.getDocumentoPrimoMovimento(true, $s) )
+#if( "$!im7.Tipo" == "IM4")#set( $im7 = '' )#end
 <td width="60" class="documento">$!im7.toString().replaceAll('IM7', '')&nbsp;</td>
 <td width="60" class="documento">$!im4.toString().replaceAll('IM4', '')&nbsp;</td>
 #if ( $c.Iter.Id == 1 && ! $s.HasLiberaPratica  )
