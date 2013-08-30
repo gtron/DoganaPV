@@ -12,7 +12,6 @@ import org.apache.velocity.Template;
 import org.apache.velocity.context.Context;
 
 import com.gsoft.doganapt.data.Utente;
-import com.gsoft.doganapt.data.adapters.UtenteAdapter;
 import com.gtsoft.utils.common.ConfigManager;
 import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.http.VelocityCommand;
@@ -37,7 +36,7 @@ public class Login extends VelocityCommand {
 		String username = getParam("user", false);
 		String pwd  = getParam("pwd", false);
 
-		Utente utente = UtenteAdapter.getUtente( username, pwd );
+		Utente utente = Utente.newAdapter().getUtente( username, pwd );
 
 		if ( isLoginValido(utente)) {
 
@@ -116,6 +115,22 @@ public class Login extends VelocityCommand {
 		return logged != null && logged.booleanValue() && u != null && u.isActive();
 	}
 
+	public static Boolean hasLevel(HttpServletRequest req, Integer level) {
+		Utente u = getUtenteLogged(req);
+
+		if ( u != null ) {
+			int userLevel = u.getLevel();
+
+			switch ( level ) {
+			case Utente.Levels.ADMIN :
+				return  userLevel >= Utente.Levels.ADMIN;
+			default:
+				return userLevel >= Utente.Levels.NORMAL;
+			}
+		} else
+			return false;
+	}
+
 	public static Utente getUtenteLogged(HttpServletRequest req) {
 		HttpSession s =  req.getSession();
 
@@ -133,7 +148,7 @@ public class Login extends VelocityCommand {
 
 		Utente u = getUtenteLogged(req);
 		if ( u != null ) {
-			username = " (" + u.getUsername() + "@" + req.getRemoteAddr() + ") - ";
+			username = " (" + u.getId() + "|" + u.getUsername()+ "@" + req.getRemoteAddr() + ") - ";
 		}
 
 		String message = username  + msg  + " |"+ req.getSession().getId();
@@ -159,8 +174,8 @@ public class Login extends VelocityCommand {
 		if ( logger != null ) {
 			logger.info(message);
 		} else {
-			System.out.println(new FormattedDate().toString() + " " + message);
 		}
+		System.out.println(new FormattedDate().toString() + " " + message);
 
 	}
 }

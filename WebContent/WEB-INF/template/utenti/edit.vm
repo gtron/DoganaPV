@@ -1,0 +1,150 @@
+#parse('costanti.vm')
+#set($addJs=['/js/jquery.validate/jquery.validate.js','/js/jquery.validate/jquery.metadata.js','/js/jquery.validate/jquery.additional-method.js','/js/jquery.ui/ui.calendar.js','/js/jquery.ui/ui.dimensions.js','/js/jquery.ui/ui.mouse.js','/js/jquery.ui/ui.draggable.js','/js/jquery.ui/ui.draggable.ext.js','/js/jquery.ui/ui.resizable.js','/js/jquery.ui/ui.dialog.js','/js/jquery.tablefilter/jquery.cookies-packed.js','/js/jquery.tablefilter/prototypes-packed.js','/js/jquery.tablefilter/json-packed.js','/js/jquery.tablefilter/jquery.truemouseout-packed.js','/js/jquery.tablefilter/daemachTools-packed.js','/js/jquery.tablefilter/jquery.tableFilter.js','/js/jquery.tablefilter/jquery.tableFilter.columnStyle-packed.js','/js/jquery.tablefilter/pp.js'] )
+#set( $addCss = ['/js/jquery.ui/themes/flora/flora.all.css','/style/tablefilter/tableFilter.aggregator.css','/style/tablefilter/tableFilter.css'] )
+#parse('header.vm')
+<script>
+$().ready(function() 
+{ try{
+}
+catch(e){alert(e.message);}
+} 
+);
+</script>
+<style>
+<!--
+TABLE { margin:0 auto;  }
+TH {text-align:right; vertical-align: top;}
+TD { position: relative; vertical-align: top; padding:4px 2px}
+INPUT { width: 100%;}
+LABEL { position: relative;}
+.error { border: 1px solid red; }
+.errorDiv { border : 1px solid red; background-color:#EE0; margin-top:4px; padding:4px 2px;}
+-->
+</style>
+
+#if( $result )<div id="result">#if( $msg ) $msg #else Modifica effettuata#end</div> #end
+
+<h2>
+#if ( $obj && $obj.Id )
+Modifica Utente <small>[id:$obj.Id]</small>
+#else
+Nuovo Utente 
+#end
+</h2>
+<form action="?" method="post" id="formUtente">
+<input type="hidden" name="cmd" value="edit" /><input type="hidden" name="exec" value="1" />
+<input type="hidden" name="id" value="$!obj.Id" />
+
+## "nome", "cognome", "datanascita" , "username", "email", "cdate", "active", "livello"
+
+<br />
+<div id="dettagli" style="margin:2px 4px;">
+<table border="0">
+
+<tr><th><label for="username">Username</label>:</th><td><input name="username" size="40" value="$!obj.Username"  class="{required:true}" /></td></tr>
+
+
+<tr><th><label for="password">Password</label>:</th><td><input name="password" type="password" size="40" value="" /></td></tr>
+<tr><th><label for="password2">Ripeti la password:</th><td><input name="password2" type="password" size="40" value="" /></td></tr>
+
+<tr><th>&nbsp;</th><td>&nbsp;<td></tr>
+
+<tr><th><label for="nome" id="Nome">Nome</label>:</th><td><input name="nome" size="40" value="$!obj.Nome"  class="{required:true}" /></td></tr>
+<tr><th><label for="cognome" id="Cooooognome">Cognome</label>:</th><td><input name="cognome" size="40" value="$!obj.Cognome"  class="{required:true}" /></td></tr>
+
+<tr><th><label for="email">Email</label>:</th><td><input name="email" size="40" value="$!obj.Email"  class="{required:true}" /></td></tr>
+
+<tr><th><label for="livello">Livello</label>:</th><td>
+<select name="livello"> 
+<option value="$!obj.getLevel()">-</option>
+<option value="0" #if("$!obj.Level" == "0")selected="selected"#end>Utente</option>
+<option value="90" #if("$!obj.Level" == "90")selected="selected"#end>Ammnistratore</option>
+</select>
+
+</table>
+
+</div>
+#if( $param_error ) 
+
+<script type="text/javascript">
+
+var labels = document.getElementsByTagName('label')
+var fieldsName = [];
+
+var errDiv = document.createElement('div');
+errDiv.className = 'errorDiv';
+		
+for( i in labels )  {
+
+if( labels[i].htmlFor == '$param_error.ParamName')  {
+
+		var field = document.getElementById('$param_error.ParamName');
+		var input = labels[i].form['$param_error.ParamName'];
+		
+		input.className += 'error';
+
+		if(field) field.className += 'error';
+		fieldsName[i] = labels[i].id;
+		errDiv = errDiv.cloneNode();
+#set($errMsg = $!param_error.getLocalizedMessage().replaceAll('java.lang.Exception: ',''))
+#if (! $errMsg && $param_error.getClass().getName().endsWith('RequiredParameterException') )
+#set( $errMsg = "Campo obbligatorio" )
+#end
+		errDiv.innerHTML = '$errMsg';
+		input.parentNode.appendChild(errDiv);
+	break ;
+}
+// 	alert('Errore nel campo ' +  + "\n" +  );
+}
+
+</script>
+#end
+
+<script type="text/javascript">
+
+var idConsegna = '$!obj.Id' ;
+
+function getDouble(id){
+
+var field=document.getElementById(id);
+if(! field)return 0 ;
+
+var v=field.value ;
+
+if(field.tagName=='TD')v=field.innerHTML;
+
+while(v.indexOf('.')> 0)v=v.replace('.','');
+
+return 1 * v ;
+}
+
+
+$('document').ready( function() {
+
+popUpCal.regional['it'] = {clearText: 'Svuota', closeText: 'Chiudi',
+prevText: '&lt;Prec', nextText: 'Succ&gt;', currentText: 'Oggi',
+dayNames: ['Do','Lu','Ma','Me','Gio','Ve','Sa'],
+monthNames: ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
+'Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre']};
+
+popUpCal.setDefaults(popUpCal.regional['it']);
+
+jQuery('#docPV_data').calendar();
+
+jQuery('#iter').change(function(){changedIter(jQuery(this));});
+
+} ) ;
+</script>
+</form>
+
+<div class="commands">
+<ul>
+<li><a href="#" onclick="getElementById('formUtente').submit();"><img src="$!images/action-ico-registra.png" />Salva</a></li>
+<li><a 
+href=".utenti"><img src="$!images/action-ico-elimina.png" /> Annulla</a></li>
+</ul>
+</div>
+
+<br /><br /><br />
+
+#parse('footer.vm')

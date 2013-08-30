@@ -16,13 +16,19 @@ package com.gsoft.doganapt.data.adapters;
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1
  */
+import java.security.NoSuchAlgorithmException;
+import java.sql.PreparedStatement;
 import java.util.Vector;
+
+import javax.servlet.http.HttpServletRequest;
 
 import com.gsoft.doganapt.data.Utente;
 import com.gtsoft.utils.common.BeanAdapter2;
 import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.data.Field;
 import com.gtsoft.utils.data.FieldSet;
+import com.gtsoft.utils.http.IAdapterException;
+import com.gtsoft.utils.http.exception.ParameterException;
 import com.gtsoft.utils.sql.IDatabase2;
 
 public class UtenteAdapter extends BeanAdapter2 {
@@ -52,6 +58,8 @@ public class UtenteAdapter extends BeanAdapter2 {
 
 		o.setLevel( (Integer) fields.get( Fields.LIVELLO ).getValue() ) ;
 		o.setUsername( (String) fields.get( Fields.USERNAME ).getValue() );
+		o.setPassword( (String) fields.get( Fields.PASSWORD ).getValue() );
+
 		o.setEmail( (String) fields.get( Fields.EMAIL).getValue() );
 		o.setCDate( (FormattedDate) fields.get( Fields.CDATE ).getValue() );
 		o.setActive( (Integer) fields.get( Fields.ACTIVE ).getValue() );
@@ -82,33 +90,100 @@ public class UtenteAdapter extends BeanAdapter2 {
 		fields.add( Fields.COGNOME, Field.Type.STRING , (fill)? o.getCognome() : null  );
 		fields.add( Fields.DATANASCITA, Field.Type.DATE , (fill)? o.getDataNascita() : null  );
 
-		fields.add( Fields.LIVELLO, Field.Type.INTEGER , (fill)? o.getLevel() : null );
+		fields.add( Fields.LIVELLO, Field.Type.INTEGER , (fill)? o.getLevel() : null);
 		fields.add( Fields.USERNAME, Field.Type.STRING , (fill)? o.getUsername() : null  );
+		fields.add( Fields.PASSWORD, Field.Type.STRING , (fill)? o.getPassword() : null  );
 		fields.add( Fields.EMAIL, Field.Type.STRING , (fill)? o.getEmail() : null  );
 		fields.add( Fields.CDATE, Field.Type.DATE , (fill)? o.getCDate() : null  );
 		fields.add( Fields.ACTIVE, Field.Type.INTEGER , (fill)?
 				( o.isActive() ? new Integer(1) : new Integer(0) ) : null  );
 
-	}
-	public static Utente getUtente(String Utentename, String pwd) {
+		fields.get(Fields.LIVELLO).setMandatory(Boolean.TRUE);
+		fields.get(Fields.PASSWORD).setMandatory(Boolean.TRUE);
 
-		if ( Utentename == null || pwd == null )
+	}
+
+
+	@Override
+	public void fillFromRequest(HttpServletRequest r, boolean doNulls) throws IAdapterException {
+
+		String pass = r.getParameter("password");
+		Field field = getField(Fields.PASSWORD);
+
+		boolean changePass = false;
+
+		int passLength = pass.trim().length();
+
+		if ( pass != null && passLength > 0 ) {
+			if ( passLength < 5 )
+				throw new ParameterException("password", field, new Exception("Password troppo corta!"));
+			String pass2 = r.getParameter("password2");
+			if ( ! pass.equals(pass2) )
+				throw new ParameterException("password2", field, new Exception("Le 2 password non coincidono"));
+
+			changePass = true;
+		} else {
+			pass = (String) field.getValue();
+		}
+
+		super.fillFromRequest(r,doNulls);
+
+		getField(Fields.ACTIVE).setValue("1");
+
+		if ( changePass ) {
+			try {
+				field.setValue( calcolaPass(pass) );
+			} catch (NoSuchAlgorithmException e) {
+				e.printStackTrace();
+				field.setValue(pass);
+				throw new ParameterException("password", field, e);
+			}
+		} else {
+			field.setValue(pass);
+		}
+	}
+
+	public String calcolaPass(String pass) throws NoSuchAlgorithmException {
+
+		pass = SALT + pass;
+
+		java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
+		byte[] array = md.digest(pass.getBytes());
+		StringBuffer sb = new StringBuffer();
+		for (byte element : array) {
+			sb.append(Integer.toHexString((element & 0xFF) | 0x100).substring(1,3));
+		}
+		return sb.toString();
+	}
+
+
+	public Utente getUtente(String username, String pwd) {
+
+		if ( username == null || pwd == null )
 			return null;
 
-		Utentename = Utentename.trim();
+		username = username.trim();
 		pwd = pwd.trim();
 
-		if ( Utentename.length() < 2 || pwd.length() < 2 )
+		if ( username.length() < 2 || pwd.length() < 2 )
 			return null;
 
 		try {
 
+			String sql = "SELECT * FROM " + getTable() + " WHERE " +
+					getTableFieldName( getField(Fields.USERNAME) ) + " = ? AND " +
+					getTableFieldName( getField(Fields.PASSWORD) ) + " = ? AND " +
+					getTableFieldName( getField(Fields.ACTIVE) ) + " > 0 ";
 
-			UtenteAdapter adp = Utente.newAdapter();
-			String UtenteFieldName = adp.getTableFieldName( adp.getField(Fields.USERNAME) );
+			if ( db == null )
+				return null ;
 
-			Vector v = adp.getWithWhere( UtenteFieldName +  " = '" + Utentename +
-					"' AND password = md5('" + SALT + pwd + "') ");
+			PreparedStatement stm = db.getConnection().prepareStatement(sql);
+
+			stm.setString(1, username );
+			stm.setString(2, calcolaPass(pwd));
+
+			Vector<?> v = getByStatment(stm);
 
 			if ( v != null && ! v.isEmpty() )
 				return (Utente) v.firstElement();
@@ -135,11 +210,13 @@ public class UtenteAdapter extends BeanAdapter2 {
 
 		static final int LIVELLO = 8;
 
-		static final int FIELDSCOUNT = 9 ;
+		static final int PASSWORD = 9 ;
+
+		static final int FIELDSCOUNT = 10 ;
 
 	}
 	private static final String[] fieldNames = {
-		"id", "nome", "cognome", "datanascita" , "username", "email", "cdate", "active", "livello"
+		"id", "nome", "cognome", "datanascita" , "username", "email", "cdate", "active", "livello", "password"
 	};
 
 	@Override
@@ -158,5 +235,13 @@ public class UtenteAdapter extends BeanAdapter2 {
 
 	public String getHttpFieldName(int f) {
 		return fieldNames[f] ;
+	}
+
+	public Object getListWithLevel(Integer i) throws Exception {
+
+		String fieldName = getTableFieldName( getField(Fields.LIVELLO) );
+
+		return getWithWhere( fieldName +  " <= " + i );
+
 	}
 }

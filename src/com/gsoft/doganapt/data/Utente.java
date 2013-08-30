@@ -69,15 +69,16 @@ public class Utente extends Persona {
 		return new UtenteAdapter(db) ;
 	}
 
-	protected interface Levels {
-		static int SUPER_ADMIN = 99 ;
+	public interface Levels {
+		static int ME = 99 ;
+		static int SUPER_ADMIN = 95 ;
 		static int ADMIN = 90 ;
 		static int NORMAL= 0 ;
 	}
 
 	public Boolean isAdmin() {
 		int l = getLevel() ;
-		if ( l > 0 && l == Levels.ADMIN || l == Levels.SUPER_ADMIN )
+		if ( l > 0 && l == Levels.ADMIN || l == Levels.SUPER_ADMIN || l == Levels.ME )
 			return Boolean.TRUE;
 		return Boolean.FALSE;
 	}

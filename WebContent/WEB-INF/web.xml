@@ -9,6 +9,10 @@
 	      <param-name>org.apache.velocity.properties</param-name>
 	      <param-value>WEB-INF/conf/velocity.properties</param-value>
 	    </init-param>
+	    <init-param>
+          <param-name>Log4jConfig</param-name>           
+          <param-value>WEB-INF/conf/log4j.properties</param-value>       
+	    </init-param>
 	</servlet>
 	<servlet-mapping>
 		<url-pattern>*.main</url-pattern>
@@ -50,6 +54,18 @@
 	<servlet-mapping>
 		<url-pattern>*.merci</url-pattern>
 		<servlet-name>merci</servlet-name>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>utenti</servlet-name>
+		<servlet-class>com.gsoft.doganapt.UtentiServlet</servlet-class>
+		<init-param>
+	      <param-name>org.apache.velocity.properties</param-name>
+	      <param-value>WEB-INF/conf/velocity.properties</param-value>
+	    </init-param>
+	</servlet>
+	<servlet-mapping>
+		<url-pattern>*.utenti</url-pattern>
+		<servlet-name>utenti</servlet-name>
 	</servlet-mapping>
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
