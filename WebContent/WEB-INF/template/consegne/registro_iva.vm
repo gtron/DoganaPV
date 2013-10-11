@@ -53,7 +53,7 @@ $!m.NumRegistro
 #if($m.getIsScarico())
 <a  href=".consegne?cmd=editgroup&idC=$m.Consegna.Id&data=$m.Data.ymdString()&t=$m.Tipo&iva=1&id=$m.Id">[Modifica]</a>
 #else
-<a  href=".consegne?cmd=editgroup&idC=$m.Consegna.Id&data=$m.Data.ymdString()&t=$m.Tipo&iva=1">[Modifica]</a>
+<a  href=".consegne?cmd=editgroup&idC=$m.Consegna.Id&data=$m.Data.ymdString()&t=$m.Tipo&iva=1&n=$!m.NumRegistro">[Modifica]</a>
 #end
 
 </td>
