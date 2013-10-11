@@ -523,9 +523,8 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			if ( this instanceof MovimentoIvaAdapter ) {
 				sql.append("if( isscarico, idstallo , numregistro) ,");
 			}
-
-			sql.append(" numregistro, ");
 		}
+		sql.append(" numregistro, ");
 
 		if ( ! soloRegistrati || ignoreNumRegistro ) {
 			sql.append("data,");
@@ -844,6 +843,7 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 	}
 
 	public final static Integer ID_STALLO_CARICO_APERTURA = Integer.valueOf(0);
+	public static final String NOTE_RETTIFICA_PESO = "Rettifica Peso";
 
 	@SuppressWarnings("unchecked")
 	public Map<Integer, Movimento> getCarichiInizialiPerStallo(final Consegna consegna) throws Exception {

@@ -159,6 +159,8 @@ public class Rettifica extends VelocityCommand {
 				mov.setDocumento(doc);
 				mov.setDocumentoPV(docPV);
 
+				mov.setNote(MovimentoAdapter.NOTE_RETTIFICA_PESO);
+
 				if (debug) {
 					System.out.printf("Stallo: %d , Umido: %f , Secco %f \n",  idStallo , rettificaUmido, rettificaSecco );
 				}
@@ -182,6 +184,12 @@ public class Rettifica extends VelocityCommand {
 
 					movIva.setValoreDollari( Double.valueOf(0d) );
 					movIva.setValoreNetto( movIva.getValoreDollari() );
+
+					if ( consegna.getIter().getRegdoganale()) {
+						movIva.setCodPosizioneDoganale(MovimentoIvaAdapter.COD_POSIZIONEDOGANALE_ENAZ);
+					} else {
+						movIva.setCodPosizioneDoganale(MovimentoIvaAdapter.COD_POSIZIONEDOGANALE_NAZ);
+					}
 
 				}
 				toCreate.add(mov);

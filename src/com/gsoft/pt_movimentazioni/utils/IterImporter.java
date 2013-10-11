@@ -50,7 +50,7 @@ GROUP BY data, merce
 	public abstract Movimento apriConsegna(Consegna c, FormattedDate d , Documento documento, Documento documentoPV, String note ) throws Exception ;
 
 
-	public Movimento apriConsegna_IVA( final Consegna c, final FormattedDate d , final Documento documento, final Documento documentoPV, final String note ) throws Exception  {
+	public Movimento apriConsegna_IVA( final Consegna c, final FormattedDate d , final Documento documento, final Documento documentoPV, String note ) throws Exception  {
 
 		MovimentoIVA m = new MovimentoIVA();
 
@@ -66,7 +66,14 @@ GROUP BY data, merce
 		m.setIsScarico(Boolean.FALSE);
 		m.setIsRettifica(Boolean.FALSE);
 
+		if ( note == null || note.trim().length() < 1 ) {
+			note = MovimentoDoganaleAdapter.NOTE_CARICO;
+		}
 		m.setNote(note);
+
+		m.setCodPosizioneDoganale(MovimentoIvaAdapter.COD_POSIZIONEDOGANALE_NAZ);
+		m.setCodProvenienza(MovimentoIvaAdapter.COD_PROVENIENZA_PORTO);
+
 
 		//		if ( c.getValoreUnitario() != null ) {
 		//			if ( c.getIsValutaEuro() ) {
@@ -403,6 +410,24 @@ GROUP BY data, merce
 		Stallo s = null ;
 		if ( isScarico ) {
 			s = StalloAdapter.getByCodice((q.getCodiceFornitore()), false) ;
+
+			if ( ! isRettifica ) {
+
+				if ( registro.isIva() ) {
+					m.setCodProvenienza(MovimentoIvaAdapter.COD_PROVENIENZA_PORTOVESME);
+
+					m.setNote(MovimentoIvaAdapter.NOTE_SCARICO);
+					if ( c.getIter().getRegdoganale() ) {
+						m.setCodPosizioneDoganale(MovimentoIvaAdapter.COD_POSIZIONEDOGANALE_ENAZ);
+					}
+					else {
+						m.setCodPosizioneDoganale(MovimentoIvaAdapter.COD_POSIZIONEDOGANALE_NAZ);
+					}
+				} else {
+					m.setNote(MovimentoDoganaleAdapter.NOTE_SCARICO);
+				}
+			}
+
 		}
 		else {
 			s = StalloAdapter.getByCodice((q.getCodiceCliente()), false) ;

@@ -27,6 +27,9 @@ public class MovimentoDoganaleAdapter extends MovimentoAdapter {
 	}
 	private static final String TABLE = "registrodoganale" ;
 
+	public static final String NOTE_CARICO = "Intr. in dep.Dog.";
+	public static final String NOTE_SCARICO = "Estr. da dep.Dog.";
+
 	public static String getStaticTable() {
 		return TABLE ;
 	}

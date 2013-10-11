@@ -172,21 +172,23 @@ public class StalloConsegna extends ModelBean2 implements Serializable, Cloneabl
 
 	public void assegnaValori(MovimentoIVA miva) {
 
+		double secco = miva.getSecco().doubleValue();
+
 		double valoreDollari = getValoreArrotondatoDollari(
 				// peso secco in kg * valore di un kg in USD
-				getValoreUnitarioDollari() * miva.getSecco().doubleValue()
+				getValoreUnitarioDollari() * secco
 				);
 
 		miva.setValoreDollari( Double.valueOf(valoreDollari));
 
 		double valoreEuroNetto = getValoreArrotondatoEuro(
-				valoreDollari / getTassoEuroDollaro().doubleValue()
+				getValoreUnitarioEuro() * secco
 				);
 
 		miva.setValoreNetto( Double.valueOf(valoreEuroNetto));
 
 		double valoreTestp = getValoreArrotondatoEuro(
-				getValoreUnitarioTesTp().doubleValue() * miva.getSecco().doubleValue()
+				getValoreUnitarioTesTp().doubleValue() * secco
 				);
 
 		miva.setValoreTestp( valoreTestp );

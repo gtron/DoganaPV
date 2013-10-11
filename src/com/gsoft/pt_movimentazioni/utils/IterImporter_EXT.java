@@ -41,6 +41,14 @@ public class IterImporter_EXT extends IterImporter {
 		m.setIsScarico(Boolean.FALSE);
 		m.setIsRettifica(Boolean.FALSE);
 
+		m.setCodPosizioneDoganale(MovimentoIvaAdapter.COD_POSIZIONEDOGANALE_EXT);
+		m.setCodProvenienza(MovimentoIvaAdapter.COD_PROVENIENZA_PORTO);
+
+		if ( note == null || note.trim().length() < 1 ) {
+			note = MovimentoDoganaleAdapter.NOTE_CARICO;
+		}
+
+
 		m.setNote(note);
 
 		registroDoganale.create(m);

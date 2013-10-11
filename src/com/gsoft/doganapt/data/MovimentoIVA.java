@@ -72,6 +72,11 @@ public class MovimentoIVA extends Movimento {
 		m.setDocumento(documento) ;
 		m.setDocumentoPV(documentoPV);
 
+		m.setCodPosizioneDoganale(codPosizioneDoganale);
+		m.setCodProvenienza(codProvenienza);
+		m.setNote(note);
+
+
 		m.setIsLocked(Boolean.FALSE);
 
 		return m ;

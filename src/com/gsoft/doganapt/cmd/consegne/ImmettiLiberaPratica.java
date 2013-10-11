@@ -222,6 +222,14 @@ public class ImmettiLiberaPratica extends VelocityCommand {
 		m.setIsRettifica(false);
 		m.setData( dataILP ) ;
 		m.setId(null);
+		m.setNote(MovimentoDoganaleAdapter.NOTE_SCARICO);
+		m.setCodProvenienza(MovimentoIvaAdapter.COD_PROVENIENZA_PORTOVESME);
+
+		if ( consegna.getIter().getRegdoganale()) {
+			m.setCodPosizioneDoganale(MovimentoIvaAdapter.COD_POSIZIONEDOGANALE_ENAZ);
+		} else {
+			m.setCodPosizioneDoganale(MovimentoIvaAdapter.COD_POSIZIONEDOGANALE_NAZ);
+		}
 	}
 
 	private MovimentoIVA getMovimentoIva( Movimento m) {
@@ -240,6 +248,15 @@ public class ImmettiLiberaPratica extends VelocityCommand {
 		miva.setData( m.getData() ) ;
 		miva.setId(null);
 		miva.setIsLocked(Boolean.FALSE);
+
+		miva.setNote(MovimentoIvaAdapter.NOTE_CARICO);
+		miva.setCodProvenienza(MovimentoIvaAdapter.COD_PROVENIENZA_MAGDOG);
+
+		if ( consegna.getIter().getRegdoganale()) {
+			miva.setCodPosizioneDoganale(MovimentoIvaAdapter.COD_POSIZIONEDOGANALE_ENAZ);
+		} else {
+			miva.setCodPosizioneDoganale(MovimentoIvaAdapter.COD_POSIZIONEDOGANALE_NAZ);
+		}
 
 		return miva;
 	}
