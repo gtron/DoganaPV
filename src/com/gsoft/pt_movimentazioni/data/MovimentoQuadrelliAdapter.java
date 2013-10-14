@@ -345,6 +345,13 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 
 		Connection conn = db.getConnection();
 
+		if ( conn == null ) {
+			db.shutdown();
+			Thread.sleep(1500);
+			db.start();
+			conn = db.getConnection();
+		}
+
 		if ( conn == null )
 			throw new Exception("Errore di Connessione con il Database Quadrelli!");
 
