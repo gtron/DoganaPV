@@ -431,6 +431,19 @@ GROUP BY data, merce
 		}
 		else {
 			s = StalloAdapter.getByCodice((q.getCodiceCliente()), false) ;
+
+			if ( registro.isIva() ) {
+				m.setCodProvenienza(MovimentoIvaAdapter.COD_PROVENIENZA_PORTO);
+
+				m.setNote(MovimentoIvaAdapter.NOTE_CARICO);
+				if ( c.getIter().getRegdoganale() ) {
+					m.setCodPosizioneDoganale(MovimentoIvaAdapter.COD_POSIZIONEDOGANALE_ENAZ);
+				} else {
+					m.setCodPosizioneDoganale(MovimentoIvaAdapter.COD_POSIZIONEDOGANALE_NAZ);
+				}
+			} else {
+				m.setNote(MovimentoDoganaleAdapter.NOTE_CARICO);
+			}
 		}
 		m.setStallo( s );
 

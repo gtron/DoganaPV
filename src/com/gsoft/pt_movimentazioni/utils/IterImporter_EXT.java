@@ -113,9 +113,7 @@ public class IterImporter_EXT extends IterImporter {
 		// per ogni stallo creo il movimento di carico
 		for ( Iterator<MovimentoQuadrelli> is = listStalli.values().iterator() ; is.hasNext() ; ) {
 
-
-
-			mq = is.next() ;
+			mq = is.next();
 
 			m = getMovimento(false, mq , c, registroDoganale ) ;
 			m.setData(d);
