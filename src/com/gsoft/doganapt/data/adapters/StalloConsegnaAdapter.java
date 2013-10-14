@@ -200,10 +200,10 @@ public class StalloConsegnaAdapter extends BeanAdapter2 {
 
 	public StalloConsegna getByMovimento(Movimento m) throws Exception {
 		StalloConsegna stalloConsegna = new StalloConsegna();
-		stalloConsegna.setIdConsegna(m.getIdConsegna());
-		stalloConsegna.setIdStallo(m.getIdStallo());
+		//		stalloConsegna.setIdConsegna();
+		//		stalloConsegna.setIdStallo();
 
-		return (StalloConsegna) getByKeys(stalloConsegna);
+		return getByKeysIds(m.getIdStallo(), m.getIdConsegna());
 
 	}
 

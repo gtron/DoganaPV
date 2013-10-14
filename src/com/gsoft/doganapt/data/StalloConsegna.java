@@ -3,7 +3,7 @@ package com.gsoft.doganapt.data;
 import java.io.Serializable;
 
 import com.gsoft.doganapt.data.adapters.StalloConsegnaAdapter;
-import com.gtsoft.utils.common.ConfigManager;
+import com.gtsoft.utils.ManagerAliquoteIva;
 import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.common.ModelBean2;
 import com.gtsoft.utils.sql.IDatabase2;
@@ -26,18 +26,12 @@ public class StalloConsegna extends ModelBean2 implements Serializable, Cloneabl
 	Double valoreTesTp;
 	Double valoreUnitarioTesTp;
 
-
 	FormattedDate dataImmissione;
-
-	private static Double aliquotaAttuale = null;
 
 	private static final int PRECISIONE_EURO = 100 ;
 	private static final int PRECISIONE_DOLLARI = 100 ;
 
 	private static final int PRECISIONE_TASSO_CAMBIO = 10000 ;
-	private static final int PRECISIONE_ALIQUOTA_IVA = 100 ; // 0,21 (2 decimali)
-	private static final String CONFIG_KEY_ALIQUOTA_IVA = "aliquotaIva";
-	private static final String ALIQUOTA_IVA_FALLBACK = "0.21";
 
 	public Integer getId() {
 		return id;
@@ -128,7 +122,7 @@ public class StalloConsegna extends ModelBean2 implements Serializable, Cloneabl
 
 	public Double getAliquotaIva() {
 		if ( aliquotaIva == null ) {
-			aliquotaIva = getAliquotaIvaAttuale();
+			aliquotaIva = ManagerAliquoteIva.getAliquotaIvaPerGiorno(new FormattedDate());
 		}
 
 		return aliquotaIva;
@@ -196,41 +190,20 @@ public class StalloConsegna extends ModelBean2 implements Serializable, Cloneabl
 		double sommaNetta = valoreEuroNetto + valoreTestp;
 		miva.setValoreEuro(sommaNetta);
 
-		double iva = getValoreArrotondatoEuro( sommaNetta * getAliquotaIva() );
+		double iva = getValoreArrotondatoEuro( sommaNetta * ManagerAliquoteIva.getAliquotaIvaPerGiorno(miva.getData()) );
 		miva.setValoreIva(iva);
 
 
 	}
 
 
-	public static StalloConsegna getNew() {
+	public static StalloConsegna getNew(FormattedDate giornoApertura) {
 		StalloConsegna sc = new StalloConsegna();
-		sc.setAliquotaIva( getAliquotaIvaAttuale() );
+		sc.setAliquotaIva( ManagerAliquoteIva.getAliquotaIvaPerGiorno(giornoApertura) );
 		return sc ;
 	}
 
-	public static Double getAliquotaIvaAttuale() {
 
-		if ( aliquotaAttuale == null ) {
-
-			String aIva = ConfigManager.getProperty(CONFIG_KEY_ALIQUOTA_IVA);
-
-			if ( aIva == null ) {
-				aIva = ALIQUOTA_IVA_FALLBACK;
-			}
-
-			Double aliquota = Double.valueOf(aIva.replace(',','.'));
-
-			long tmp = Math.round(
-					aliquota.doubleValue() * PRECISIONE_ALIQUOTA_IVA );
-
-			aliquotaAttuale = Double.valueOf( 1d * tmp / PRECISIONE_ALIQUOTA_IVA );
-
-		}
-
-		return aliquotaAttuale ;
-
-	}
 	public StalloConsegna initValori(Double pesoSecco) {
 		double secco = pesoSecco.doubleValue();
 		setValoreDollari(getValoreArrotondato( secco * getValoreUnitarioDollari().doubleValue(), PRECISIONE_DOLLARI) );
@@ -281,10 +254,10 @@ public class StalloConsegna extends ModelBean2 implements Serializable, Cloneabl
 		return ( getValoreArrotondato(d, PRECISIONE_DOLLARI ) );
 	}
 
-	public static Double calcolaValoreIva(Double valoreNetto) {
+	public static Double calcolaValoreIva(Double valoreNetto, FormattedDate giorno) {
 
 		return getValoreArrotondato(
-				valoreNetto.doubleValue() * getAliquotaIvaAttuale().doubleValue()
+				valoreNetto.doubleValue() * ManagerAliquoteIva.getAliquotaIvaPerGiorno(giorno).doubleValue()
 				, PRECISIONE_EURO );
 
 	}

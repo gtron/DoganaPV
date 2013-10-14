@@ -126,7 +126,7 @@ public class ApriConsegna extends VelocityCommand {
 
 				stalloConsegnaAdapter = new StalloConsegnaAdapter();
 
-				initStalloConsegnaApertura();
+				initStalloConsegnaApertura(movApertura.getData());
 
 				if ( movApertura != null ) {
 
@@ -191,9 +191,9 @@ public class ApriConsegna extends VelocityCommand {
 		ConsegnaAdapter.assegnaStalloAConsegna(c, s);
 	}
 
-	protected void initStalloConsegnaApertura() throws Exception {
+	protected void initStalloConsegnaApertura(FormattedDate formattedDate) throws Exception {
 
-		stalloConsegna = StalloConsegna.getNew();
+		stalloConsegna = StalloConsegna.getNew(formattedDate);
 		stalloConsegna.setIdConsegna(idConsegna);
 		stalloConsegna.setIsInLiberaPratica(Boolean.FALSE);
 

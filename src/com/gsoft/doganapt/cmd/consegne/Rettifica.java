@@ -180,7 +180,7 @@ public class Rettifica extends VelocityCommand {
 					movIva.setValoreTestp( rettificaOneri );
 					movIva.setValoreEuro( rettificaOneri  );
 
-					movIva.setValoreIva( StalloConsegna.calcolaValoreIva(rettificaOneri) );
+					movIva.setValoreIva( StalloConsegna.calcolaValoreIva(rettificaOneri, movIva.getData()) );
 
 					movIva.setValoreDollari( Double.valueOf(0d) );
 					movIva.setValoreNetto( movIva.getValoreDollari() );

@@ -12,6 +12,7 @@ import com.gsoft.doganapt.data.adapters.ConsegnaAdapter;
 import com.gsoft.doganapt.data.adapters.IterAdapter;
 import com.gsoft.doganapt.data.adapters.MerceAdapter;
 import com.gsoft.doganapt.data.adapters.StalloAdapter;
+import com.gtsoft.utils.ManagerAliquoteIva;
 import com.gtsoft.utils.http.VelocityCommand;
 import com.gtsoft.utils.http.servlet.GtServlet;
 
@@ -173,6 +174,7 @@ public class Homepage extends VelocityCommand {
 		StalloAdapter.clearCache();
 		MerceAdapter.clearCache();
 		IterAdapter.clearCache();
+		ManagerAliquoteIva.clearCache();
 	}
 
 

@@ -87,7 +87,7 @@ public class ImmettiLiberaPratica extends VelocityCommand {
 
 		ArrayList<Movimento> movimentiUscita = getMovimentiUscita();
 
-		stalloConsegnaValoriUnitari = StalloConsegna.getNew();
+		stalloConsegnaValoriUnitari = StalloConsegna.getNew(new FormattedDate());
 		stalloConsegnaValoriUnitari.setValoreDollari(valoreDollari);
 		stalloConsegnaValoriUnitari.setValoreEuro(
 				stalloConsegnaValoriUnitari.getValoreArrotondatoEuro(valoreDollari/tassoCambio));
@@ -104,7 +104,7 @@ public class ImmettiLiberaPratica extends VelocityCommand {
 
 			if ( stalloConsegna == null ) {
 				// Non è ancora stato creato ... non dovrebbe succedere, cmq lo creiamo ora
-				stalloConsegna = StalloConsegna.getNew();
+				stalloConsegna = StalloConsegna.getNew(m.getData());
 				stalloConsegna.setIdStallo(m.getIdStallo());
 				stalloConsegna.setIdConsegna(idConsegna);
 				stalloConsegna.setIsInLiberaPratica(Boolean.FALSE);
