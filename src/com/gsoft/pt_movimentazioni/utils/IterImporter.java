@@ -442,6 +442,8 @@ GROUP BY data, merce
 					m.setCodPosizioneDoganale(MovimentoIvaAdapter.COD_POSIZIONEDOGANALE_NAZ);
 				}
 			} else {
+				m.setCodProvenienza(MovimentoIvaAdapter.COD_PROVENIENZA_PORTOVESME);
+				m.setCodPosizioneDoganale(MovimentoIvaAdapter.COD_POSIZIONEDOGANALE_COM);
 				m.setNote(MovimentoDoganaleAdapter.NOTE_CARICO);
 			}
 		}
