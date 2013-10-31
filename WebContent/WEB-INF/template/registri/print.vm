@@ -119,8 +119,8 @@ Num.<br />Reg.</th>
 #end
 
 #if ( $isIva )
-<td class="r">$!tools.Number.format('#,##0',$m.ValoreEuro )</td>
-<td class="r">$!tools.Number.format('#,##0',$m.ValoreIva )</td>
+<td class="r">$!tools.Number.format('#,##0.00',$m.ValoreEuro )</td>
+<td class="r">$!tools.Number.format('#,##0.00',$m.ValoreIva )</td>
 #end
 
 </tr>
