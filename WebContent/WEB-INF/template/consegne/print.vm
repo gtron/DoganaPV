@@ -26,6 +26,7 @@ CAPTION {border-bottom: 1px solid #000 ; font-size: 12pt; font-weight: bold;}
 .note {font-size:8pt;}
 </style>
 
+## #set( $righePartitiari  = 5 )
 #set($sumPagina = 0)
 #set($rigaPartitario = 0)
 #set($dateFormat = 'dd/MM/yy')
@@ -173,12 +174,13 @@ $!m.NumRegistro
 <td>&nbsp;</td>
 <td class="r">$!tools.Number.format($tools.Math.mul( -1 , $m.Umido))</td>
 #set($sumUmidoOut = $tools.Math.add( $sumUmidoOut , $tools.Math.mul( -1 , $m.Umido) ) )
+#set($sumUmido = $tools.Math.add( $sumUmido , $m.Umido ) )
 #else
 <td>&nbsp;</td>
 <td class="r">$tools.Number.format($m.Umido)</td>
 #set($sumUmidoOut = $tools.Math.add( $sumUmidoOut , $m.Umido ) )
-#end
 #set($sumUmido = $tools.Math.sub( $sumUmido , $m.Umido ) )
+#end
 #else
 <td class="r">$tools.Number.format($m.Umido)</td>
 <td>&nbsp;</td>
@@ -193,12 +195,14 @@ $!m.NumRegistro
 <td>&nbsp;</td>
 <td class="r">$!tools.Number.format($tools.Math.mul( -1 , $m.Secco))</td>
 #set($sumSeccoOut = $tools.Math.sub( $sumSeccoOut , $m.Secco ) )
+#set($sumSecco = $tools.Math.add( $sumSecco, $m.Secco ) )
 #else
 <td>&nbsp;</td>
 <td class="r">$tools.Number.format($m.Secco)</td>
 #set($sumSeccoOut = $tools.Math.add( $sumSeccoOut , $m.Secco ) )
-#end
 #set($sumSecco = $tools.Math.sub( $sumSecco, $m.Secco ) )
+#end
+
 #else
 <td class="r">$tools.Number.format($m.Secco)</td>
 <td>&nbsp;</td>
