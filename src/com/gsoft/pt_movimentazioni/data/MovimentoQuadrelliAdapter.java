@@ -6,6 +6,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Vector;
 
 import com.gsoft.doganapt.data.Consegna;
@@ -336,7 +337,7 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 
 		}
 
-		sql.append(" group by cliente, data order by data, cliente" ) ;
+		sql.append(" group by cliente, data order by data desc" ) ;
 
 		String key = FileBasedCacher.getCachedKey(sql);
 
@@ -383,6 +384,8 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 		finally {
 			db.freeConnection(conn) ;
 		}
+		Collections.reverse(codici);
+
 		return codici;
 	}
 

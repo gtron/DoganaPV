@@ -67,7 +67,7 @@ public class EditConsegna extends BeanEditor {
 
 					Stallo stallo = StalloAdapter.get(idStallo);
 
-					if ( stallo != null || stallo.getIdConsegnaAttuale() != null ) {
+					if ( stallo != null ) { // && stallo.getIdConsegnaAttuale() != null ) {
 						stallo.setIdConsegnaAttuale(c.getId());
 						stallo.setIdConsegnaPrenotata(null);
 						stallo.setCaricato(0d);
@@ -89,9 +89,9 @@ public class EditConsegna extends BeanEditor {
 
 					//if ( ! c.isAperta() && ! c.isChiusa() )
 
-					if ( Boolean.TRUE.equals( s.getAttribute("admin") ) ) {
-						aggiornaStalli(c, stalli);
-					}
+					//					if ( Boolean.TRUE.equals( s.getAttribute("admin") ) ) {
+					//						aggiornaStalli(c, stalli);
+					//					}
 				}
 
 				ctx.put("result", Boolean.TRUE ) ;
@@ -118,26 +118,26 @@ public class EditConsegna extends BeanEditor {
 		//		ArrayList<Integer> idStalliPrenotati = getIntParams("stalliprenotati", 1);
 		Stallo s = null ;
 
-		HashMap<Integer,Stallo> toUpdate = new HashMap<Integer,Stallo>(3);
-
-		for ( Iterator i = stalli.iterator() ; i.hasNext() ; ){
-			s = ( Stallo ) i.next() ;
-
-			if ( c.isAperta() ) {
-				if ( c.getId().equals( s.getIdConsegnaAttuale() ) ) {
-					s.setIdConsegnaAttuale(null);
-					toUpdate.put(s.getId(), s);
-				}
-			}
-			else if ( ! c.isChiusa() ) {
-				if ( c.getId().equals( s.getIdConsegnaPrenotata() ) ) {
-					s.setIdConsegnaPrenotata(null);
-					toUpdate.put(s.getId(), s);
-				}
-			}
-		}
-
 		if ( idStalliAssegnati != null ) {
+			HashMap<Integer,Stallo> toUpdate = new HashMap<Integer,Stallo>(3);
+
+			for ( Iterator i = stalli.iterator() ; i.hasNext() ; ){
+				s = ( Stallo ) i.next() ;
+
+				if ( c.isAperta() ) {
+					if ( c.getId().equals( s.getIdConsegnaAttuale() ) ) {
+						s.setIdConsegnaAttuale(null);
+						toUpdate.put(s.getId(), s);
+					}
+				}
+				else if ( ! c.isChiusa() ) {
+					if ( c.getId().equals( s.getIdConsegnaPrenotata() ) ) {
+						s.setIdConsegnaPrenotata(null);
+						toUpdate.put(s.getId(), s);
+					}
+				}
+			}
+
 			for (Integer integer : idStalliAssegnati) {
 				s = StalloAdapter.get(integer) ;
 
@@ -153,12 +153,14 @@ public class EditConsegna extends BeanEditor {
 					//					s.update();
 				}
 			}
-		}
 
-		StalloAdapter adp = Stallo.newAdapter() ;
-		for ( Iterator<Stallo> i = toUpdate.values().iterator() ; i.hasNext() ; ){
-			s = i.next() ;
-			adp.update(s);
+			StalloAdapter adp = Stallo.newAdapter() ;
+
+			for( Stallo ss : toUpdate.values() ) {
+				//			for ( Iterator<Stallo> i = toUpdate.values().iterator() ; i.hasNext() ; ){
+				//				s = i.next() ;
+				adp.update(ss);
+			}
 		}
 	}
 

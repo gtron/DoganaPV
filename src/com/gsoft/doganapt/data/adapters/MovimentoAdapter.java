@@ -27,6 +27,17 @@ import com.gtsoft.utils.sql.IDatabase2;
 
 public abstract class MovimentoAdapter extends BeanAdapter2 {
 
+	public static final String COD_POSIZIONEDOGANALE_NAZ = "4500";
+	public static final String COD_POSIZIONEDOGANALE_ENAZ = "4571";
+	public static final String COD_POSIZIONEDOGANALE_EXT = "7100";
+	public static final String COD_PROVENIENZA_MAGDOG = "MAGDOG";
+	public static final String COD_PROVENIENZA_PORTO = "PORTO";
+	public static final String COD_PROVENIENZA_PORTOVESME = "PV";
+	public static final String COD_POSIZIONEDOGANALE_COM = "0000";
+	public static final String NOTE_SCARICO = "Estr. da dep.IVA";
+	public static final String NOTE_CARICO =  "Intr. in dep.IVA";
+
+
 	public MovimentoAdapter() {
 		super();
 	}

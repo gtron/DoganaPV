@@ -186,9 +186,9 @@ public class Rettifica extends VelocityCommand {
 					movIva.setValoreNetto( movIva.getValoreDollari() );
 
 					if ( consegna.getIter().getRegdoganale()) {
-						movIva.setCodPosizioneDoganale(MovimentoIvaAdapter.COD_POSIZIONEDOGANALE_ENAZ);
+						movIva.setCodPosizioneDoganale(MovimentoAdapter.COD_POSIZIONEDOGANALE_ENAZ);
 					} else {
-						movIva.setCodPosizioneDoganale(MovimentoIvaAdapter.COD_POSIZIONEDOGANALE_NAZ);
+						movIva.setCodPosizioneDoganale(MovimentoAdapter.COD_POSIZIONEDOGANALE_NAZ);
 					}
 
 				}

@@ -223,12 +223,12 @@ public class ImmettiLiberaPratica extends VelocityCommand {
 		m.setData( dataILP ) ;
 		m.setId(null);
 		m.setNote(MovimentoDoganaleAdapter.NOTE_SCARICO);
-		m.setCodProvenienza(MovimentoIvaAdapter.COD_PROVENIENZA_PORTOVESME);
+		m.setCodProvenienza(MovimentoAdapter.COD_PROVENIENZA_PORTOVESME);
 
 		if ( consegna.getIter().getRegdoganale()) {
-			m.setCodPosizioneDoganale(MovimentoIvaAdapter.COD_POSIZIONEDOGANALE_ENAZ);
+			m.setCodPosizioneDoganale(MovimentoAdapter.COD_POSIZIONEDOGANALE_ENAZ);
 		} else {
-			m.setCodPosizioneDoganale(MovimentoIvaAdapter.COD_POSIZIONEDOGANALE_NAZ);
+			m.setCodPosizioneDoganale(MovimentoAdapter.COD_POSIZIONEDOGANALE_NAZ);
 		}
 	}
 
@@ -249,13 +249,13 @@ public class ImmettiLiberaPratica extends VelocityCommand {
 		miva.setId(null);
 		miva.setIsLocked(Boolean.FALSE);
 
-		miva.setNote(MovimentoIvaAdapter.NOTE_CARICO);
-		miva.setCodProvenienza(MovimentoIvaAdapter.COD_PROVENIENZA_MAGDOG);
+		miva.setNote(MovimentoAdapter.NOTE_CARICO);
+		miva.setCodProvenienza(MovimentoAdapter.COD_PROVENIENZA_MAGDOG);
 
 		if ( consegna.getIter().getRegdoganale()) {
-			miva.setCodPosizioneDoganale(MovimentoIvaAdapter.COD_POSIZIONEDOGANALE_ENAZ);
+			miva.setCodPosizioneDoganale(MovimentoAdapter.COD_POSIZIONEDOGANALE_ENAZ);
 		} else {
-			miva.setCodPosizioneDoganale(MovimentoIvaAdapter.COD_POSIZIONEDOGANALE_NAZ);
+			miva.setCodPosizioneDoganale(MovimentoAdapter.COD_POSIZIONEDOGANALE_NAZ);
 		}
 
 		return miva;

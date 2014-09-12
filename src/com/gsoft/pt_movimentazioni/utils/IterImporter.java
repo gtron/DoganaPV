@@ -71,8 +71,8 @@ GROUP BY data, merce
 		}
 		m.setNote(note);
 
-		m.setCodPosizioneDoganale(MovimentoIvaAdapter.COD_POSIZIONEDOGANALE_NAZ);
-		m.setCodProvenienza(MovimentoIvaAdapter.COD_PROVENIENZA_PORTO);
+		m.setCodPosizioneDoganale(MovimentoAdapter.COD_POSIZIONEDOGANALE_NAZ);
+		m.setCodProvenienza(MovimentoAdapter.COD_PROVENIENZA_PORTO);
 
 
 		//		if ( c.getValoreUnitario() != null ) {
@@ -414,16 +414,17 @@ GROUP BY data, merce
 			if ( ! isRettifica ) {
 
 				if ( registro.isIva() ) {
-					m.setCodProvenienza(MovimentoIvaAdapter.COD_PROVENIENZA_PORTOVESME);
+					m.setCodProvenienza(MovimentoAdapter.COD_PROVENIENZA_PORTOVESME);
 
-					m.setNote(MovimentoIvaAdapter.NOTE_SCARICO);
+					m.setNote(MovimentoAdapter.NOTE_SCARICO);
 					if ( c.getIter().getRegdoganale() ) {
-						m.setCodPosizioneDoganale(MovimentoIvaAdapter.COD_POSIZIONEDOGANALE_ENAZ);
+						m.setCodPosizioneDoganale(MovimentoAdapter.COD_POSIZIONEDOGANALE_ENAZ);
 					}
 					else {
-						m.setCodPosizioneDoganale(MovimentoIvaAdapter.COD_POSIZIONEDOGANALE_NAZ);
+						m.setCodPosizioneDoganale(MovimentoAdapter.COD_POSIZIONEDOGANALE_NAZ);
 					}
 				} else {
+					m.setCodPosizioneDoganale(MovimentoAdapter.COD_POSIZIONEDOGANALE_COM);
 					m.setNote(MovimentoDoganaleAdapter.NOTE_SCARICO);
 				}
 			}
@@ -433,17 +434,17 @@ GROUP BY data, merce
 			s = StalloAdapter.getByCodice((q.getCodiceCliente()), false) ;
 
 			if ( registro.isIva() ) {
-				m.setCodProvenienza(MovimentoIvaAdapter.COD_PROVENIENZA_PORTO);
+				m.setCodProvenienza(MovimentoAdapter.COD_PROVENIENZA_PORTO);
 
-				m.setNote(MovimentoIvaAdapter.NOTE_CARICO);
+				m.setNote(MovimentoAdapter.NOTE_CARICO);
 				if ( c.getIter().getRegdoganale() ) {
-					m.setCodPosizioneDoganale(MovimentoIvaAdapter.COD_POSIZIONEDOGANALE_ENAZ);
+					m.setCodPosizioneDoganale(MovimentoAdapter.COD_POSIZIONEDOGANALE_ENAZ);
 				} else {
-					m.setCodPosizioneDoganale(MovimentoIvaAdapter.COD_POSIZIONEDOGANALE_NAZ);
+					m.setCodPosizioneDoganale(MovimentoAdapter.COD_POSIZIONEDOGANALE_NAZ);
 				}
 			} else {
-				m.setCodProvenienza(MovimentoIvaAdapter.COD_PROVENIENZA_PORTOVESME);
-				m.setCodPosizioneDoganale(MovimentoIvaAdapter.COD_POSIZIONEDOGANALE_COM);
+				m.setCodProvenienza(MovimentoAdapter.COD_PROVENIENZA_PORTOVESME);
+				m.setCodPosizioneDoganale(MovimentoAdapter.COD_POSIZIONEDOGANALE_COM);
 				m.setNote(MovimentoDoganaleAdapter.NOTE_CARICO);
 			}
 		}
