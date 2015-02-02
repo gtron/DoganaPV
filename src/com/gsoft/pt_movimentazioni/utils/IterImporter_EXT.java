@@ -1,5 +1,6 @@
 package com.gsoft.pt_movimentazioni.utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
@@ -66,8 +67,6 @@ public class IterImporter_EXT extends IterImporter {
 	public MovimentoAdapter getRegistroOutPerILP() {
 		return registroDoganale;
 	}
-
-
 
 	@Override
 	public MovimentoAdapter getRegistroPrimoCarico() {
@@ -161,6 +160,31 @@ public class IterImporter_EXT extends IterImporter {
 
 			registroDoganale.create(m);
 		}
+	}
+
+	/**
+	 * Restituisce la data dell'ultima importazione, se non ho ancora importato
+	 * utilizzo la data di creazione al quale tolgo un giorno per fare in modo
+	 * che venga importata anche quel giorno
+	 */
+	@Override
+	protected FormattedDate getLastData( final Consegna c ,  final ArrayList<Integer> idStalli, final boolean onlyScarichi ) throws Exception {
+		FormattedDate lastData = registroIVA.getLastDate(c, idStalli, onlyScarichi);
+
+		// per le Extracomunitarie non bisogna guardare il registro doganale
+		// altrimenti uno scarico IM4 potrebbe impedire di importare gli scarichi
+		// fatti lo stesso giorno
+
+		/*
+		final FormattedDate lastData2 = registroDoganale.getLastDate(c, idStalli, onlyScarichi);
+
+		if ( lastData == null ||
+				( lastData2 != null && lastData2.after( lastData ) ) ) {
+			lastData = lastData2 ;
+		}
+		 */
+
+		return lastData;
 	}
 
 
