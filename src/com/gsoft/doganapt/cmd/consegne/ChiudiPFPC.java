@@ -73,11 +73,22 @@ public class ChiudiPFPC extends VelocityCommand {
 					m.setIsScarico(true);
 					m.setUmido(0d);
 					m.setSecco(0d);
+					m.setValoreDollari(0d);
+					m.setValoreEuro(0d);
+					m.setValoreIva(0d);
+					m.setValoreNetto(0d);
+					m.setValoreTestp(0d);
 				}
 				m.aggiustaGiacenza(mGiacenza);
+
 				//				m.togli(mGiacenza);
 
-				movAdp.update(m);
+				if ( m.getId() != null && m.getId() > 0 ) {
+					movAdp.update(m);
+				} else {
+					movAdp.create(m);
+				}
+
 				resp.sendRedirect(".consegne?id=" + consegna.getId());
 			}
 			else {

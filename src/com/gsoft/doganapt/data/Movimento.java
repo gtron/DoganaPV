@@ -276,17 +276,22 @@ public abstract class Movimento extends ModelBean2 {
 		if ( sommareValoreGiacente( giacenza.getUmido() ) ) {
 			setUmido(sommaArrotondata(getUmido(), giacenza.getUmido()));
 		} else {
-			setUmido(sottrazioneArrotondata(getUmido(), giacenza.getUmido()));
+			setUmido(sottrazioneArrotondata(getUmido(), Math.abs(giacenza.getUmido())));
 		}
 
 		if ( sommareValoreGiacente( giacenza.getSecco() ) ) {
 			setSecco(sommaArrotondata(getSecco(), giacenza.getSecco()));
 		} else {
-			setSecco(sottrazioneArrotondata(getSecco(), giacenza.getSecco()));
+			setSecco(sottrazioneArrotondata(getSecco(), Math.abs(giacenza.getSecco())));
 		}
 	}
 
 	protected boolean sommareValoreGiacente( Double v ) {
+
+		//		boolean isScaricoONegativo = isScaricoONegativo();
+		//
+		//		boolean vPositivo = v.doubleValue() > 0;
+
 		return ( v.doubleValue() > 0 && isScaricoONegativo()
 				||
 				v.doubleValue() < 0 && ! isScaricoONegativo() );

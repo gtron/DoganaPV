@@ -136,33 +136,32 @@ public class MovimentoIVA extends Movimento {
 		if ( sommareValoreGiacente( giacenzaIva.getValoreDollari() ) ) {
 			setValoreDollari(sommaArrotondata(getValoreDollari(), giacenzaIva.getValoreDollari()));
 		} else {
-			setValoreDollari(sottrazioneArrotondata(getValoreDollari(), giacenzaIva.getValoreDollari()));
+			setValoreDollari(sottrazioneArrotondata(getValoreDollari(), Math.abs(giacenzaIva.getValoreDollari())));
 		}
 
 		if ( sommareValoreGiacente( giacenzaIva.getValoreEuro() ) ) {
 			setValoreEuro(sommaArrotondata(getValoreEuro(), giacenzaIva.getValoreEuro()));
 		} else {
-			setValoreEuro(sottrazioneArrotondata(getValoreEuro(), giacenzaIva.getValoreEuro()));
+			setValoreEuro(sottrazioneArrotondata(getValoreEuro(), Math.abs(giacenzaIva.getValoreEuro())));
 		}
 
 		if ( sommareValoreGiacente( giacenzaIva.getValoreTestp() ) ) {
 			setValoreTestp(sommaArrotondata(getValoreTestp(), giacenzaIva.getValoreTestp()));
 		} else {
-			setValoreTestp(sottrazioneArrotondata(getValoreTestp(), giacenzaIva.getValoreTestp()));
+			setValoreTestp(sottrazioneArrotondata(getValoreTestp(), Math.abs(giacenzaIva.getValoreTestp())));
 		}
 
 		if ( sommareValoreGiacente( giacenzaIva.getValoreNetto() ) ) {
 			setValoreNetto(sommaArrotondata(getValoreNetto(), giacenzaIva.getValoreNetto()));
 		} else {
-			setValoreNetto(sottrazioneArrotondata(getValoreNetto(), giacenzaIva.getValoreNetto()));
+			setValoreNetto(sottrazioneArrotondata(getValoreNetto(), Math.abs(giacenzaIva.getValoreNetto())));
 		}
 
 		if ( sommareValoreGiacente( giacenzaIva.getValoreIva() ) ) {
 			setValoreIva(sommaArrotondata(getValoreIva(), giacenzaIva.getValoreIva()));
 		} else {
-			setValoreIva(sottrazioneArrotondata(getValoreIva(), giacenzaIva.getValoreIva()));
+			setValoreIva(sottrazioneArrotondata(getValoreIva(), Math.abs(giacenzaIva.getValoreIva())));
 		}
-
 	}
 
 
