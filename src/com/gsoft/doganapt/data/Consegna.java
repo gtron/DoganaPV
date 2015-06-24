@@ -428,13 +428,13 @@ public class Consegna extends ModelBean2 implements Serializable {
 		else if ( iva != null && iva.size() > 0 ) {
 			dog = iva ;
 		}
-
+		
 		if ( minNumero != null && minNumero > 0 ) {
 			Movimento m;
 			Vector<Movimento> filtered = new Vector<Movimento>(13);
 			for( Object o : dog ) {
 				m = (Movimento) o;
-				if( m.getNumRegistro() > minNumero ) {
+				if( m.getNumRegistro() >= minNumero ) {
 					filtered.add(m);
 				}
 			}
