@@ -153,7 +153,7 @@ public class StalloConsegna extends ModelBean2 implements Serializable, Cloneabl
 	}
 	public Integer getTassoEuroDollaroDB() {
 		if (tassoEuroDollaro == null ) return null;
-		return new Double( tassoEuroDollaro.doubleValue() * PRECISIONE_TASSO_CAMBIO  ).intValue();
+		return (int) Math.round( tassoEuroDollaro.doubleValue() * PRECISIONE_TASSO_CAMBIO  );
 	}
 
 	public void updateValore(MovimentoIVA m) {
