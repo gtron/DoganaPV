@@ -88,7 +88,8 @@ CAPTION {border-bottom: 1px solid #000 ; font-size: 12pt; font-weight: bold;}
 #if( $paginaPrecedente > 0)
 <small>(continua da pag. $paginaPrecedente)</small>
 #else
-/ $sumPagina
+# togliamo le pagine
+# / $sumPagina
 #end
 </div>
 <div id="dettaglio">
