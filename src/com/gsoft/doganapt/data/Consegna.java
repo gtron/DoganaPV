@@ -406,10 +406,18 @@ public class Consegna extends ModelBean2 implements Serializable {
 
 	}
 
-	public Vector getPartitario() throws Exception {
+	public Vector<?> getPartitario() throws Exception {
+		return getPartitario(null, null);
+	}
 
-		Vector dog = new MovimentoDoganaleAdapter().getByConsegna(true, id, null, "idstallo, data" , null );
-		final Vector iva = new MovimentoIvaAdapter().getByConsegna(true, id, null, "idstallo, data" , null );
+	public Vector<?> getPartitario(Integer idStallo) throws Exception {
+		return getPartitario(idStallo, null);
+	}
+
+	public Vector<?> getPartitario(Integer idStallo, Integer minNumero) throws Exception {
+
+		Vector<?> dog = new MovimentoDoganaleAdapter().getByConsegna(true, id, idStallo, "idstallo, data" , null );
+		final Vector iva = new MovimentoIvaAdapter().getByConsegna(true, id, idStallo, "idstallo, data" , null );
 
 		if ( dog != null && dog.size() >  0 ) {
 			if ( iva != null && iva.size() > 0 ) {
@@ -421,7 +429,19 @@ public class Consegna extends ModelBean2 implements Serializable {
 			dog = iva ;
 		}
 
-		return dog;
+		if ( minNumero != null && minNumero > 0 ) {
+			Movimento m;
+			Vector<Movimento> filtered = new Vector<Movimento>(13);
+			for( Object o : dog ) {
+				m = (Movimento) o;
+				if( m.getNumRegistro() > minNumero ) {
+					filtered.add(m);
+				}
+			}
+			return filtered;
+		}
+		else
+			return dog;
 	}
 
 	private class PartitarioSorter implements Comparator {
@@ -469,7 +489,6 @@ public class Consegna extends ModelBean2 implements Serializable {
 					else
 						return s.getHasLiberaPratica().booleanValue();
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 					return false;
 				}
