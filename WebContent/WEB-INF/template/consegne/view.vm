@@ -69,10 +69,7 @@ il Valore Unitario e il Tasso di Cambio nel pannello di dettaglio!</span>
 </div>
 <div id="ret" class="print"></div>
 
-<script>
-function printPartitari() {
-$('#ret').load('?id=$obj.Id&cmd=print', {}, function(){doPrint(true);} );
-}
+<script type="text/javascript">
 function initRowHighlighting(){
 var table = document.getElementById('tablemovimenti');
 attachRowMouseEvents(table.getElementsByTagName('tr'));
@@ -119,7 +116,7 @@ $("#menuConsegna").tabs();
 
 <div class="commands">
 <ul>
-<li><a href="#" onclick="printPartitari();return false;"><img src="$!images/action-ico-stampa.png" /> Stampa</a></li>
+<li><a href="#" onclick="$('#dlg_Stampa').dialogOpen();return false;"><img src="$!images/action-ico-stampa.png" /> Stampa</a></li>
 #if($obj.isChiusa())
 
 #elseif($obj.isAperta()) 
@@ -162,6 +159,27 @@ $("#menuConsegna").tabs();
 ##<li><a href=".consegne?cmd=edit"><img src="$!images/action-ico-nuovo.png" /> Nuova consegna</a></li>
 </ul>
 </div>
+
+
+
+<div id="dlg_Stampa" class="flora" style="text-align:center;">
+
+<form action="" id="frm_Stampa" method="POST">
+Stallo: 
+<select size="1" name="idStallo" id="idStallo">
+<option value="-1" selected="selected">Tutti</option>
+#foreach( $s in $obj.StalliRelazionati )
+<option value="$s.Id" >$s.Nome</option>
+#end
+</select>
+<br /><br />
+<label>Stampa a partire dal N. di registro (incluso): <input type="text" name="minNumRegistro" size="6" id="minNumRegistro" /></label><br />
+<br />
+<label>Continua da Pagina: <input type="text" name="paginaPrecedente" size="6" id="paginaPrecedente" /></label><br />
+<br /><br />
+</form>
+</div>
+
 
 <div id="dlg_Travasa" class="flora" style="text-align:center;">
 <form action="" id="frm_Travasa" method="POST">
@@ -254,7 +272,26 @@ monthNames: ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
 
 popUpCal.setDefaults(popUpCal.regional['it']);
 
+
+function stampaPartitari() {
+var idStallo = 1*$('#idStallo').val();
+var minNumRegistro   = 0 + 1*$('#minNumRegistro').val();
+var paginaPrecedente = 0 + 1*$('#paginaPrecedente').val();
+
+if( idStallo === -1 || ( minNumRegistro > 0 && paginaPrecedente > 0) ){
+$('#ret').load('?id=$obj.Id&cmd=print&idStallo='+idStallo+'&minNumRegistro='+minNumRegistro+'&paginaPrecedente='+paginaPrecedente, {}, function(){doPrint(true);} );
+} else {
+	alert('Attenzione, per poter stampare un solo stallo bisogna indicare la pagina precedente e il numero di partenza!');
+}
+}
+
+
 jQuery('#dataLP').calendar();
+
+$("#dlg_Stampa").dialog({ width:500,height:220,buttons:
+{Stampa:function(){stampaPartitari(this);},Annulla:function(){$("#dlg_Stampa").dialogClose();}}
+});
+$("#dlg_Stampa").dialogClose();
 
 $("#dlg_Travasa").dialog({ width:500,
 height:420,buttons:{'Travasa/Libera Stallo': function(){travasaStallo(true);} ,Annulla : function() { $("#dlg_Travasa").dialogClose(); } } 

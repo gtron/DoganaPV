@@ -11,6 +11,15 @@ width:270mm;
 height: 190mm;
 color: #000;
 }
+
+#if($topMargin > 0)
+CAPTION { 
+display: none;
+}
+.movimenti { margin-top: ${topMargin}em  ; }
+}
+#end
+
 .titoloStallo { padding:10px 0 2px 0; }
 TABLE { width : 100%; font-size: 1em; border-collapse: collapse ; page-break-inside: avoid ; color: #000;}
 CAPTION {border-bottom: 1px solid #000 ; font-size: 12pt; font-weight: bold;}
@@ -31,7 +40,7 @@ CAPTION {border-bottom: 1px solid #000 ; font-size: 12pt; font-weight: bold;}
 #set($rigaPartitario = 0)
 #set($dateFormat = 'dd/MM/yy')
 #set($oldStallo = '')
-#foreach( $m in $obj.Partitario )
+#foreach( $m in $partitario )
 #set($rigaPartitario = $rigaPartitario + 1 )
 #set($nuovoStallo = ( $oldStallo == '' || $oldStallo.Id != $m.Stallo.Id  ) )
 #if( $nuovoStallo || ( $rigaPartitario  % $righePartitiari ) == 0 )
@@ -75,7 +84,13 @@ CAPTION {border-bottom: 1px solid #000 ; font-size: 12pt; font-weight: bold;}
 <div id="partitario_$oldStallo.Id" class="partitario">
 
 <table border="0" class="movimenti" cellpadding="2" cellspacing="0" class="tablemovimenti">
-<caption><div id="numPartitario">$!obj.NumeroPartitario / $sumPagina</div>
+<caption><div id="numPartitario">$!obj.NumeroPartitario 
+#if( $paginaPrecedente > 0)
+<small>(continua da pag. $paginaPrecedente)</small>
+#else
+/ $sumPagina
+#end
+</div>
 <div id="dettaglio">
 <br />
 <table border="0" style="font-size:9pt"><tr><td valign="top" style="text-align:left; border:0;">
