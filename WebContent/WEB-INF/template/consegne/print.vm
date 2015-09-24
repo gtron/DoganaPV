@@ -43,7 +43,19 @@ CAPTION {border-bottom: 1px solid #000 ; font-size: 12pt; font-weight: bold;}
 #foreach( $m in $partitario )
 #set($rigaPartitario = $rigaPartitario + 1 )
 #set($nuovoStallo = ( $oldStallo == '' || $oldStallo.Id != $m.Stallo.Id  ) )
+
 #if( $nuovoStallo || ( $rigaPartitario  % $righePartitiari ) == 0 )
+
+
+#if( $paginaPrecedente > 0)
+#set( $stallo = $m.Stallo )
+#set( $idCAttuale = $stallo.IdConsegnaAttuale )
+$stallo.setIdConsegnaAttuale($m.IdConsegna)
+#set($giacenzaUmido = $tools.Math.max( $m.Stallo.getGiacenzaDoganale(false), $m.Stallo.getGiacenzaIva(false)) )
+#set($giacenzaSecco = $tools.Math.max( $m.Stallo.getGiacenzaDoganale(true), $m.Stallo.getGiacenzaIva(true)) )
+$stallo.setIdConsegnaAttuale($idCAttuale)
+#end
+
 #if( $oldStallo.Id )
 ##if ( $sumUmidoIn == $sumUmidoOut )
 <tr class="tot">
@@ -51,16 +63,15 @@ CAPTION {border-bottom: 1px solid #000 ; font-size: 12pt; font-weight: bold;}
 </tr>
 <tr class="tot">
 <td colspan="5" class="r">Giacenza Attuale:</td>
-#*
-<td>$tools.Number.format($sumUmidoIn)</td>
-<td>$tools.Number.format($sumUmidoOut)</td>
-*#
+
+#if( $paginaPrecedente > 0)
+<td class="c" colspan="2">$tools.Number.format($giacenzaUmido)</td>
+<td class="c" colspan="2">$tools.Number.format($giacenzaSecco)</td>
+#else
 <td class="c" colspan="2">$tools.Number.format($sumUmido)</td>
-##<td>&nbsp;</td>
-#*<td>$tools.Number.format($sumSeccoIn)</td>
-<td>$tools.Number.format($sumSeccoOut)</td>
-*#
 <td class="c" colspan="2">$tools.Number.format($sumSecco)</td>
+#end
+
 <td>&nbsp;</td>
 <td>&nbsp;</td>
 <td>&nbsp;</td>
@@ -88,8 +99,10 @@ CAPTION {border-bottom: 1px solid #000 ; font-size: 12pt; font-weight: bold;}
 #if( $paginaPrecedente > 0)
 <small>(continua da pag. $paginaPrecedente)</small>
 #else
-# togliamo le pagine
-# / $sumPagina
+
+## togliamo le pagine
+## / $sumPagina
+
 #end
 </div>
 <div id="dettaglio">
@@ -230,45 +243,29 @@ $!m.NumRegistro
 <td class="c">$!m.RegimeDoganale</td>
 <td class="c note">$!m.Note</td>
 
-#*
-#if( $m.getIsScarico() )
-#set($sumSecco = $tools.Math.sub( $sumSecco , $m.Secco ) )
-#set($sumUmido = $tools.Math.sub( $sumUmido , $m.Umido ) )
-#else
-#set($sumSecco = $tools.Math.add( $sumSecco , $m.Secco ) )
-#set($sumUmido = $tools.Math.add( $sumUmido , $m.Umido ) )
-#end
-*#
-
-#if ( $sumUmidoIn == $sumUmidoIn )
-##<tr class="sep"><td colspan="10" align="center">Svuotamento Stallo</td></tr>
-#end
-
 #set($oldStallo = $m.Stallo)
 
 #end
 
 #if( $oldStallo.Id)
-##if ( $sumUmidoIn == $sumUmidoOut )
 <tr class="tot">
 <td colspan="10" class="f" style="height:1pt;"><img src="$!wwwRoot/images/bgrabber.gif" width="1" height="1" alt=" "/></td>
 </tr>
 <tr class="tot">
 <td colspan="5" class="r">Giacenza Attuale:</td>
-#*
-<td>$tools.Number.format($sumUmidoIn)</td>
-<td>$tools.Number.format($sumUmidoOut)</td>
-*#
+
+#if( $paginaPrecedente > 0)
+<td class="c" colspan="2">$tools.Number.format($giacenzaUmido)</td>
+<td class="c" colspan="2">$tools.Number.format($giacenzaSecco)</td>
+#else
 <td class="c" colspan="2">$tools.Number.format($sumUmido)</td>
-##<td>&nbsp;</td>
-#*<td>$tools.Number.format($sumSeccoIn)</td>
-<td>$tools.Number.format($sumSeccoOut)</td>
-*#
 <td class="c" colspan="2">$tools.Number.format($sumSecco)</td>
+#end
+
 <td>&nbsp;</td>
 <td>&nbsp;</td>
 <td>&nbsp;</td>
 </tr>
-##end
+
 </tbody></table></div>
 #end
