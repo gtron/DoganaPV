@@ -18,6 +18,7 @@ import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.common.ModelBean2;
 import com.gtsoft.utils.sql.IDatabase2;
 
+@SuppressWarnings("serial")
 public class Consegna extends ModelBean2 implements Serializable {
 
 	Integer id ;
@@ -428,7 +429,7 @@ public class Consegna extends ModelBean2 implements Serializable {
 		else if ( iva != null && iva.size() > 0 ) {
 			dog = iva ;
 		}
-		
+
 		if ( minNumero != null && minNumero > 0 ) {
 			Movimento m;
 			Vector<Movimento> filtered = new Vector<Movimento>(13);
@@ -444,7 +445,7 @@ public class Consegna extends ModelBean2 implements Serializable {
 			return dog;
 	}
 
-	private class PartitarioSorter implements Comparator {
+	private class PartitarioSorter implements Comparator<Object> {
 
 		public int compare(final Object o1, final Object o2) {
 			final Movimento a = (Movimento) o1 ;
