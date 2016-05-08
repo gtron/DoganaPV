@@ -1,5 +1,7 @@
 package com.gsoft.doganapt.cmd.consegne;
 
+import java.util.Vector;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -7,6 +9,8 @@ import org.apache.velocity.Template;
 import org.apache.velocity.context.Context;
 
 import com.gsoft.doganapt.data.Consegna;
+import com.gsoft.doganapt.data.Movimento;
+import com.gsoft.doganapt.data.MovimentoDoganale;
 import com.gsoft.doganapt.data.adapters.ConsegnaAdapter;
 import com.gtsoft.utils.common.BeanAdapter2;
 import com.gtsoft.utils.http.VelocityCommand;
@@ -37,10 +41,28 @@ public class PrintConsegna extends VelocityCommand {
 		Consegna c = (Consegna) getAdapter().getByKey(id);
 		ctx.put(ContextKeys.OBJECT, c);
 
-
-
 		if (idStallo > -1) {
-			ctx.put( "partitario", c.getPartitario(idStallo, minNumRegistro));
+
+			Vector<?> partitario = c.getPartitario(idStallo);
+
+			if ( minNumRegistro != null && minNumRegistro > 0 ) {
+				Movimento m;
+				Movimento giacenzaIniziale = new MovimentoDoganale();
+				giacenzaIniziale.setUmido(0d);
+				giacenzaIniziale.setSecco(0d);
+				Vector<Movimento> filtered = new Vector<Movimento>(13);
+				for( Object o : partitario ) {
+					m = (Movimento) o;
+					if( m.getNumRegistro() >= minNumRegistro ) {
+						filtered.add(m);
+					} else {
+						giacenzaIniziale.aggiungi(m);
+					}
+				}
+				partitario = filtered;
+			}
+
+			ctx.put( "partitario", partitario);
 
 			ctx.put( PAGINA_PRECEDENTE, paginaPrecedente);
 		} else {
@@ -63,4 +85,5 @@ public class PrintConsegna extends VelocityCommand {
 	public String getTemplateName() {
 		return TEMPLATE;
 	}
+
 }
