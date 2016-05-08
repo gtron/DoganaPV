@@ -10,7 +10,7 @@ import com.gsoft.doganapt.data.adapters.StalloAdapter;
 import com.gtsoft.utils.common.ModelBean2;
 import com.gtsoft.utils.sql.IDatabase2;
 
-public class Stallo extends ModelBean2 {
+public class Stallo extends ModelBean2 implements Cloneable {
 
 	Integer id ;
 
@@ -107,29 +107,18 @@ public class Stallo extends ModelBean2 {
 	}
 
 	public Double getGiacenza(MovimentoAdapter registro, boolean secco) throws Exception {
-		double sum = 0 ;
-		double val = 0;
+
 		@SuppressWarnings("unchecked")
 		Vector<Movimento> v = registro.getByConsegna(true, idConsegnaAttuale, id, null, null );
 
-		for (Movimento m : v) {
-			if ( secco ) {
-				val = m.getSecco().doubleValue() ;
-			} else {
-				val = m.getUmido().doubleValue() ;
-			}
-			if ( m.isScarico || m.getSecco().intValue() < 0 ) {
-				if( m.getSecco().intValue() < 0 ) {
-					sum += val ;
-				} else {
-					sum -= val ;
-				}
-			} else {
-				sum += val ;
-			}
-		}
-		return sum ;
+		Movimento giacenza = Movimento.getMovimentoRisultante(v);
+
+		if ( secco )
+			return giacenza.getSecco();
+		else
+			return giacenza.getUmido();
 	}
+
 	public Double getGiacenzaIva(boolean secco) throws Exception {
 		return getGiacenza(new MovimentoIvaAdapter(), secco);
 	}
@@ -153,7 +142,12 @@ public class Stallo extends ModelBean2 {
 
 		for (Movimento m : v) {
 			if ( m.isScaricoONegativo() ) {
-				mov.togli(m);
+				if ( m.getIsRettifica() && m.getSecco().doubleValue() < 0 ) {
+					// se è una rettifica negativa va sommato ... credo ...
+					mov.aggiungi(m);
+				} else {
+					mov.togli(m);
+				}
 			} else {
 				mov.aggiungi(m);
 			}
@@ -202,6 +196,12 @@ public class Stallo extends ModelBean2 {
 		if ( update ) {
 			Stallo.newAdapter().update(this);
 		}
+	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		// TODO Auto-generated method stub
+		return super.clone();
 	}
 
 }
