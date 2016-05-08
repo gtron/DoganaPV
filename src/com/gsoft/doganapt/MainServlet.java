@@ -53,4 +53,10 @@ public class MainServlet extends TooledServlet {
 		public static final String RECOVERDB = "recover" ;
 		public static final String BACKUPDB = "backup";
 	}
+
+	//  @Override
+	//      public final IDatabase2 getDatabase() {
+	//              return DbManager2.getStaticInstance() ;
+	//      }
+
 }

@@ -38,6 +38,40 @@ public class Login extends VelocityCommand {
 
 		Utente utente = Utente.newAdapter().getUtente( username, pwd );
 
+		/*
+		+               IDatabase2 db = getDatabase();
+		+               Connection c = null;
+		+               DbConnectionBroker b = db.getBroker();
+		+
+		+               try {
+		+                       c = db.getConnection();
+		+                       if ( b.getAge(c) > 10) {
+		+                               System.out.println("Connessione VECCHIA ! ");
+		+                               b.freeConnection(c);
+		+                       }
+		+                       String m = c.getCatalog();
+		+               } catch ( Exception e ) {
+		+
+		+                       e.printStackTrace();
+		+
+		+                       try {
+		+
+		+                               if ( b != null) {
+		+                                       b.destroy(500);
+		+
+		+                                       c = b.getConnection();
+		+                                       System.out.println("Connessione " +
+		+                                                       ((! db.getConnection().isClosed())? "CHIUSA":"APERT
+		+                                                       "! ");
+		+                               }
+		+
+		+
+		+                       } catch ( Exception e1 ) {
+		+                               e1.printStackTrace();
+		+                       }
+		+               }
+		+                */
+
 		if ( isLoginValido(utente)) {
 
 			if ( isLogged(req) ) {
