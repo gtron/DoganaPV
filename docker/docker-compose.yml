@@ -1,0 +1,7 @@
+db:
+  image: mysql:5.6
+  environment:
+   MYSQL_ROOT_PASSWORD: root
+  volumes:
+    - ./mysqlData:/var/lib/mysql
+    - ./mysqlInitSql:/docker-entrypoint-initdb.d
