@@ -1,5 +1,7 @@
 package com.gsoft.doganapt.data;
 
+import java.util.Vector;
+
 import com.gsoft.doganapt.data.adapters.ConsegnaAdapter;
 import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.common.ModelBean2;
@@ -297,7 +299,7 @@ public abstract class Movimento extends ModelBean2 {
 				v.doubleValue() < 0 && ! isScaricoONegativo() );
 	}
 
-	protected Double sottrazioneArrotondata(Double a, Double b) {
+	protected static Double sottrazioneArrotondata(Double a, Double b) {
 
 		double _a = 0d;
 		if ( a != null ) {
@@ -312,7 +314,7 @@ public abstract class Movimento extends ModelBean2 {
 		return Double.valueOf(  Math.round( 100 * _a - 100 * _b) / 100d );
 	}
 
-	protected Double sommaArrotondata(Double a, Double b) {
+	protected static Double sommaArrotondata(Double a, Double b) {
 
 		double _a = 0d;
 		if ( a != null ) {
@@ -325,6 +327,37 @@ public abstract class Movimento extends ModelBean2 {
 		}
 
 		return Double.valueOf(  Math.round( 100 * _a + 100 * _b) / 100d );
+	}
+
+	public static Movimento getMovimentoRisultante(Vector<Movimento> movimenti) {
+
+		Movimento movRisultante;
+
+		if ( movimenti.size() > 0 ) {
+			movRisultante = movimenti.firstElement().clone();
+		}
+		else {
+			movRisultante = new MovimentoDoganale();
+		}
+		movRisultante.setSecco(0d);
+		movRisultante.setUmido(0d);
+
+		for (Movimento m : movimenti) {
+			if ( m.isScaricoONegativo() ) {
+				if( m.getSecco().intValue() < 0 ) {
+					movRisultante.setSecco( sommaArrotondata( movRisultante.getSecco(), m.getSecco()) );
+					movRisultante.setUmido( sommaArrotondata( movRisultante.getUmido(), m.getUmido()) );
+				} else {
+					movRisultante.setSecco( sottrazioneArrotondata( movRisultante.getSecco(), m.getSecco()) );
+					movRisultante.setUmido( sottrazioneArrotondata( movRisultante.getUmido(), m.getUmido()) );
+				}
+			} else {
+				movRisultante.setSecco( sommaArrotondata( movRisultante.getSecco(), m.getSecco()) );
+				movRisultante.setUmido( sommaArrotondata( movRisultante.getUmido(), m.getUmido()) );
+			}
+		}
+
+		return movRisultante;
 	}
 
 }
