@@ -102,6 +102,10 @@ jQuery("#tablemovimenti").jqGrid({
 url:'.registri?$!{regiva}json=true&records=$!records&idMerce='+ '' + '&inputNum= ' + $("#inputNum").val() + '&inputDal=' + $("#inputDal").val() + '&inputAl=' + $("#inputAl").val() + '&ndS='+new Date().getTime(),
 datatype: 'json', 
 height: 450,
+
+sortname: "data",
+sortorder: "desc",
+
 #*
 
 subGrid: true,
