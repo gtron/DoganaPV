@@ -103,7 +103,7 @@ url:'.registri?$!{regiva}json=true&records=$!records&idMerce='+ '' + '&inputNum=
 datatype: 'json', 
 height: 450,
 
-sortname: "data",
+sortname: "numregistro",
 sortorder: "desc",
 
 #*
