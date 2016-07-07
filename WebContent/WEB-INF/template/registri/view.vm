@@ -312,10 +312,11 @@ if ( d == 'true') location.href = location.href ; else alert( 'Si è verificato 
 <li style="border-right:2px solid #EEE;"><a href="#" onclick="deregistraMovimento(); return false;"><img src="$!images/action-ico-elimina.png" />De-Registra Movimento</a></li>
 #end
 <li style="border-right:2px solid #EEE;"><a href="#" onclick="editMovimento(); return false;"><img src="$!images/action-ico-modifica.png" />Modifica Movimento</a></li>
-<li><a href="#" onclick="riordina();return false;"><img src="$!images/action-ico-immetti.png" />Riordina Numerazione</a></li>
+<!-- li><a href="#" onclick="riordina();return false;"><img src="$!images/action-ico-immetti.png" />Riordina Numerazione</a></li -->
 <li><a href="#" onclick="stampaCopertina(); return false;"><img src="$!images/action-ico-stampa.png" />Copertina</a></li>
 <li><a href="#" onclick="$('#dlg_Prepara').dialogOpen(); return false;"><img src="$!images/action-ico-stampa.png" />Prepara Pagine</a></li>
-<li><a href="#" onclick="$('#dlg_Print').dialogOpen(); return false;"><img src="$!images/action-ico-stampa.png" />Stampa Registro</a></li>
+<li><a href="#" onclick="$('#dlg_Print').dialogOpen(); return false;"><img src="$!images/action-ico-stampa.png" />Stampa</a></li>
+<!-- li><a href="#" onclick="$('#dlg_Export').dialogOpen(); return false;"><img width="22" src="$!images/tab-ico-importazione.png" />Esporta</a></li -->
 </ul>
 </div>
 
