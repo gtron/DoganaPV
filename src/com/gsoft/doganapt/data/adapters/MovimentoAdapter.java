@@ -575,7 +575,10 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 
 		if(page!=null && rows!=null){
 			sql.append(" LIMIT ").append((page - 1) *  rows).append(",").append(rows);
+		} else if ( rows != null ) {
+			sql.append(" LIMIT ").append(rows);
 		}
+		
 		Vector list = null ;
 
 		final Connection conn = db.getConnection() ;
