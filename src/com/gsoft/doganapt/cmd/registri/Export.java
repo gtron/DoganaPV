@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.velocity.Template;
 import org.apache.velocity.context.Context;
 
-import com.gsoft.doganapt.data.Movimento;
+import com.gsoft.doganapt.cmd.Login;
 import com.gsoft.doganapt.data.adapters.ConsegnaAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoDoganaleAdapter;
@@ -20,7 +20,7 @@ import com.gtsoft.utils.http.servlet.GtServlet;
 
 
 public class Export extends ViewRegistro {
-	private static final Integer MAX_ROWS = 100;
+	private static final Integer MAX_ROWS = 50000;
 	
 	protected static String TEMPLATE = "registri/csv/view.vm";
 	
@@ -30,19 +30,27 @@ public class Export extends ViewRegistro {
 	public Template exec(HttpServletRequest req, HttpServletResponse resp, Context ctx) throws Exception  {
 		
 		Boolean isRegistroIva = getBooleanParam(TIPO_REGISTRO_IVA, false);
-		if ( isRegistroIva == null )
+		String registro = "iva";
+		if ( isRegistroIva == null ) {
 			isRegistroIva = Boolean.FALSE;
+			registro = "doganale";
+		}
 		
-		resp.setContentType("application/force-download");
-//		resp.setContentLength((int)f.length());
-//		resp.setHeader("Content-Transfer-Encoding", "binary");
-		String filename = "export_registro.csv";
-		if(isRegistroIva) filename = "export_registro_iva.csv";
+		Boolean isDebug = getBooleanParam("d", false);
 		
-		resp.setHeader("Content-Disposition","attachment; filename=\"" + filename + "\"");//fileName);
-
+		FormattedDate now = new FormattedDate();
+		String timestamp = now.fullString().replaceAll("[:-]","").replaceAll(" ", "_");
 		
+		if ( ! Boolean.TRUE.equals(isDebug) ) {
 		
+			resp.setContentType("application/force-download");
+	//		resp.setContentLength((int)f.length());
+	//		resp.setHeader("Content-Transfer-Encoding", "binary");
+			String filename = "export_registro_" + registro + "_" + timestamp + ".csv";
+			
+			
+			resp.setHeader("Content-Disposition","attachment; filename=\"" + filename + "\"");//fileName);
+		}
 		
 		ctx.put( TIPO_REGISTRO_IVA ,  isRegistroIva) ;
 		
@@ -53,6 +61,11 @@ public class Export extends ViewRegistro {
 		
 		FormattedDate dal = getDateParam(DAL, false);
 		FormattedDate al = getDateParam(AL, false);
+		
+		if ( al != null ) {
+			al = new FormattedDate( al.ymdString() + " 23:59:59" );
+		}
+		
 
 		MovimentoAdapter adp = ( isRegistroIva ? 
 				new MovimentoIvaAdapter() : new MovimentoDoganaleAdapter() ) ;
@@ -62,6 +75,8 @@ public class Export extends ViewRegistro {
 		ctx.put( "list" , vector);
 //		writeExcel(resp, vector);
 		
+		
+		Login.logAction("Exporting registry " + registro + " - from: " + dal + " to: " + al, request);
 		
 		
 		return null ;
