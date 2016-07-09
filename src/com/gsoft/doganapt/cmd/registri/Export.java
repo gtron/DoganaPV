@@ -1,14 +1,24 @@
 package com.gsoft.doganapt.cmd.registri;
 
+import java.io.IOException;
 import java.util.Vector;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.velocity.Template;
 import org.apache.velocity.context.Context;
 
 import com.gsoft.doganapt.cmd.Login;
+import com.gsoft.doganapt.data.Consegna;
+import com.gsoft.doganapt.data.Movimento;
+import com.gsoft.doganapt.data.MovimentoIVA;
 import com.gsoft.doganapt.data.adapters.ConsegnaAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoDoganaleAdapter;
@@ -41,17 +51,6 @@ public class Export extends ViewRegistro {
 		FormattedDate now = new FormattedDate();
 		String timestamp = now.fullString().replaceAll("[:-]","").replaceAll(" ", "_");
 		
-		if ( ! Boolean.TRUE.equals(isDebug) ) {
-		
-			resp.setContentType("application/force-download");
-	//		resp.setContentLength((int)f.length());
-	//		resp.setHeader("Content-Transfer-Encoding", "binary");
-			String filename = "export_registro_" + registro + "_" + timestamp + ".csv";
-			
-			
-			resp.setHeader("Content-Disposition","attachment; filename=\"" + filename + "\"");//fileName);
-		}
-		
 		ctx.put( TIPO_REGISTRO_IVA ,  isRegistroIva) ;
 		
 		Boolean json = getBooleanParam(JSON, false);
@@ -72,11 +71,24 @@ public class Export extends ViewRegistro {
 		
 		Vector vector = adp.getRegistro( true, null , null, MAX_ROWS, null, null, dal, al, null, null );
 		
-		ctx.put( "list" , vector);
-//		writeExcel(resp, vector);
-		
-		
+//		ctx.put( "list" , vector);
 		Login.logAction("Exporting registry " + registro + " - from: " + dal + " to: " + al, request);
+		
+		
+		if ( ! Boolean.TRUE.equals(isDebug) ) {
+			
+//			resp.setContentType("application/force-download");
+	//		resp.setContentLength((int)f.length());
+	//		resp.setHeader("Content-Transfer-Encoding", "binary");
+			
+			String filename = "export_registro_" + registro + "_" + timestamp + ".xls";
+			resp.setHeader("Content-Disposition","attachment; filename=\"" + filename + "\"");//fileName);
+			
+			resp.setContentType("application/vnd.ms-excel");
+			
+			writeAsExcel(resp, vector, isRegistroIva);
+			
+		}
 		
 		
 		return null ;
@@ -95,35 +107,97 @@ public class Export extends ViewRegistro {
 		return TEMPLATE;
 	}
 	
-	private void writeExcel( HttpServletResponse resp, Vector<?> vector ) {
-//		Workbook wb = new HSSF	Workbook();
-//		Sheet personSheet = wb.createSheet("PersonList");
-//		Row headerRow = personSheet.createRow(0);
-//		Cell nameHeaderCell = headerRow.createCell(0);
-//		Cell addressHeaderCell = headerRow.createCell(1);
+	private void writeAsExcel( HttpServletResponse resp, Vector<?> vector, boolean isIva ) throws IOException {
+		Workbook wb = new HSSFWorkbook();
+		
+		Sheet sheet = wb.createSheet("Movimenti");
+		Row headerRow = sheet.createRow(0);
+		
+		int col = 0 ;
+		
+		
+		headerRow.createCell(col++).setCellValue("Num. Registro");
+		headerRow.createCell(col++).setCellValue("Data");
+		headerRow.createCell(col++).setCellValue("Num. Consegna");
+		headerRow.createCell(col++).setCellValue("NumeroPartitario");
+		headerRow.createCell(col++).setCellValue("Documento");
+	    
+	    headerRow.createCell(col++).setCellValue("Merce");
+	    headerRow.createCell(col++).setCellValue("Umido IN");
+	    headerRow.createCell(col++).setCellValue("Umido OUT");
+	    headerRow.createCell(col++).setCellValue("Secco IN");
+	    headerRow.createCell(col++).setCellValue("Secco OUT");
+	   
+	    if(isIva) {
+	    	headerRow.createCell(col++).setCellValue("Valore");
+	    }
+	    
+	    
 
+		Row dataRow;
+		Movimento m;
+		Consegna c;
 		int row = 1;
+		
 		for(Object _m : vector ) {
 		    
-//		    Row dataRow = personSheet.createRow(row);
+			m = (Movimento) _m;
+			c = m.getConsegna();
+			
+		    dataRow = sheet.createRow(row);
+		    
+		    col = 0;
 
-//		    Cell dataNameCell = dataRow.createCell(0);
-//		    dataNameCell.setCellValue(name);
-
-//		    Cell dataAddressCell = dataRow.createCell(1);
-//		    dataAddressCell.setCellValue(address);
-
-//			$!m.NumRegistro	$!tools.Date.format($dateFormat	, $m.Data)	$!m.Consegna.Numero	$!m.Consegna.NumeroPartitario	$!m.Documento	$!m.Consegna.Merce	#if($m.getIsScarico() ||  $m.Umido.intValue() < 0 )
-//				0	$!tools.Number.format($m.UmidoAssoluto).replaceAll("[.]", "")#else$!tools.Number.format($m.Umido).replaceAll("[.]", "")	0#end	#if($m.getIsScarico() ||  $m.Secco.intValue() < 0 )
-//				0	$!tools.Number.format($m.SeccoAssoluto).replaceAll("[.]", "")#else
-//				$!tools.Number.format($m.Secco).replaceAll("[.]", "")	0#end
+		    dataRow.createCell(col++).setCellValue(m.getNumRegistro());
+		    dataRow.createCell(col++).setCellValue(m.getData().dmyString());
+		    dataRow.createCell(col++).setCellValue(c.getNumero());
+		    dataRow.createCell(col++).setCellValue(c.getNumeroPartitario());
+		    
+		    if ( m.getDocumento() != null ) {
+		    	dataRow.createCell(col++).setCellValue(m.getDocumento().toString());
+		    } else {
+		    	dataRow.createCell(col++).setCellValue("");
+		    }
+		    
+		    dataRow.createCell(col++).setCellValue(c.getMerce().getNome());
+		    
+		    if(m.getIsScarico() || m.getUmido().intValue() < 0 ) {
+		    	dataRow.createCell(col++).setCellValue("");
+		    	dataRow.createCell(col++).setCellValue(m.getUmidoAssoluto());
+		    } else {
+		    	dataRow.createCell(col++).setCellValue(m.getUmidoAssoluto());
+		    	dataRow.createCell(col++).setCellValue("");
+		    }
+		    if(m.getIsScarico() ||  m.getSecco().intValue() < 0 ) {
+		    	dataRow.createCell(col++).setCellValue("");
+		    	dataRow.createCell(col++).setCellValue(m.getSeccoAssoluto());
+		    } else {
+		    	dataRow.createCell(col++).setCellValue("");
+		    	dataRow.createCell(col++).setCellValue(m.getSeccoAssoluto());
+		    }
+		   
+		    if(isIva) {
+		    	dataRow.createCell(col++).setCellValue(((MovimentoIVA) m).getValoreEuro());
+		    }
 				
-		    row = row + 1;
+		    row++;
 		}
+		
+		for ( int x = 0 ; x < col ; x++ ) {
+			sheet.autoSizeColumn(x);
+		}
+		
 
 //		String outputDirPath = "D:/PersonList.xls";
 //		FileOutputStream fileOut = new FileOutputStream(outputDirPath);
-//		wb.write(resp.getWriter());
+//		resp.setContentType("application/vnd.ms-excel");
+//		resp.setHeader("Content-Disposition", "attachment; filename=MyExcel.xls");
+        
+		ServletOutputStream out = response.getOutputStream();
+        wb.write(out);
+        wb.close();
+        out.flush();
+        out.close();
 	}
 	
 }
