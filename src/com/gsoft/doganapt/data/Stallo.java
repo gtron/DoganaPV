@@ -7,6 +7,7 @@ import com.gsoft.doganapt.data.adapters.MovimentoAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoDoganaleAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoIvaAdapter;
 import com.gsoft.doganapt.data.adapters.StalloAdapter;
+import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.common.ModelBean2;
 import com.gtsoft.utils.sql.IDatabase2;
 
@@ -106,12 +107,12 @@ public class Stallo extends ModelBean2 implements Cloneable {
 		return getIdConsegnaAttuale() == null ;
 	}
 
-	public Double getGiacenza(MovimentoAdapter registro, boolean secco) throws Exception {
+	public Double getGiacenza(MovimentoAdapter registro, boolean secco, FormattedDate data) throws Exception {
 
 		@SuppressWarnings("unchecked")
 		Vector<Movimento> v = registro.getByConsegna(true, idConsegnaAttuale, id, null, null );
 
-		Movimento giacenza = Movimento.getMovimentoRisultante(v);
+		Movimento giacenza = Movimento.getMovimentoRisultante(v, data);
 
 		if ( secco )
 			return giacenza.getSecco();
@@ -120,10 +121,17 @@ public class Stallo extends ModelBean2 implements Cloneable {
 	}
 
 	public Double getGiacenzaIva(boolean secco) throws Exception {
-		return getGiacenza(new MovimentoIvaAdapter(), secco);
+		return getGiacenza(new MovimentoIvaAdapter(), secco, null);
 	}
 	public Double getGiacenzaDoganale(boolean secco) throws Exception {
-		return getGiacenza(new MovimentoDoganaleAdapter(), secco);
+		return getGiacenza(new MovimentoDoganaleAdapter(), secco, null);
+	}
+	
+	public Double getGiacenzaIva(boolean secco, FormattedDate data) throws Exception {
+		return getGiacenza(new MovimentoIvaAdapter(), secco, data);
+	}
+	public Double getGiacenzaDoganale(boolean secco, FormattedDate data) throws Exception {
+		return getGiacenza(new MovimentoDoganaleAdapter(), secco, data);
 	}
 
 	public MovimentoDoganale getMovimentoGiacenzaDoganale(MovimentoDoganaleAdapter registro, Consegna consegna) throws Exception {

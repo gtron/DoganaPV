@@ -44,16 +44,16 @@ TABLE { border: 0 none ; color : #000 ; font-size: 1em ; }
 <td width="60" class="documento">$!im7.toString().replaceAll('IM7', '')&nbsp;</td>
 <td width="60" class="documento">$!im4.toString().replaceAll('IM4', '')&nbsp;</td>
 #if ( $c.Iter.Id == 1 && ! $s.HasLiberaPratica  )
-<td width="60" class="r">$tools.Number.format($!s.getGiacenzaDoganale(false))&nbsp;</td>
-<td width="60" class="r">$tools.Number.format($!s.getGiacenzaDoganale(true))&nbsp;</td>
+<td width="60" class="r">$tools.Number.format($!s.getGiacenzaDoganale(false, $!data))&nbsp;</td>
+<td width="60" class="r">$tools.Number.format($!s.getGiacenzaDoganale(true, $!data))&nbsp;</td>
 
 #elseif ( $c.Iter.Id != 4 )
-<td width="60" class="r">$tools.Number.format($!s.getGiacenzaIva(false))&nbsp;</td>
-<td width="60" class="r">$tools.Number.format($!s.getGiacenzaIva(true))&nbsp;</td>	
+<td width="60" class="r">$tools.Number.format($!s.getGiacenzaIva(false, $!data))&nbsp;</td>
+<td width="60" class="r">$tools.Number.format($!s.getGiacenzaIva(true, $!data))&nbsp;</td>	
 
 #else
-<td width="60" class="r">$tools.Number.format($!s.getGiacenzaDoganale(false))&nbsp;</td>
-<td width="60" class="r">$tools.Number.format($!s.getGiacenzaDoganale(true))&nbsp;</td>
+<td width="60" class="r">$tools.Number.format($!s.getGiacenzaDoganale(false, $!data))&nbsp;</td>
+<td width="60" class="r">$tools.Number.format($!s.getGiacenzaDoganale(true, $!data))&nbsp;</td>
 #end
 
 

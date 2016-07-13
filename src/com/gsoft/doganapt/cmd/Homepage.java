@@ -143,6 +143,8 @@ public class Homepage extends VelocityCommand {
 		if ( logged != Boolean.TRUE ) {
 			resp.sendRedirect(".main");
 		}
+		
+		ctx.put("data", getDateParam("data", false));
 
 		ctx.put("isAdmin", s.getAttribute("admin") ) ;
 
