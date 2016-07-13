@@ -109,8 +109,14 @@ public class Stallo extends ModelBean2 implements Cloneable {
 
 	public Double getGiacenza(MovimentoAdapter registro, boolean secco, FormattedDate data) throws Exception {
 
+		Integer idConsegna = idConsegnaAttuale;
+		
+		if ( data != null ) {
+			idConsegna = registro.getIdConsegnaInStalloAllaData(id, data);
+		}
+		
 		@SuppressWarnings("unchecked")
-		Vector<Movimento> v = registro.getByConsegna(true, idConsegnaAttuale, id, null, null );
+		Vector<Movimento> v = registro.getByConsegna(true, idConsegna, id, null, null );
 
 		Movimento giacenza = Movimento.getMovimentoRisultante(v, data);
 
