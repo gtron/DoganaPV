@@ -1,7 +1,5 @@
 package com.gsoft.doganapt.data.adapters;
 
-import gnu.trove.THashMap;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,9 +8,12 @@ import java.util.Vector;
 
 import com.gsoft.doganapt.data.Stallo;
 import com.gtsoft.utils.common.BeanAdapter2;
+import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.data.Field;
 import com.gtsoft.utils.data.FieldSet;
 import com.gtsoft.utils.sql.IDatabase2;
+
+import gnu.trove.THashMap;
 
 public class StalloAdapter extends BeanAdapter2 {
 
@@ -112,7 +113,7 @@ public class StalloAdapter extends BeanAdapter2 {
 
 	public Object getByCodice(final String codice) throws Exception {
 
-		final Vector list = getWithWhere("codice = '" + codice + "'");
+		final Vector<?> list = getWithWhere("codice = '" + codice + "'");
 
 		if ( list.size() > 0 )
 			return list.firstElement() ;
@@ -128,11 +129,12 @@ public class StalloAdapter extends BeanAdapter2 {
 	}
 
 	@Override
-	public Vector getAll(final String orderby) throws Exception {
-		final Vector list = super.getAll(orderby);
+	public Vector<Stallo> getAll(final String orderby) throws Exception {
+		@SuppressWarnings("unchecked")
+		final Vector<Stallo> list = super.getAll(orderby);
 		Stallo a = null ;
-		for( final Iterator i = list.iterator(); i.hasNext(); ) {
-			a = (Stallo) i.next();
+		for( final Iterator<Stallo> i = list.iterator(); i.hasNext(); ) {
+			a = i.next();
 			cache.put(a.getId(), a);
 			cacheByCodice.put(a.getCodice(), a);
 		}
@@ -235,5 +237,45 @@ public class StalloAdapter extends BeanAdapter2 {
 		}
 
 		return list ;
+	}
+	
+	public Vector<Stallo> getAll(FormattedDate data, String order) throws Exception {
+		Vector<Stallo> stalliAttuali = getAll(order);
+		
+		if ( data == null )
+			return stalliAttuali ;
+		
+		MovimentoIvaAdapter registroIva = new MovimentoIvaAdapter();
+		MovimentoDoganaleAdapter registroDoganale = new MovimentoDoganaleAdapter();
+		
+		Vector<Stallo> list = new Vector<Stallo>(stalliAttuali.size());
+		Stallo s2;
+		
+		Integer idC = 0;
+		
+		for ( Stallo s : stalliAttuali ) {
+			s2 = s.clone();
+			
+			Integer idCIva = registroIva.getIdConsegnaInStalloAllaData(s2.getId(), data);
+			
+			Integer idCDog = registroDoganale.getIdConsegnaInStalloAllaData(s2.getId(), data);
+			
+			if ( idCIva != null && idCDog == null) {
+				idC = idCIva;
+			} else if ( idCIva == null && idCDog != null ) {
+				idC = idCDog;
+			} else {
+				idC = idCIva;
+//				System.out.println("Conflitto! iva:" + idCIva + " dog:" + idCDog);
+			}
+			
+			s2.setIdConsegnaAttuale(idC);
+			s2.setDataRiferimento(data);
+			
+			list.add(s2);
+			
+		}
+		return list;
+		
 	}
 }
