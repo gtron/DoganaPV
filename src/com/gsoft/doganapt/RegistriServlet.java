@@ -9,6 +9,7 @@ import org.apache.velocity.Template;
 import org.apache.velocity.context.Context;
 
 import com.gsoft.doganapt.cmd.registri.DeregistraMovimento;
+import com.gsoft.doganapt.cmd.registri.Export;
 import com.gsoft.doganapt.cmd.registri.PreparaRegistro;
 import com.gsoft.doganapt.cmd.registri.RegistraMovimento;
 import com.gsoft.doganapt.cmd.registri.SistemaNumerazione;
@@ -44,6 +45,9 @@ public class RegistriServlet extends TooledServlet {
 
 		addCommand( Commands.CHECK,
 				new SistemaNumerazione( this ) ) ;
+		
+		addCommand( Commands.EXPORT,
+				new Export( this ) ) ;
 
 	}
 
@@ -80,6 +84,7 @@ public class RegistriServlet extends TooledServlet {
 		public static final String DEREGISTRA = "deregistra" ;
 		public static final String PREPARA = "prepara" ;
 		public static final String CHECK = "check" ;
+		public static final String EXPORT = "export" ;
 
 	}
 }

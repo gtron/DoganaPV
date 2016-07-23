@@ -122,11 +122,18 @@ public abstract class Movimento extends ModelBean2 {
 	public void setSecco(final Double secco) {
 		this.secco = secco;
 	}
+	public Integer getSeccoAssoluto() {
+		return Math.abs(secco.intValue());
+	}
+	
 	public Double getUmido() {
 		return umido;
 	}
 	public void setUmido(final Double umido) {
 		this.umido = umido;
+	}
+	public Integer getUmidoAssoluto() {
+		return Math.abs(umido.intValue());
 	}
 
 	public boolean isAppenaRegistrato() {
