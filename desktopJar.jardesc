@@ -11,16 +11,6 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <javaElement handleIdentifier="=DoganaPV/src&lt;com.gsoft.doganapt.cmd.merci"/>
-        <javaElement handleIdentifier="=DoganaPV/src&lt;com.gtsoft.utils"/>
-        <javaElement handleIdentifier="=DoganaPV/src&lt;com.gsoft.doganapt.cmd.consegne"/>
-        <javaElement handleIdentifier="=DoganaPV/src&lt;com.gsoft.doganapt.cmd"/>
-        <javaElement handleIdentifier="=DoganaPV/src&lt;com.gsoft.doganapt.data"/>
-        <javaElement handleIdentifier="=DoganaPV/src&lt;com.gsoft.doganapt.cmd.registri"/>
-        <javaElement handleIdentifier="=DoganaPV/src&lt;com.gsoft.pt_movimentazioni.utils"/>
-        <javaElement handleIdentifier="=DoganaPV/src&lt;com.gsoft.pt_movimentazioni.data"/>
-        <javaElement handleIdentifier="=DoganaPV/src&lt;com.gsoft.doganapt.data.adapters"/>
-        <javaElement handleIdentifier="=DoganaPV/src&lt;com.gsoft.doganapt"/>
-        <javaElement handleIdentifier="=DoganaPV/src&lt;com.gsoft.doganapt.cmd.movimenti"/>
+        <javaElement handleIdentifier="=DoganaPV/src"/>
     </selectedElements>
 </jardesc>

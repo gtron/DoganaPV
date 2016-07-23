@@ -145,8 +145,21 @@ public class Homepage extends VelocityCommand {
 			resp.sendRedirect(".main");
 		}
 		
+		FormattedDate now = new FormattedDate();
+		
 		FormattedDate data = getDateParam("data", false);
+		if ( data != null && data.after(now) ) {
+			data = null;
+		}
+		
 		ctx.put("data", data);
+		
+		FormattedDate dataHead = data;
+		if ( data == null ) {
+			dataHead = now;
+		}
+		ctx.put("dataHead", dataHead);
+		
 
 		ctx.put("isAdmin", s.getAttribute("admin") ) ;
 
