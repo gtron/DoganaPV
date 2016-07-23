@@ -523,9 +523,12 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			sql.append(" AND R.idmerce  = ").append(idMerce).append(" ");
 		}
 
-		if( dal != null && al!=null){
-			sql.append(" AND '").append(dal.fullString()).
-			append("' <= data AND '").append(al.fullString()).append("' >= data ");
+		if( dal != null ) { 
+			sql.append(" AND data >= '").append(dal.fullString()).append("' ");
+		}
+		
+		if( al!=null){
+			sql.append(" AND data <= '").append(al.fullString()).append("' ");
 		}
 		sql.append(" GROUP BY ");
 
@@ -572,7 +575,10 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 
 		if(page!=null && rows!=null){
 			sql.append(" LIMIT ").append((page - 1) *  rows).append(",").append(rows);
+		} else if ( rows != null ) {
+			sql.append(" LIMIT ").append(rows);
 		}
+		
 		Vector list = null ;
 
 		final Connection conn = db.getConnection() ;

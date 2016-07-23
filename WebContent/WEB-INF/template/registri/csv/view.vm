@@ -1,0 +1,11 @@
+#set( $dateFormat = 'dd/MM/yyyy')
+NumRegistro	Data	Consegna	NumPartitario	Documento	Merce	Umido IN	Umido OUT	Secco IN	Secco OUT#if($iva)	Valore Euro	IVA#end
+
+#foreach( $m in $list )
+$!m.NumRegistro	$!tools.Date.format($dateFormat	, $m.Data)	$!m.Consegna.Numero	$!m.Consegna.NumeroPartitario	$!m.Documento	$!m.Consegna.Merce	#if($m.getIsScarico() ||  $m.Umido.intValue() < 0 )
+0	$!tools.Number.format($m.UmidoAssoluto).replaceAll("[.]", "")#else$!tools.Number.format($m.Umido).replaceAll("[.]", "")	0#end	#if($m.getIsScarico() ||  $m.Secco.intValue() < 0 )
+0	$!tools.Number.format($m.SeccoAssoluto).replaceAll("[.]", "")#else
+$!tools.Number.format($m.Secco).replaceAll("[.]", "")	0#end
+#if($iva)	$!tools.Number.format('#,##0.00', $m.ValoreEuro ).replaceAll("[.]", "")	$!tools.Number.format('#,##0.00',$!m.ValoreIva)#end
+
+#end
