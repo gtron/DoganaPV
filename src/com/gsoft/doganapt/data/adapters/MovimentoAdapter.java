@@ -1035,6 +1035,34 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 	public boolean isIva() {
 		return false;
 	}
+	
+	public Integer getIdConsegnaInStalloAllaData(Integer idStallo, FormattedDate data) throws Exception {
+
+		Integer idC = null;
+		
+		final String sql = 
+				" SELECT distinct c.idconsegna, c.* FROM " + getTable() + " r inner join " + ConsegnaAdapter.getStaticTable() + " c using(idconsegna) \n " +
+				" WHERE c.datacreazione < '" + data.ymdString() + " 23:59:59' and ( datachiusura > '" + data.ymdString() + "' or datachiusura is null )  \n "
+						+ " AND r.idStallo = " + idStallo + " order by r.data desc, r.id desc " ;
+
+
+		final Connection conn = db.getConnection() ;
+		try {
+
+			Vector<?> x = executeScalarQuery(sql);
+			
+			if ( ! x.isEmpty() ) {
+				idC = (Integer) x.firstElement();
+			}
+			
+
+		}
+		finally {
+			db.freeConnection(conn);
+		}
+
+		return idC ;
+	}
 
 	//	private String getIdsFromNumRegistro( Movimento m ) throws Exception {
 	//
