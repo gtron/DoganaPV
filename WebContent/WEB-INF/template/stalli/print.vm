@@ -5,7 +5,7 @@ TABLE { border: 0 none ; color : #000 ; font-size: 1em ; }
 .cNumero {width:3em;}
 ## .onepage { page-break-after: always ; page-break-inside : avoid;   }
 </style>
-#if($dataHead)<h1>Giacenze al $dataHead.dmyString() #if( ! $!data ) $dataHead.hmsString()#end</h1>#end
+#if($dataHead)<h1>Giacenze al $dataHead.dmyString() #if( ! $!data ) $dataHead.getHours():$dataHead.getMinutes()#end</h1>#end
 #set($oldParco = "")
 #foreach( $s in $stalli ) 
 #if($oldParco != $s.Parco)
