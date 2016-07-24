@@ -245,6 +245,13 @@ public class StalloAdapter extends BeanAdapter2 {
 		if ( data == null )
 			return stalliAttuali ;
 		
+		return getStalliAllaData(data, stalliAttuali);
+		
+	}
+	
+	private Vector<Stallo> getStalliAllaData(FormattedDate data, Vector<Stallo> stalliAttuali)
+			throws CloneNotSupportedException, Exception {
+		
 		MovimentoIvaAdapter registroIva = new MovimentoIvaAdapter();
 		MovimentoDoganaleAdapter registroDoganale = new MovimentoDoganaleAdapter();
 		
@@ -266,16 +273,19 @@ public class StalloAdapter extends BeanAdapter2 {
 				idC = idCDog;
 			} else {
 				idC = idCIva;
-//				System.out.println("Conflitto! iva:" + idCIva + " dog:" + idCDog);
+				
+				if ( idCIva != null && idCDog != null && idCIva - idCDog != 0) {
+					System.out.println("Conflitto! iva:" + idCIva + " dog:" + idCDog);
+				}
+				
 			}
-			
+
 			s2.setIdConsegnaAttuale(idC);
 			s2.setDataRiferimento(data);
 			
 			list.add(s2);
-			
+
 		}
 		return list;
-		
 	}
 }
