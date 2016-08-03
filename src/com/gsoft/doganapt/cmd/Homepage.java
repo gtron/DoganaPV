@@ -152,12 +152,14 @@ public class Homepage extends VelocityCommand {
 			data = null;
 		}
 		
-		ctx.put("data", data);
-		
 		FormattedDate dataHead = data;
 		if ( data == null ) {
 			dataHead = now;
+		} else {
+			data = new FormattedDate(data.ymdString() + " 23:59:59");
 		}
+		
+		ctx.put("data", data);
 		ctx.put("dataHead", dataHead);
 		
 
