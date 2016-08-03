@@ -272,7 +272,8 @@ public class StalloAdapter extends BeanAdapter2 {
 			} else if ( idCIva == null && idCDog != null ) {
 				idC = idCDog;
 			} else {
-				idC = idCIva;
+				
+				idC = Math.max( idCIva, idCDog );
 				
 				if ( idCIva != null && idCDog != null && idCIva - idCDog != 0) {
 					System.out.println("Conflitto! iva:" + idCIva + " dog:" + idCDog);
