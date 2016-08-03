@@ -13,6 +13,7 @@ import com.gsoft.doganapt.data.adapters.IterAdapter;
 import com.gsoft.doganapt.data.adapters.MerceAdapter;
 import com.gsoft.doganapt.data.adapters.StalloAdapter;
 import com.gtsoft.utils.ManagerAliquoteIva;
+import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.http.VelocityCommand;
 import com.gtsoft.utils.http.servlet.GtServlet;
 
@@ -143,10 +144,28 @@ public class Homepage extends VelocityCommand {
 		if ( logged != Boolean.TRUE ) {
 			resp.sendRedirect(".main");
 		}
+		
+		FormattedDate now = new FormattedDate();
+		
+		FormattedDate data = getDateParam("data", false);
+		if ( data != null && data.after(now) ) {
+			data = null;
+		}
+		
+		FormattedDate dataHead = data;
+		if ( data == null ) {
+			dataHead = now;
+		} else {
+			data = new FormattedDate(data.ymdString() + " 23:59:59");
+		}
+		
+		ctx.put("data", data);
+		ctx.put("dataHead", dataHead);
+		
 
 		ctx.put("isAdmin", s.getAttribute("admin") ) ;
 
-		ctx.put("stalli", Stallo.newAdapter().getAll("parco, numero") );
+		ctx.put("stalli", Stallo.newAdapter().getAll(data , "parco, numero") );
 
 		//		BeanAdapter2 adp = BeanAdapter2.newAdapter();
 		//		ctx.put( ContextKeys.LIST , adp.getAll() ) ;

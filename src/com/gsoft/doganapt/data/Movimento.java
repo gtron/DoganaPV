@@ -122,11 +122,18 @@ public abstract class Movimento extends ModelBean2 {
 	public void setSecco(final Double secco) {
 		this.secco = secco;
 	}
+	public Integer getSeccoAssoluto() {
+		return Math.abs(secco.intValue());
+	}
+	
 	public Double getUmido() {
 		return umido;
 	}
 	public void setUmido(final Double umido) {
 		this.umido = umido;
+	}
+	public Integer getUmidoAssoluto() {
+		return Math.abs(umido.intValue());
 	}
 
 	public boolean isAppenaRegistrato() {
@@ -329,7 +336,7 @@ public abstract class Movimento extends ModelBean2 {
 		return Double.valueOf(  Math.round( 100 * _a + 100 * _b) / 100d );
 	}
 
-	public static Movimento getMovimentoRisultante(Vector<Movimento> movimenti) {
+	public static Movimento getMovimentoRisultante(Vector<Movimento> movimenti, FormattedDate data) {
 
 		Movimento movRisultante;
 
@@ -343,17 +350,20 @@ public abstract class Movimento extends ModelBean2 {
 		movRisultante.setUmido(0d);
 
 		for (Movimento m : movimenti) {
-			if ( m.isScaricoONegativo() ) {
-				if( m.getSecco().intValue() < 0 ) {
+			
+			if ( data == null || m.getData().before(data)) {
+				if ( m.isScaricoONegativo() ) {
+					if( m.getSecco().intValue() < 0 ) {
+						movRisultante.setSecco( sommaArrotondata( movRisultante.getSecco(), m.getSecco()) );
+						movRisultante.setUmido( sommaArrotondata( movRisultante.getUmido(), m.getUmido()) );
+					} else {
+						movRisultante.setSecco( sottrazioneArrotondata( movRisultante.getSecco(), m.getSecco()) );
+						movRisultante.setUmido( sottrazioneArrotondata( movRisultante.getUmido(), m.getUmido()) );
+					}
+				} else {
 					movRisultante.setSecco( sommaArrotondata( movRisultante.getSecco(), m.getSecco()) );
 					movRisultante.setUmido( sommaArrotondata( movRisultante.getUmido(), m.getUmido()) );
-				} else {
-					movRisultante.setSecco( sottrazioneArrotondata( movRisultante.getSecco(), m.getSecco()) );
-					movRisultante.setUmido( sottrazioneArrotondata( movRisultante.getUmido(), m.getUmido()) );
 				}
-			} else {
-				movRisultante.setSecco( sommaArrotondata( movRisultante.getSecco(), m.getSecco()) );
-				movRisultante.setUmido( sommaArrotondata( movRisultante.getUmido(), m.getUmido()) );
 			}
 		}
 
