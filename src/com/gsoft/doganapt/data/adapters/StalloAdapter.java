@@ -261,6 +261,9 @@ public class StalloAdapter extends BeanAdapter2 {
 		Integer idC = 0;
 		
 		for ( Stallo s : stalliAttuali ) {
+			
+			idC = null ;
+			
 			s2 = s.clone();
 			
 			Integer idCIva = registroIva.getIdConsegnaInStalloAllaData(s2.getId(), data);
@@ -273,10 +276,13 @@ public class StalloAdapter extends BeanAdapter2 {
 				idC = idCDog;
 			} else {
 				
-				idC = Math.max( idCIva, idCDog );
-				
-				if ( idCIva != null && idCDog != null && idCIva - idCDog != 0) {
-					System.out.println("Conflitto! iva:" + idCIva + " dog:" + idCDog);
+				if ( idCIva != null && idCDog != null ) {
+					
+					idC = Math.max( idCIva, idCDog );
+					
+					if ( idCIva - idCDog != 0 ) { 
+						System.out.println("Conflitto! idC:" + idC + " iva:" + idCIva + " dog:" + idCDog );
+					}
 				}
 				
 			}

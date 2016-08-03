@@ -1041,8 +1041,8 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 		Integer idC = null;
 		
 		final String sql = 
-				" SELECT distinct c.idconsegna, c.* FROM " + getTable() + " r inner join " + ConsegnaAdapter.getStaticTable() + " c using(idconsegna) \n " +
-				" WHERE c.datacreazione < '" + data.ymdString() + " 23:59:59' and ( datachiusura > '" + data.ymdString() + "' or datachiusura is null )  \n "
+				" SELECT distinct c.idconsegna FROM " + getTable() + " r inner join " + ConsegnaAdapter.getStaticTable() + " c using(idconsegna) \n " +
+				" WHERE r.data < '" + data.ymdString() + " 23:59:59' and ( datachiusura > '" + data.ymdString() + "' or datachiusura is null )  \n "
 						+ " AND r.idStallo = " + idStallo + " order by r.data desc, r.id desc " ;
 
 
