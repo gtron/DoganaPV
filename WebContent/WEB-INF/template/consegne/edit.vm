@@ -314,7 +314,7 @@ $("#dlg_ImportTo").dialog({ width:360,height:140,
 buttons:{Importa: function(){importTo(true);} , Annulla : function() { $("#dlg_ImportTo").dialogClose(); } } 
 });
 $("#dlg_ImportTo").dialogClose();
-$("#dlg_OpenC").dialog({ width:480,height:460,
+$("#dlg_OpenC").dialog({ width:520,height:500,
 buttons:{Apri: function(){OpenC(true);} ,Annulla : function() { $("#dlg_OpenC").dialogClose(); } } 
 });
 $("#dlg_OpenC").dialogClose();
@@ -413,13 +413,11 @@ Inserire la data del carico in ingresso :
 <input type="hidden" name="id" value="" />
 <input name="data" type="text" size="10" maxlength="10" id="dataOpenC" /><br />
 
-#if($hasIva && ! $im7)
 <fieldset><legend>Valori</legend>
 Valore USD: <input type="text" name="valoreDollari" size="10" id="valoreDollari" />&nbsp;$<br /> 
 Tasso EUR/USD: <input type="text" name="tasso" size="5" id="tasso" /><br />
 Oneri Accessori:&nbsp;&nbsp;<input type="text" name="valoreTestp" size="10" id="valoreTestp" />&nbsp;&euro;
 </fieldset>
-#end
 
 <fieldset><legend>Documento di Ingresso</legend>
 Tipo: <select name="doc"><option value=""></option>

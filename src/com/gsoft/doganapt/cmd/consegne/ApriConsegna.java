@@ -122,7 +122,7 @@ public class ApriConsegna extends VelocityCommand {
 								).apriConsegna(consegna, data, documento, documentoPV, note);
 			}
 
-			if ( movApertura instanceof MovimentoIVA ) {
+//			if ( movApertura instanceof MovimentoIVA ) {
 
 				stalloConsegnaAdapter = new StalloConsegnaAdapter();
 
@@ -146,13 +146,15 @@ public class ApriConsegna extends VelocityCommand {
 
 					stalloConsegna.initValoriUnitari(seccoTotale);
 					stalloConsegnaAdapter.update(stalloConsegna);
-
-					stalloConsegna.assegnaValori((MovimentoIVA) movApertura);
+				   
+					if ( movApertura instanceof MovimentoIVA ) {
+				    	stalloConsegna.assegnaValori((MovimentoIVA) movApertura);
+				    }
 
 					movimentoIvaAdapter.update(movApertura);
 
 				}
-			}
+//			}
 
 
 			consegna.setDataChiusura(null);
