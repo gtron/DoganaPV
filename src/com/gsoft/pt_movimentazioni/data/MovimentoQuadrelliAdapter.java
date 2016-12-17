@@ -18,6 +18,7 @@ import com.gtsoft.utils.data.Field;
 import com.gtsoft.utils.data.FieldSet;
 import com.gtsoft.utils.sql.IDatabase2;
 
+@SuppressWarnings("unchecked")
 public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 
 	static private Boolean readFromCache = false;
@@ -188,7 +189,7 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 		String sql = c.getIter().getQueryin(c, null, null) ;
 
 
-		String key = FileBasedCacher.getCachedKey(sql);
+		String key = FileBasedCacher.getCacheKey(sql);
 
 		if ( key != null && readFromCache )
 			return (FormattedDate) FileBasedCacher.get(key);
@@ -227,7 +228,7 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 			sql = s.getConsegna().getIter().getQueryin(s.getConsegna(), s, data) ;
 		}
 
-		String key = FileBasedCacher.getCachedKey(sql);
+		String key = FileBasedCacher.getCacheKey(sql);
 
 		if ( key != null && readFromCache )
 			return (Vector) FileBasedCacher.get(key);
@@ -339,7 +340,7 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 
 		sql.append(" group by cliente, data order by data desc" ) ;
 
-		String key = FileBasedCacher.getCachedKey(sql);
+		String key = FileBasedCacher.getCacheKey(sql);
 
 		if ( key != null && readFromCache )
 			return (ArrayList<String>) FileBasedCacher.get(key);
@@ -389,7 +390,7 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 		return codici;
 	}
 
-	@SuppressWarnings("unchecked")
+	
 	public ArrayList<FormattedDate> getDateDaImportare( Consegna c , FormattedDate fromData ) throws Exception {
 		StringBuilder sql = new StringBuilder(70)
 		.append("SELECT distinct min(data) FROM ")
@@ -406,7 +407,7 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 			sql.append(" having min(data) > ? ");
 		}
 
-		String key = FileBasedCacher.getCachedKey(sql);
+		String key = FileBasedCacher.getCacheKey(sql);
 
 		if ( key != null && readFromCache )
 			return (ArrayList<FormattedDate>) FileBasedCacher.get(key);

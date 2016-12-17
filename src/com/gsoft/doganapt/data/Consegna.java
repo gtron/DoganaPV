@@ -18,6 +18,7 @@ import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.common.ModelBean2;
 import com.gtsoft.utils.sql.IDatabase2;
 
+@SuppressWarnings({"serial","unchecked"})
 public class Consegna extends ModelBean2 implements Serializable {
 
 	Integer id ;
@@ -264,7 +265,6 @@ public class Consegna extends ModelBean2 implements Serializable {
 		return d ;
 	}
 
-	@SuppressWarnings("unchecked")
 	public Documento getPrimoDocumento(final boolean iva, Stallo s) throws Exception {
 
 		final Vector<Movimento> v = getRegistro(iva, false, false) ;
