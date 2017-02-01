@@ -116,14 +116,9 @@ public class Stallo extends ModelBean2 implements Cloneable {
 		return getIdConsegnaAttuale() == null ;
 	}
 
-//	public Double getGiacenza(MovimentoAdapter registro, boolean secco, FormattedDate data) throws Exception {
 	public Double getGiacenza(MovimentoAdapter registro, boolean secco) throws Exception {
 		
 		Integer idConsegna = idConsegnaAttuale;
-		
-//		if ( data != null ) {
-//			idConsegna = registro.getIdConsegnaInStalloAllaData(id, data);
-//		}
 		
 		@SuppressWarnings("unchecked")
 		Vector<Movimento> v = registro.getByConsegna(true, idConsegna, id, null, null );
@@ -142,13 +137,6 @@ public class Stallo extends ModelBean2 implements Cloneable {
 	public Double getGiacenzaDoganale(boolean secco) throws Exception {
 		return getGiacenza(new MovimentoDoganaleAdapter(), secco);
 	}
-	
-//	public Double getGiacenzaIva(boolean secco, FormattedDate data) throws Exception {
-//		return getGiacenza(new MovimentoIvaAdapter(), secco, data);
-//	}
-//	public Double getGiacenzaDoganale(boolean secco, FormattedDate data) throws Exception {
-//		return getGiacenza(new MovimentoDoganaleAdapter(), secco, data);
-//	}
 
 	public MovimentoDoganale getMovimentoGiacenzaDoganale(MovimentoDoganaleAdapter registro, Consegna consegna) throws Exception {
 		return (MovimentoDoganale) getMovimentoGiacenza(registro, consegna);
@@ -174,6 +162,10 @@ public class Stallo extends ModelBean2 implements Cloneable {
 				}
 			} else {
 				mov.aggiungi(m);
+			}
+			
+			if ( mov.getData() == null || mov.getData().before(m.getData())) {
+				mov.setData(m.getData());
 			}
 		}
 

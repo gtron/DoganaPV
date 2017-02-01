@@ -130,8 +130,8 @@ public class Iter extends ModelBean2 {
 				.replaceAll("%C%", c.getNumero().toString() )
 				//			.replaceAll("%SS%", PARCHI )
 				.replaceAll("%S%", ( s != null ) ? s.codice : "" )
-				.replaceAll("%ANDS%", ( s != null ) ? " and cliente  = '"+
-						s.codice + "' " : "" )
+				.replaceAll("%ANDS%", 
+						( s != null ) ? " and cliente  = '" + s.codice + "' " : "" )
 						.replaceAll("%M%", c.getMerce().getCodiceQuadrelli() )
 						.replaceAll("%D%", (data != null)? data.ymdString() : "1900-01-01" )
 						;

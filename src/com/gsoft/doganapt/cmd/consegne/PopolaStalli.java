@@ -317,7 +317,7 @@ public class PopolaStalli extends VelocityCommand {
 					ConsegnaAdapter.assegnaStalloAConsegna(consegna, s);
 				}
 
-				listMov = quadAdp.get(false, null , s);
+				listMov = (Vector<MovimentoQuadrelli>) quadAdp.get(false, null , s);
 
 				sommaUmido = 0 ;
 
