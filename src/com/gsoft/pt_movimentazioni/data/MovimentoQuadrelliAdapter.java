@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Vector;
 
+import com.gsoft.doganapt.cmd.Login;
 import com.gsoft.doganapt.data.Consegna;
 import com.gsoft.doganapt.data.Stallo;
 import com.gtsoft.utils.common.BeanAdapter2;
@@ -17,6 +18,8 @@ import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.data.Field;
 import com.gtsoft.utils.data.FieldSet;
 import com.gtsoft.utils.sql.IDatabase2;
+
+import gnu.trove.TLinkedList;
 
 @SuppressWarnings("unchecked")
 public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
@@ -194,13 +197,10 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 		if ( key != null && readFromCache )
 			return (FormattedDate) FileBasedCacher.get(key);
 
-		Connection conn = null ;
-		conn  = db.getConnection();
-
 		Connection cn = db.getConnection();
 		try {
 			PreparedStatement stmt = cn.prepareStatement(sql);
-			Vector list = getByStatment(stmt);
+			Vector<?> list = getByStatment(stmt);
 
 			if ( list != null && list.size() > 0 ) {
 				d = ((MovimentoQuadrelli) list.firstElement()).getData();
@@ -218,7 +218,7 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 		return d ;
 	}
 
-	public Vector get(boolean scarichi, FormattedDate data, Stallo s ) throws Exception  {
+	public Vector<?> get(boolean scarichi, FormattedDate data, Stallo s ) throws Exception  {
 
 		String sql  ;
 		if ( scarichi) {
@@ -231,13 +231,13 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 		String key = FileBasedCacher.getCacheKey(sql);
 
 		if ( key != null && readFromCache )
-			return (Vector) FileBasedCacher.get(key);
+			return (Vector<?>) FileBasedCacher.get(key);
 
 		Connection cn = db.getConnection();
 
 		try {
 			PreparedStatement stmt = cn.prepareStatement(sql);
-			Vector res = getByStatment(stmt);
+			Vector<?> res = getByStatment(stmt);
 
 			if ( key != null && writeCache ) {
 				FileBasedCacher.set(key, res);
@@ -250,42 +250,6 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 			db.freeConnection(cn);
 			return null ;
 		}
-
-
-		// ------------------------------------ WRONG ------
-		//
-		//		StringBuilder sql = new StringBuilder();
-		//		sql.append("SELECT * FROM ").append(getTable()).append( " WHERE " );
-		//
-		//		if ( data != null ) {
-		//			sql.append( " data = #?# AND " ) ;
-		//		}
-		//
-		//		if ( c != null ) {
-		//			sql.append( " `Num Consegna` = ? AND Merce = ? AND " ) ;
-		//		}
-		//
-		//		if ( scarichi )
-		//			sql.append(" fornitore in ( ");
-		//		else
-		//			sql.append(" cliente in ( ");
-		//
-		//		sql.append(PARCHI).append(")");
-
-		//		PreparedStatement ps = db.getConnection().prepareStatement(sql.toString()) ;
-		//		ResultSet rs = stmt.getResultSet();
-		//		int params = 1 ;
-		//		if ( data != null )
-		//			ps.setString( params++, data.ymdString() ) ;
-		//
-		//		if ( c != null ) {
-		//			ps.setInt( params++, c.getNumero().intValue() ) ;
-		//			ps.setString(params++, c.getIdmerce().toString());
-		//		}
-
-		//		 if (rs != null )
-		//		        while( rs.next() )
-		//		            list.add( getFromRS(rs) );
 
 	}
 
@@ -319,7 +283,6 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 		db.end();
 	}
 
-	@SuppressWarnings("unchecked")
 	public ArrayList<String> getCodiciStalli( Consegna c, FormattedDate data ) throws Exception {
 
 		ArrayList<String> codici = null;
@@ -466,6 +429,96 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 			db.freeConnection(conn) ;
 		}
 		return list ;
+	}
+	
+	/*
+	 * 
+	 * select  distinct min( data )  as mindata ,  merce, cliente, fornitore , `num consegna` , `num documento`
+ from `archivio corretto` where  
+destinazione <> 7 and len(cliente) < 4 and len(fornitore) < 4 and
+data > #2016-12-17# and data <= #2016-12-19#
+group by  cliente,  merce, `num consegna` , `num documento`, fornitore, destinazione
+
+	 */
+	
+	public ArrayList<MovimentoQuadrelli> getScarichiDaImportare( FormattedDate fromData, ArrayList<Stallo> stalliAttivi ) throws Exception {
+		
+		StringBuilder sql = new StringBuilder(70)
+		.append("SELECT distinct max( data )  as mindata ,  merce, cliente, fornitore , `num consegna` , `num documento` FROM ")
+		.append(getTable()).append(" WHERE ")
+		.append(" destinazione <> 7 AND fornitore IN ( ? ) ");
+
+		if ( fromData != null ) {
+			sql.append(" AND data > #2017-01-23# ");
+		}
+		
+		sql.append(" GROUP BY cliente,  merce, `num consegna` , `num documento`, fornitore, destinazione");
+
+		sql = new StringBuilder("SELECT distinct max( data )  as mindata ,  merce, cliente, fornitore , `num consegna` , `num documento` FROM `ARCHIVIO CORRETTO` ")
+				.append( "WHERE  destinazione <> 7 AND fornitore IN ( ")
+				.append( " '932','933','904','905','908','909','101','102','103','105','107','108','109','110','111','113','114','115','116' )  AND data > #2017-01-23#  GROUP BY cliente,  merce, `num consegna` , `num documento`, fornitore, destinazione " );
+		
+		Login.debug(sql + " ## " +fromData + "  2017-01-23 : " + getListaCodiciStalli(stalliAttivi));
+		
+		String key = FileBasedCacher.getCacheKey(sql);
+		if ( key != null && readFromCache )
+			return (ArrayList<MovimentoQuadrelli>) FileBasedCacher.get(key);
+
+		Connection conn = db.getConnection();
+
+		ArrayList<MovimentoQuadrelli> list = null ;
+		try {
+			
+			PreparedStatement s = conn.prepareStatement(sql.toString()) ;
+
+			int n = 1 ;
+//			s.setString(n++, getListaCodiciStalli(stalliAttivi).toString() ) ;
+			
+//			if ( fromData != null ) {
+//				s.setDate(n++, new Date( fromData.getTime() ) ) ;
+//			}
+			
+			
+// min( data )  as mindata ,  merce, cliente, fornitore , `num consegna` , `num documento`
+			ResultSet rs = s.executeQuery();
+			
+//			FileBasedCacher.set(key + "_RS", rs);
+			
+			if ( rs != null ) {
+				list = new ArrayList<MovimentoQuadrelli>(5);
+				while (rs.next()) {
+					MovimentoQuadrelli m = (MovimentoQuadrelli) getFromRS(rs);
+					
+//					m.setData(new FormattedDate(rs.getString(1)));
+//					m.setIdMerce(rs.getString(1) );
+					list.add( m );
+				}
+			}
+			if ( key != null && writeCache ) {
+				FileBasedCacher.set(key, list);
+			}
+		}
+
+		finally {
+			db.freeConnection(conn) ;
+		}
+		return list ;
+	}
+	
+	private StringBuilder getListaCodiciStalli(ArrayList<Stallo> stalliAttivi) {
+		StringBuilder sb = new StringBuilder();
+		boolean first = true;
+		for( Stallo s : stalliAttivi) {
+			
+			if ( first ) {
+				first = false;
+			} else {
+				sb.append(",");
+			}
+			sb.append("'").append(s.getCodice()).append("'");
+			
+		}
+		return sb;
 	}
 
 }

@@ -46,18 +46,31 @@ public class PtMovimentazioniImporter {
 	
 	PtMovimentazioniImporter() {
 		
-		String fileMovimentazioni = ConfigManager.getProperty("movimentazioni.filename") ;
-		
-		adb = new AccessDB(fileMovimentazioni) ;
-
 		ivaAdp = new MovimentoIvaAdapter() ;
 		dogAdp = new MovimentoDoganaleAdapter() ;
 		
-		quadAdp = new MovimentoQuadrelliAdapter(adb) ;
+		getQuadrelliAdapter();
 	
+	}
+
+	private void getQuadrelliAdapter() {
+		
+		if (quadAdp != null) {
+			try {
+				freeInstance();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		quadAdp = new MovimentoQuadrelliAdapter(getAccessDB()) ;
 	}
 	
 	public AccessDB getAccessDB() {
+		if ( adb == null ) {
+			String fileMovimentazioni = ConfigManager.getProperty("movimentazioni.filename") ;
+			adb = new AccessDB(fileMovimentazioni) ;
+		}
 		return adb;
 	}
 	
@@ -88,92 +101,4 @@ public class PtMovimentazioniImporter {
 			
 	}
 
-//	public synchronized void old_importTo( FormattedDate to ) throws Exception {
-//
-//		if ( to == null )
-//			to = new FormattedDate() ;
-//		
-//		Vector consegne = Consegna.newAdapter().getAperte();
-//		
-//		Consegna c = null ;
-//		
-//		FormattedDate dataLastCarico = null ;
-//		FormattedDate dataLastScarico = null;
-//		FormattedDate giornoCorrente = null ;
-//		
-//		Stallo s = null;
-//
-//		// TODO : Se la data del carico è null guardare la data del primo carico di quadrelli
-//		try {
-//			dataLastCarico = movAdp.getLastDate(false, null) ;
-//			dataLastScarico = movAdp.getLastDate(true, null) ;
-//			
-//			GregorianCalendar gc = new GregorianCalendar(Locale.ITALIAN);
-//			
-//			if ( dataLastCarico == null && dataLastScarico == null ) {
-////				giornoCorrente = new FormattedDate( "01/01/" + new FormattedDate().getAnno() + " 00:00:00" );
-//				giornoCorrente = new FormattedDate( "01/01/2006 00:00:00" );
-//				to = new FormattedDate( "01/01/2007 00:00:00" );
-//				
-//				gc.setTime(giornoCorrente);
-//				gc.add(GregorianCalendar.DAY_OF_YEAR, -1) ;
-//				giornoCorrente = new FormattedDate( gc.getTime() );
-//			}
-//			else if ( dataLastCarico == null ) {
-//				giornoCorrente = dataLastScarico ;
-//			}
-//			else if ( dataLastScarico == null ) {
-//				giornoCorrente = dataLastCarico ;
-//			}
-//			else if ( dataLastScarico.after(dataLastCarico) ) {
-//				giornoCorrente = dataLastScarico ;
-//			}
-//			else  {
-//				giornoCorrente = dataLastCarico ;
-//			}
-//
-//			
-//			gc.setTime(giornoCorrente) ;
-//			
-//			boolean carichiSingoli = false ;
-//			while ( giornoCorrente.before(to) ) {
-//				gc.add(GregorianCalendar.DAY_OF_YEAR, 1) ;
-//				giornoCorrente = new FormattedDate(gc.getTime());
-//				
-//				// Per tutte le consegne ... 
-//				for ( Iterator i = consegne.iterator(); i.hasNext() ; ) {
-//					c = (Consegna) i.next();
-//					
-//					carichiSingoli = ( c.getIter().getIspesofattura() || c.getIter().getIspesobolla() );
-//					// E tutti gli stalli di ciascuna consegna ...
-//					for ( Iterator is = c.getStalli().iterator() ; is.hasNext() ; ) {
-//
-//						s = (Stallo) is.next() ;
-//					
-//						if ( carichiSingoli && 
-//								( dataLastCarico == null || giornoCorrente.before(dataLastCarico) ) ) {
-//							importMovimenti( quadAdp.get(false, giornoCorrente, s), c, false, null);
-//						}
-//						if ( dataLastScarico == null || giornoCorrente.before(dataLastScarico) ) {
-//							importMovimenti( quadAdp.get(true, giornoCorrente, s), c, true, null );
-//						}
-//					}
-//				}
-//			}
-//		}
-//		catch ( Exception e ) {
-//			throw e ;
-//		}
-//		finally {
-//			
-////			quadAdp.end() ;
-//		}
-//		
-//	}
-	
-	
-	
-	
-	
-	
 }
