@@ -58,6 +58,8 @@ public class Homepage extends VelocityCommand {
 		FormattedDate now = new FormattedDate();
 		
 		FormattedDate selectedData = getDateParam("data", false);
+		
+		boolean hasSelectedData = false;
 		if ( selectedData != null && selectedData.after(now) ) {
 			selectedData = null;
 		}
@@ -66,8 +68,21 @@ public class Homepage extends VelocityCommand {
 		if ( selectedData == null ) {
 			dataHead = now;
 		} else {
+			hasSelectedData = true;
 			selectedData = new FormattedDate(selectedData.ymdString() + " 23:59:59");
 		}
+		
+//		String iva = "2016-04-01";
+//		String dog = "2016-05-01";
+//		
+//		int c = iva.compareTo(dog);
+//		
+//		if ( c > 0 ) 
+//			Login.debug("aprile maggiore dog " + c );
+//		else if( c < 0 ) 
+//			Login.debug("dog maggiore di iva " + c );
+//		
+//		Login.debug( dataHead.ymdString() + " " + dataHead.ymdString().compareTo("2017-02-05") )
 		
 		ctx.put("data", selectedData);
 		ctx.put("dataHead", dataHead);
@@ -77,14 +92,17 @@ public class Homepage extends VelocityCommand {
 		Vector<Stallo> stalli = Stallo.newAdapter().getAll(selectedData , "parco, numero");
 		ctx.put("stalli", stalli );
 
-		if ( ! isPrintOutput() && selectedData != null ) {
+//		Login.debug("Home" + ( isPrintOutput() ? " P " : " - " ) + ( hasSelectedData ? "hasSelectedData" : " NotSelectedData") );
+		if ( ! isPrintOutput() && ! hasSelectedData ) {
+			
 			MovimentoQuadrelliAdapter qAdp = new MovimentoQuadrelliAdapter(PtMovimentazioniImporter.getInstance().getAccessDB());
 			MovimentoDoganaleAdapter dogAdp = new MovimentoDoganaleAdapter() ;
 			MovimentoIvaAdapter ivaAdp = new MovimentoIvaAdapter() ;
 			
 			StalloHomepageHelper stalliHelper = new StalloHomepageHelper(stalli, qAdp, dogAdp, ivaAdp);
-
 			ctx.put("stalliHelper", stalliHelper );
+			
+//			Login.debug("stalliHelper:" + stalliHelper);
 			
 		}
 		
