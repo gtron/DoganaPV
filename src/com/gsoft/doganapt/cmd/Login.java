@@ -180,6 +180,9 @@ public class Login extends VelocityCommand {
 	}
 	
 	public static void debug(String msg) {
-		logger.debug(msg);
+		if ( logger != null )
+			logger.debug(msg);
+		else 
+			System.out.println(msg);
 	}
 }
