@@ -222,7 +222,9 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 	public Movimento getLast( final Consegna c , final Stallo stallo, final boolean onlyScarichi ) throws Exception {
 
 		final StringBuilder sql = new StringBuilder(70)
-		.append("SELECT max(data) FROM ")
+		.append("SELECT " )
+		.append(getFieldsRegistro(null)) 
+		.append(" FROM ")
 		.append(getTable());
 
 		sql.append(" WHERE deleted = 0 AND idconsegna = ?  ");
@@ -234,6 +236,8 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		if ( stallo != null  ) {
 			sql.append(" AND idstallo = ? ");
 		}
+		
+		sql.append(" ORDER BY data DESC LIMIT 1 ");
 
 		Movimento m = null;
 		
