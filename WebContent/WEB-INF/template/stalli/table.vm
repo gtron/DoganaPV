@@ -1,5 +1,7 @@
 #set($oldParco = "")
+##
 #foreach( $s in $stalli ) 
+##
 #if($oldParco != $s.Parco)
 #set($oldParco = $s.Parco)
 #if ( $velocityCount > 1)</tr></table><br>#end
@@ -17,7 +19,10 @@
 <a href=".main?id=$!s.Id&cmd=viewstallo" class="stallo" #if ( $s.IdConsegnaAttuale ) style="background-color:$!s.Consegna.Merce.Colore"#end >
 #end
 <span>$count</span>
-<p>
+<p style="position:relative;">
+#if( $!stalliHelper.hasScarichiPendenti($s) )
+<img src="$!images/important-round.png" style="position:absolute; right:0; top:0;"/>
+#end
 #if( $s.IdConsegnaAttuale )
 Cons: <strong>$!s.Consegna.Numero</strong> - Partit: <strong>$!s.Consegna.NumeroPartitario</strong><br>
 <strong>$!s.Consegna.Merce.Nome</strong><br>
