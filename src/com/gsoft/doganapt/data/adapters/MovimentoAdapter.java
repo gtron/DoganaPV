@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
+import com.gsoft.doganapt.cmd.Login;
 import com.gsoft.doganapt.data.Consegna;
 import com.gsoft.doganapt.data.Documento;
 import com.gsoft.doganapt.data.Merce;
@@ -237,9 +238,13 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			sql.append(" AND idstallo = ? ");
 		}
 		
+		sql.append(" GROUP BY numregistro, data, isscarico , isrettifica");
+		
 		sql.append(" ORDER BY data DESC LIMIT 1 ");
 
 		Movimento m = null;
+		
+//		Login.debug("\nLast: " + sql + "\n idConsegna:" + c.getId() + " idStallo:" + stallo.getId() );
 		
 		final Connection conn = db.getConnection() ;
 		try {

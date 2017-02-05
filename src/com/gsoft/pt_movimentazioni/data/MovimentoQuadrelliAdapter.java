@@ -446,20 +446,16 @@ group by  cliente,  merce, `num consegna` , `num documento`, fornitore, destinaz
 		StringBuilder sql = new StringBuilder(70)
 		.append("SELECT distinct max( data )  as mindata ,  merce, cliente, fornitore , `num consegna` , `num documento` FROM ")
 		.append(getTable()).append(" WHERE ")
-		.append(" destinazione <> 7 AND fornitore IN ( ? ) ");
+		.append(" destinazione <> 7 AND fornitore IN ( ")
+		.append(getListaCodiciStalli(stalliAttivi))
+		.append(") ");
 
 		if ( fromData != null ) {
-			sql.append(" AND data > #2017-01-23# ");
+			sql.append(" AND data > ? ");
 		}
 		
 		sql.append(" GROUP BY cliente,  merce, `num consegna` , `num documento`, fornitore, destinazione");
 
-		sql = new StringBuilder("SELECT distinct max( data )  as mindata ,  merce, cliente, fornitore , `num consegna` , `num documento` FROM `ARCHIVIO CORRETTO` ")
-				.append( "WHERE  destinazione <> 7 AND fornitore IN ( ")
-				.append( " '932','933','904','905','908','909','101','102','103','105','107','108','109','110','111','113','114','115','116' )  AND data > #2017-01-23#  GROUP BY cliente,  merce, `num consegna` , `num documento`, fornitore, destinazione " );
-		
-		Login.debug(sql + " ## " +fromData + "  2017-01-23 : " + getListaCodiciStalli(stalliAttivi));
-		
 		String key = FileBasedCacher.getCacheKey(sql);
 		if ( key != null && readFromCache )
 			return (ArrayList<MovimentoQuadrelli>) FileBasedCacher.get(key);
@@ -472,25 +468,16 @@ group by  cliente,  merce, `num consegna` , `num documento`, fornitore, destinaz
 			PreparedStatement s = conn.prepareStatement(sql.toString()) ;
 
 			int n = 1 ;
-//			s.setString(n++, getListaCodiciStalli(stalliAttivi).toString() ) ;
+			if ( fromData != null ) {
+				s.setDate(n++, new Date( fromData.getTime() ) ) ;
+			}
 			
-//			if ( fromData != null ) {
-//				s.setDate(n++, new Date( fromData.getTime() ) ) ;
-//			}
-			
-			
-// min( data )  as mindata ,  merce, cliente, fornitore , `num consegna` , `num documento`
 			ResultSet rs = s.executeQuery();
-			
-//			FileBasedCacher.set(key + "_RS", rs);
 			
 			if ( rs != null ) {
 				list = new ArrayList<MovimentoQuadrelli>(5);
 				while (rs.next()) {
 					MovimentoQuadrelli m = (MovimentoQuadrelli) getFromRS(rs);
-					
-//					m.setData(new FormattedDate(rs.getString(1)));
-//					m.setIdMerce(rs.getString(1) );
 					list.add( m );
 				}
 			}
