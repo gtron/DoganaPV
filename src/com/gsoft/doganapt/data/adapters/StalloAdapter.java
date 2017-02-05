@@ -202,6 +202,7 @@ public class StalloAdapter extends BeanAdapter2 {
 
 		clearCache(); // da cambiare
 	}
+
 	public static Stallo getByCodice(final String codice , final boolean updateCache) {
 		Stallo a = null ;
 

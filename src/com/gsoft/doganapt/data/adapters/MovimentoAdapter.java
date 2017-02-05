@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
+import com.gsoft.doganapt.cmd.Login;
 import com.gsoft.doganapt.data.Consegna;
 import com.gsoft.doganapt.data.Documento;
 import com.gsoft.doganapt.data.Merce;
@@ -217,6 +218,54 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		}
 
 		return list ;
+	}
+	
+	public Movimento getLast( final Consegna c , final Stallo stallo, final boolean onlyScarichi ) throws Exception {
+
+		final StringBuilder sql = new StringBuilder(70)
+		.append("SELECT " )
+		.append(getFieldsRegistro(null)) 
+		.append(" FROM ")
+		.append(getTable());
+
+		sql.append(" WHERE deleted = 0 AND idconsegna = ?  ");
+
+		if ( onlyScarichi ) {
+			sql.append(" AND isscarico = 1 ");
+		}
+
+		if ( stallo != null  ) {
+			sql.append(" AND idstallo = ? ");
+		}
+		
+		sql.append(" GROUP BY numregistro, data, isscarico , isrettifica");
+		
+		sql.append(" ORDER BY data DESC LIMIT 1 ");
+
+		Movimento m = null;
+		
+//		Login.debug("\nLast: " + sql + "\n idConsegna:" + c.getId() + " idStallo:" + stallo.getId() );
+		
+		final Connection conn = db.getConnection() ;
+		try {
+			final PreparedStatement s = conn.prepareStatement(sql.toString());
+			
+			s.setInt(1, c.getId().intValue()) ;
+			if ( stallo != null ) {
+				s.setInt(2, stallo.getId());
+			}
+			
+			final ResultSet rs = s.executeQuery() ;
+
+			if ( rs != null && rs.next() ) {
+				m = (Movimento) getFromRS(rs);
+			}
+		}
+		finally {
+			db.freeConnection(conn);
+		}
+
+		return m;
 	}
 
 	public FormattedDate getLastDate( final Consegna c , final ArrayList<Integer> idStalli, final boolean onlyScarichi ) throws Exception {

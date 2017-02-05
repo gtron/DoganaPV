@@ -365,6 +365,10 @@ public abstract class Movimento extends ModelBean2 {
 					movRisultante.setUmido( sommaArrotondata( movRisultante.getUmido(), m.getUmido()) );
 				}
 			}
+			
+			if ( movRisultante.getData() == null || movRisultante.getData().before(m.getData())) {
+				movRisultante.setData(m.getData());
+			}
 		}
 
 		return movRisultante;

@@ -178,4 +178,11 @@ public class Login extends VelocityCommand {
 		System.out.println(new FormattedDate().toString() + " " + message);
 
 	}
+	
+	public static void debug(String msg) {
+		if ( logger != null )
+			logger.debug(msg);
+		else 
+			System.out.println(msg);
+	}
 }
