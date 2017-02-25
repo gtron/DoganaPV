@@ -107,7 +107,8 @@ public class ApriConsegna extends VelocityCommand {
 			}
 
 			Movimento movApertura = null;
-			MovimentoIvaAdapter movimentoIvaAdapter = new MovimentoIvaAdapter();
+			MovimentoDoganaleAdapter movDoganaleAdp = new MovimentoDoganaleAdapter();
+			MovimentoIvaAdapter movIvaAdp = new MovimentoIvaAdapter();
 
 			if ( consegna.isChiusa() ) {
 				//				c.setDataChiusura(null);
@@ -116,8 +117,8 @@ public class ApriConsegna extends VelocityCommand {
 			else {
 				movApertura = consegna.getIter()
 						.getImporter(
-								new MovimentoDoganaleAdapter(),
-								movimentoIvaAdapter ,
+								movDoganaleAdp,
+								movIvaAdp ,
 								qAdp
 								).apriConsegna(consegna, data, documento, documentoPV, note);
 			}
@@ -149,9 +150,11 @@ public class ApriConsegna extends VelocityCommand {
 				   
 					if ( movApertura instanceof MovimentoIVA ) {
 				    	stalloConsegna.assegnaValori((MovimentoIVA) movApertura);
+				    	movIvaAdp.update(movApertura);
+				    } else {
+				    	movDoganaleAdp.update(movApertura);
 				    }
 
-					movimentoIvaAdapter.update(movApertura);
 
 				}
 //			}
@@ -206,7 +209,7 @@ public class ApriConsegna extends VelocityCommand {
 
 		stalloConsegna.setIdStallo(StalloConsegnaAdapter.ID_STALLO_APERTURA);
 
-		Long id = (Long)  stalloConsegnaAdapter.create(stalloConsegna);
+		Long id = Long.valueOf( stalloConsegnaAdapter.create(stalloConsegna).toString() );
 		stalloConsegna.setId(Integer.valueOf(id.intValue()) );
 	}
 
