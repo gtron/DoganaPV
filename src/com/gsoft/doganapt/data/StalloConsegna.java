@@ -238,7 +238,9 @@ public class StalloConsegna extends ModelBean2 implements Serializable, Cloneabl
 
 	@Override
 	public StalloConsegna clone() throws CloneNotSupportedException {
-		return (StalloConsegna) super.clone();
+		StalloConsegna sc = (StalloConsegna) super.clone();
+		sc.setId(null);
+		return sc;
 	}
 
 	public static final double getValoreArrotondato(double val , int precisione ) {
