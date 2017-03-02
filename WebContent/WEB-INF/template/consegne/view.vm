@@ -227,31 +227,18 @@ Inserire la data fino alla quale si desidera importare (compresa):
 <input type="hidden" name="exec" value="1" />
 <input type="hidden" name="c" value="$obj.Id" />
 
-#set($giacDog=0)
 <fieldset><legend>Selezione degli Stalli</legend>
 #foreach( $s in $obj.Stalli )
 #if(! $s.HasLiberaPratica )
-#if($giacDog==0)
-#set($giacDog=$s.getGiacenzaDoganale(true))
-#set($sc=$obj.getStalloConsegna($s))
-#set($valoreUSD=$!tools.Number.format('##0.00',$tools.Math.mul($giacDog,$sc.getValoreUnitarioDollari())))
-#set($valoreTesTp=$!tools.Number.format('##0.00',$tools.Math.mul($giacDog,$sc.getValoreUnitarioTesTp())))
-#set($autocheck=true)
-#else
-#unset($valoreUSD)
-#unset($valoreTesTp)
-#end
 <input name="list" value="$s.Id" id="libPrat_$velocityCount" #if($autocheck)checked="checked"#end type="checkbox" />
-#set( $tassoEURUSD=$sc.TassoEuroDollaro )
-<input type="hidden" id="usd_$s.Id" value="$!tools.Number.format('##0.00', $valoreUSD)" />
 <label for="libPrat_$velocityCount">$s.Nome</label><br />
 #end#end
 </fieldset>
 
 <fieldset><legend>Dati del Movimento</legend>
-Valore USD: <input type="text" name="valoreDollari" size="10" id="valoreDollari" value="$!valoreUSD" /> 
-Tasso EUR/USD: <input type="text" name="tasso" size="5" id="tasso" value="$!tassoEURUSD" /><br />
-Oneri Accessori:&nbsp;&nbsp;<input type="text" name="valoreTestp" size="10" id="valoreTestp" value="$!valoreTesTp"/> &nbsp;&nbsp;
+Valore USD: <input type="text" name="valoreDollari" size="10" id="valoreDollari" value="" /> 
+Tasso EUR/USD: <input type="text" name="tasso" size="5" id="tasso" value="" /><br />
+Oneri Accessori:&nbsp;&nbsp;<input type="text" name="valoreTestp" size="10" id="valoreTestp" value=""/> &nbsp;&nbsp;
 Data : <input type="text" name="dataLP" size="10" id="dataLP" value="" /><br />
 </fieldset>
 
