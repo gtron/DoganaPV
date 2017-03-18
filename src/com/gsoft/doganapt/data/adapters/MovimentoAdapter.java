@@ -220,7 +220,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		return list ;
 	}
 	
-	public Movimento getLast( final Consegna c , final Stallo stallo, final boolean onlyScarichi ) throws Exception {
+	public Movimento getLast( final Consegna c , final Stallo stallo, final boolean onlyScarichi, final boolean onlyRegistered ) throws Exception {
 
 		final StringBuilder sql = new StringBuilder(70)
 		.append("SELECT " )
@@ -236,6 +236,10 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 
 		if ( stallo != null  ) {
 			sql.append(" AND idstallo = ? ");
+		}
+		
+		if ( onlyRegistered ) {
+			sql.append(" AND numregistro > 0 ") ;
 		}
 		
 		sql.append(" GROUP BY numregistro, data, isscarico , isrettifica");

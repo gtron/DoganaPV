@@ -63,8 +63,8 @@ public class StalloHomepageHelper {
 
 						if ( s.getConsegna().getNumero().equals( Integer.valueOf( q.getConsegna()))) {
 
-							Movimento lastIva = registroIVA.getLast(s.getConsegna(), s, true );
-							Movimento lastDog = registroDoganale.getLast(s.getConsegna(), s, true );
+							Movimento lastIva = registroIVA.getLast(s.getConsegna(), s, true, true );
+							Movimento lastDog = registroDoganale.getLast(s.getConsegna(), s, true, true );
 							
 //							Login.debug("Stallo: "+s.getNome() + " Pend:"+q.getData() + 
 //									(lastIva != null ? " Iva:"+lastIva.getData() : "" ) + 
