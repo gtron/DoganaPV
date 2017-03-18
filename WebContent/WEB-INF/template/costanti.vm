@@ -1,4 +1,4 @@
-#set( $versione = '1.2' )
+#set( $versione = '1.2.1' )
 #set( $wwwRoot = '/DoganaPV')
 #set($images = "$wwwRoot/images")
 #set( $dateFormat = 'dd/MM/yyyy')
@@ -9,6 +9,10 @@
 #*
 
 Changelog
+
+1.2.1 18 Marzo 2017 
+- Icona di allarme tiene conto solo degli movimenti registrati
+  (in questo modo salta se ci sono movimenti da importare o da registrare)
 
 1.2 05 Febbraio 2017 
 - Icona di allarme per gli stalli con scarichi da importare
