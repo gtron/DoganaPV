@@ -285,7 +285,8 @@ public class PopolaStalli extends VelocityCommand {
 			stalloConsegna = scValoriUnitari.clone();
 			stalloConsegna.setIdStallo(s.getId());
 
-			stalloConsegnaAdp.create(stalloConsegna);
+			Object _id =   stalloConsegnaAdp.create(stalloConsegna);
+			stalloConsegna.setId(Integer.valueOf("" +_id));
 		}
 
 		stalloConsegna.setValoreUnitarioDollari(scValoriUnitari.getValoreUnitarioDollari());
