@@ -242,9 +242,8 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			sql.append(" AND numregistro > 0 ") ;
 		}
 		
-		sql.append(" GROUP BY numregistro, data, isscarico , isrettifica");
-		
-		sql.append(" ORDER BY data DESC LIMIT 1 ");
+		sql.append(" GROUP BY numregistro, data, isscarico , isrettifica")
+		   .append(" ORDER BY data DESC LIMIT 1 ");
 
 		Movimento m = null;
 		
@@ -275,20 +274,14 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 	public FormattedDate getLastDate( final Consegna c , final ArrayList<Integer> idStalli, final boolean onlyScarichi ) throws Exception {
 		final StringBuilder sql = new StringBuilder(70)
 		.append("SELECT max(data) FROM ")
-		.append(getTable())
-
-		//			.append(" WHERE isscarico = ?")
-		;
+		.append(getTable());
 
 		sql.append(" WHERE deleted = 0 AND idconsegna = ?  ");
-
-
 
 		if ( onlyScarichi ) {
 			sql.append(" AND ")
 			.append(" isscarico = 1 ");
 		}
-
 
 		ArrayList<Object> stalli ;
 		if ( idStalli == null || idStalli.size() < 1 ) {
@@ -300,7 +293,6 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			for ( final Integer ids : idStalli ) {
 				stalli.add(StalloAdapter.get(ids));
 			}
-
 		}
 		if ( stalli != null && stalli.size() > 0 ) {
 
@@ -338,7 +330,6 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		finally {
 			db.freeConnection(conn);
 		}
-
 		return d;
 	}
 
@@ -352,7 +343,6 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		if ( idConsegna != null ) {
 			sb.append("AND idconsegna =")
 			.append( idConsegna.toString() ) ;
-
 		}
 		if ( idStallo != null ) {
 			sb.append(" AND idstallo = ")
@@ -364,12 +354,10 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			//				sb.append(" AND ") ;
 			sb.append(" AND numregistro > 0 ") ;
 		}
-
 		return getWithWhere( sb.toString() ,order, limit);
 	}
 
 	public Vector getByNumeroRegistro(final Integer num ) throws Exception {
-
 		return getWithWhere( " deleted = 0 AND numregistro =" + num );
 	}
 
@@ -386,7 +374,6 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		try {
 			conn = db.getConnection() ;
 			db.executeNonQuery(sql.toString(), conn) ;
-
 		}
 		catch ( final Exception e ) {
 			throw e ;
@@ -394,7 +381,6 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		finally {
 			db.freeConnection(conn) ;
 		}
-
 	}
 
 	public void unregister( final Long numreg ) throws Exception {
@@ -411,7 +397,6 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			db.executeNonQuery(sql.toString(), conn) ;
 
 			shiftRegistro( true, new Integer( numreg.intValue() ), conn ) ;
-
 		}
 		catch ( final Exception e ) {
 			throw e ;
@@ -429,14 +414,12 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		.append(getTable())
 		.append(" set numregistro = numregistro ") ;
 
-
 		if ( down ) {
 			sql.append( " - 1 where deleted = 0 AND numregistro > ") ;
 		}
 		else {
 			sql.append( " + 1 where deleted = 0 AND numregistro >= ") ;
 		}
-
 		sql.append( from ) ;
 
 		db.executeNonQuery(sql.toString(), conn) ;
@@ -476,17 +459,14 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		final Connection conn = db.getConnection() ;
 		Vector<Integer> list = null ;
 		try {
-
 			final PreparedStatement s = conn.prepareStatement(sql.toString()) ;
 
 			final ResultSet rs = s.executeQuery() ;
-
 			list = new Vector<Integer>(rs.getFetchSize()) ;
 
 			while( rs.next() ) {
 				list.add( (Integer) rs.getObject(1) );
 			}
-
 		}
 		finally {
 			db.freeConnection(conn);
@@ -544,7 +524,6 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 						sql.append(" M ON M.id = C.idmerce ");
 						writeJoinMerce=false;
 					}
-
 				}
 			}
 		}
@@ -553,9 +532,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		}
 
 		if ( soloRegistrati ) {
-
 			sql.append(" AND numregistro > 0 ");
-
 			//			if ( c != null )
 			//				sql.append(" AND ");
 		}
@@ -622,7 +599,6 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			if( ! ignoreNumRegistro ) {
 				sql.append( " numregistro, ") ;
 			}
-
 			sql.append( "data, isrettifica, isscarico, idstallo " );
 		}
 
@@ -644,10 +620,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			}
 
 			list = getByStatment(s);
-
-
 		} catch (Exception e ) {
-
 			e.printStackTrace();
 		}
 		finally {
@@ -917,13 +890,10 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 				+ " AND isrettifica = '" + (rettifica ? "1":"0") + "'"
 				+ " AND isscarico = '" + (scarico ? "1":"0") + "'"
 				) ;
-
 	}
 
 	public Vector getByData( final Integer idConsegna , final FormattedDate d ) throws Exception {
-
 		return getWithWhere(" deleted = 0 AND idconsegna = " + idConsegna.toString() + " AND data = '" + d.ymdString() + "'" ) ;
-
 	}
 
 	public final static Integer ID_STALLO_CARICO_APERTURA = Integer.valueOf(0);
@@ -955,7 +925,6 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 				out.put(idStallo, m);
 			}
 		}
-
 		return out;
 	}
 
@@ -1038,22 +1007,15 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 			while ( i.hasNext() ) {
 				m = i.next() ;
 
-
 				currNum ++;
 
 				if ( doFix ) {
-
 					final Integer num = new Integer( currNum ) ;
 
 					//				String ids = getIdsFromNumRegistro( m ) ;
-
-
-
-
 					//					shiftRegistro( false, num , conn  ) ;
 
 					updateNumRegistro(m , num, conn);
-
 				}
 				else if ( m.getNumRegistro().intValue() != currNum  ) {
 					ret = false ;
@@ -1112,7 +1074,6 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 				" WHERE r.data < '" + data.ymdString() + " 23:59:59' and ( datachiusura > '" + data.ymdString() + "' or datachiusura is null )  \n "
 						+ " AND r.idStallo = " + idStallo + " order by r.data desc, r.id desc " ;
 
-
 		final Connection conn = db.getConnection() ;
 		try {
 
@@ -1121,8 +1082,6 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 			if ( ! x.isEmpty() ) {
 				idC = (Integer) x.firstElement();
 			}
-			
-
 		}
 		finally {
 			db.freeConnection(conn);
