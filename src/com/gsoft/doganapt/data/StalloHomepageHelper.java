@@ -18,7 +18,8 @@ public class StalloHomepageHelper {
 	FormattedDate minData ;
 	FormattedDate maxValido;
 
-	THashMap cacheStalli ;
+	THashMap cacheStalliDaImportare ;
+	THashMap cacheStalliDaRegistrare ;
 	THashMap cacheLastMovimento ;
 
 	MovimentoQuadrelliAdapter qAdp;
@@ -30,14 +31,48 @@ public class StalloHomepageHelper {
 		this.registroDoganale = registroDoganale;
 		this.registroIVA = registroIVA;
 
-		initCacheFromStalli(stalli);
+		ArrayList<Stallo> stalliAttivi = getStalliAttivi(stalli);
+		
+		cacheStalliDaImportare = new THashMap(stalliAttivi.size());
+		cacheStalliDaRegistrare = new THashMap(stalliAttivi.size());
+		cacheLastMovimento = new THashMap(stalliAttivi.size());
+		
+		ArrayList<Stallo> stalliAttiviRestanti = initCacheFromStalliDaRegistrare(stalliAttivi);
+		
+		initCacheFromStalliDaImportare(stalliAttiviRestanti);
 
 	}
+	
+	private ArrayList<Stallo> initCacheFromStalliDaRegistrare(ArrayList<Stallo> stalliAttivi) {
+		ArrayList<Stallo> stalliAttiviRestanti = new ArrayList<Stallo>(3);
 
-	private void initCacheFromStalli(Vector<Stallo> stalli) {
+		for ( Stallo s : stalliAttivi ) {
+			try {
+				
+				Movimento m = null;
 
-		ArrayList<Stallo> stalliAttivi = getStalliAttivi(stalli);
+				Vector<Movimento> list = registroDoganale.getDaRegistrareByIdStallo(s.getId());
+				if ( list == null || list.size() < 1 ) {
+					list = registroIVA.getDaRegistrareByIdStallo(s.getId());
+				}
+				
+				if ( list != null && list.size() > 0 ) {
+					m = findLastMovimentoRegistrato(s);
+					
+					cacheStalliDaRegistrare.put(s, list.get(list.size() - 1));
+					cacheLastMovimento.put(s, m);
+				} else {
+					stalliAttiviRestanti.add(s);
+				}
+			} catch (Exception e) {
+				Login.debug(e, this.getClass().getName());
+			}
+		}
+		
+		return stalliAttiviRestanti;
+	}
 
+	private void initCacheFromStalliDaImportare(ArrayList<Stallo> stalliAttivi) {
 
 		FormattedDate fromData = new FormattedDate();
 		fromData.setTime(fromData.getTime() - ( 45L * 24 * 3600 * 1000 ) );
@@ -46,74 +81,61 @@ public class StalloHomepageHelper {
 			ArrayList<MovimentoQuadrelli> movimentiDaImportare = qAdp.getScarichiDaImportare(fromData, stalliAttivi);
 
 			if ( movimentiDaImportare != null ) {
-				cacheStalli = new THashMap(stalliAttivi.size());
-				cacheLastMovimento = new THashMap(stalliAttivi.size());
+//				Login.debug("fromData:" + fromData + " movimentiDaImportare.size: " + movimentiDaImportare.size());
 
-				//			Login.debug("fromData:" + fromData + " movimentiDaImportare.size: " + movimentiDaImportare.size());
-
-				Stallo s;
+				Stallo s = null;
 				Movimento m = null;
-
 
 				for ( MovimentoQuadrelli q : movimentiDaImportare ) {
 					s = StalloAdapter.getByCodice(q.getCodiceFornitore(), false);
 					m = null;
 
 					try {
-
 						if ( s.getConsegna().getNumero().equals( Integer.valueOf( q.getConsegna()))) {
 
-							Movimento lastIva = registroIVA.getLast(s.getConsegna(), s, true, true );
-							Movimento lastDog = registroDoganale.getLast(s.getConsegna(), s, true, true );
-							
-//							Login.debug("Stallo: "+s.getNome() + " Pend:"+q.getData() + 
-//									(lastIva != null ? " Iva:"+lastIva.getData() : "" ) + 
-//									(lastDog != null ? " Dog:"+lastDog.getData() : "" ));
-							
-							if ( lastIva != null ) {
-								
-								if ( lastDog != null ) {
-									if ( lastIva.getData() != null && 
-											
-											lastIva.getData().ymdString().compareTo( lastDog.getData().ymdString() ) > 0
-											) {
-										m = lastIva ;
-									} else {
-										m = lastDog;
-									}
-								} 
-							} else { // else if ( lastDog != null ) 
-								m = lastDog;
-							}
+							m = findLastMovimentoRegistrato(s);
 
 							if ( m != null && m.getData() != null && 
 									q.getData().ymdString().compareTo( m.getData().ymdString() ) > 0) {
-								cacheStalli.put(s, q);
+								cacheStalliDaImportare.put(s, q);
 								cacheLastMovimento.put(s, m);
 							}
 						}
 					} catch (Exception ex) {
-						StringBuilder trace = new StringBuilder(5);
-						int count=0;
-						for ( StackTraceElement t : ex.getStackTrace() ) {
-							trace.append("\n"+t.toString());
-							if( ++count > 15 ) {
-								break;
-							}
-						}
-						Login.debug("Error StalloHomepage:" + ex.getMessage() + trace);
+						Login.debug(ex, this.getClass().getName());
 					}
 				}
 			}
-
 		} catch (Exception e) {
-			StringBuilder trace = new StringBuilder(5);
-			for ( StackTraceElement t : e.getStackTrace() ) {
-				trace.append("\n"+t.toString());
-			}
-			Login.debug("Error StalloHomepage:" + e.getMessage() + trace);
+			Login.debug(e, this.getClass().getName());
 		}
+	}
 
+	private Movimento findLastMovimentoRegistrato(Stallo s) throws Exception {
+		
+		Movimento m = null;
+		
+		Movimento lastIva = registroIVA.getLast(s.getConsegna(), s, true, true );
+		Movimento lastDog = registroDoganale.getLast(s.getConsegna(), s, true, true );
+		
+//							Login.debug("Stallo: "+s.getNome() + " Pend:"+q.getData() + 
+//									(lastIva != null ? " Iva:"+lastIva.getData() : "" ) + 
+//									(lastDog != null ? " Dog:"+lastDog.getData() : "" ));
+		
+		if ( lastIva != null ) {
+			if ( lastDog != null ) {
+				if ( lastIva.getData() != null && 
+						lastIva.getData().ymdString().compareTo( lastDog.getData().ymdString() ) > 0
+						) {
+					m = lastIva ;
+				} else {
+					m = lastDog;
+				}
+			} 
+		} else { // else if ( lastDog != null ) 
+			m = lastDog;
+		}
+		return m;
 	}
 
 	private ArrayList<Stallo> getStalliAttivi(Vector<Stallo> stalli) {
@@ -127,13 +149,26 @@ public class StalloHomepageHelper {
 		return stalliAttivi;
 	}
 
-	public boolean hasScarichiPendenti(Stallo s ) {
-		return cacheStalli!= null && cacheStalli.containsKey(s);
+	public boolean hasScarichiPendentiImportazione(Stallo s ) {
+		return cacheStalliDaImportare!= null && cacheStalliDaImportare.containsKey(s);
 	}
-	public Object getScaricoPendente(Stallo s ) {
-		if ( cacheStalli == null )
+	
+	public boolean hasScarichiPendentiRegistrazione(Stallo s ) {
+		return cacheStalliDaRegistrare!= null && cacheStalliDaRegistrare.containsKey(s);
+	}
+	
+	public boolean hasScarichiPendenti(Stallo s ) {
+		return hasScarichiPendentiImportazione(s) || hasScarichiPendentiRegistrazione(s) ;
+	}
+	public Movimento getScaricoPendenteRegistrazione(Stallo s ) {
+		if ( cacheStalliDaRegistrare == null )
 			return null;
-		return cacheStalli.get(s);
+		return (Movimento) cacheStalliDaRegistrare.get(s);
+	}
+	public Movimento getScaricoPendenteImportazione(Stallo s ) {
+		if ( cacheStalliDaImportare == null )
+			return null;
+		return (Movimento) cacheStalliDaImportare.get(s);
 	}
 	public Object getLastMovimento(Stallo s ) {
 		if ( cacheLastMovimento == null )
