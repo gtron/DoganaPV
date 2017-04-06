@@ -43,10 +43,10 @@ public class StalloHomepageHelper {
 
 	}
 	
-	private ArrayList<Stallo> initCacheFromStalliDaRegistrare(ArrayList<Stallo> stalliAttivi) {
+	private ArrayList<Stallo> initCacheFromStalliDaRegistrare(ArrayList<Stallo> stalli) {
 		ArrayList<Stallo> stalliAttiviRestanti = new ArrayList<Stallo>(3);
 
-		for ( Stallo s : stalliAttivi ) {
+		for ( Stallo s : stalli ) {
 			try {
 				
 				Movimento m = null;
@@ -72,13 +72,13 @@ public class StalloHomepageHelper {
 		return stalliAttiviRestanti;
 	}
 
-	private void initCacheFromStalliDaImportare(ArrayList<Stallo> stalliAttivi) {
+	private void initCacheFromStalliDaImportare(ArrayList<Stallo> stalli) {
 
 		FormattedDate fromData = new FormattedDate();
 		fromData.setTime(fromData.getTime() - ( 45L * 24 * 3600 * 1000 ) );
 
 		try {
-			ArrayList<MovimentoQuadrelli> movimentiDaImportare = qAdp.getScarichiDaImportare(fromData, stalliAttivi);
+			ArrayList<MovimentoQuadrelli> movimentiDaImportare = qAdp.getScarichiDaImportare(fromData, stalli);
 
 			if ( movimentiDaImportare != null ) {
 //				Login.debug("fromData:" + fromData + " movimentiDaImportare.size: " + movimentiDaImportare.size());
@@ -90,12 +90,19 @@ public class StalloHomepageHelper {
 					s = StalloAdapter.getByCodice(q.getCodiceFornitore(), false);
 					m = null;
 
+//					Login.debug("---\nConsegna da importare: " + q.getConsegna() + " Data:" + q.getData().ymdString() );
 					try {
 						if ( s.getConsegna().getNumero().equals( Integer.valueOf( q.getConsegna()))) {
 
 							m = findLastMovimentoRegistrato(s);
-
-							if ( m != null && m.getData() != null && 
+							
+//							if ( m != null ) 
+//								Login.debug("Ultimo Movimento registrato: " + m.getId() + " Data:" + m.getData().ymdString());
+//							else
+//								Login.debug("NON C'E' Ultimo Movimento registrato");
+							
+							if ( m == null ||
+									m.getData() != null && 
 									q.getData().ymdString().compareTo( m.getData().ymdString() ) > 0) {
 								cacheStalliDaImportare.put(s, q);
 								cacheLastMovimento.put(s, m);
@@ -118,11 +125,13 @@ public class StalloHomepageHelper {
 		Movimento lastIva = registroIVA.getLast(s.getConsegna(), s, true, true );
 		Movimento lastDog = registroDoganale.getLast(s.getConsegna(), s, true, true );
 		
-//							Login.debug("Stallo: "+s.getNome() + " Pend:"+q.getData() + 
-//									(lastIva != null ? " Iva:"+lastIva.getData() : "" ) + 
-//									(lastDog != null ? " Dog:"+lastDog.getData() : "" ));
+//		Login.debug("Stallo: "+s.getNome() + //  " Pend:"+q.getData() + 
+//				(lastIva != null ? " Iva:"+lastIva.getData() : "" ) + 
+//				(lastDog != null ? " Dog:"+lastDog.getData() : "" ));
 		
 		if ( lastIva != null ) {
+			m = lastIva;
+			
 			if ( lastDog != null ) {
 				if ( lastIva.getData() != null && 
 						lastIva.getData().ymdString().compareTo( lastDog.getData().ymdString() ) > 0
