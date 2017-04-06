@@ -20,7 +20,10 @@
 #end
 <span>$count</span>
 <p style="position:relative;">
-#if( $!stalliHelper.hasScarichiPendenti($s) )
+#if( $!stalliHelper.hasScarichiPendentiImportazione($s) )
+<img src="$!images/important-round.png" style="position:absolute; right:0; top:0;"/>
+#end
+#if( $!stalliHelper.hasScarichiPendentiRegistrazione($s) )
 <img src="$!images/important-round.png" style="position:absolute; right:0; top:0;"/>
 #end
 #if( $s.IdConsegnaAttuale )

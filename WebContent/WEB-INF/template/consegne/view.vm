@@ -230,15 +230,15 @@ Inserire la data fino alla quale si desidera importare (compresa):
 <fieldset><legend>Selezione degli Stalli</legend>
 #foreach( $s in $obj.Stalli )
 #if(! $s.HasLiberaPratica )
-<input name="list" value="$s.Id" id="libPrat_$velocityCount" #if($obj.Stalli.size() == 1)checked="checked"#end type="checkbox" />
+<input name="list" value="$s.Id" id="libPrat_$velocityCount" #if($autocheck)checked="checked"#end type="checkbox" />
 <label for="libPrat_$velocityCount">$s.Nome</label><br />
 #end#end
 </fieldset>
 
 <fieldset><legend>Dati del Movimento</legend>
-Valore USD: <input type="text" name="valoreDollari" size="10" id="valoreDollari" /> 
-Tasso EUR/USD: <input type="text" name="tasso" size="5" id="tasso" /><br />
-Oneri Accessori:&nbsp;&nbsp;<input type="text" name="valoreTestp" size="10" id="valoreTestp" /> &nbsp;&nbsp;
+Valore USD: <input type="text" name="valoreDollari" size="10" id="valoreDollari" value="" /> 
+Tasso EUR/USD: <input type="text" name="tasso" size="5" id="tasso" value="" /><br />
+Oneri Accessori:&nbsp;&nbsp;<input type="text" name="valoreTestp" size="10" id="valoreTestp" value=""/> &nbsp;&nbsp;
 Data : <input type="text" name="dataLP" size="10" id="dataLP" value="" /><br />
 </fieldset>
 
@@ -264,6 +264,12 @@ Note :<br />
 
 $('document').ready( function() {
 
+/*$('input[type="checkbox"]').change(function () {
+       var stallo = $(this).val();
+       var checked = $(this).is(':checked');
+       var val = $('#usd_' + stallo).val();
+       console.log( checked, val);
+   });*/
 popUpCal.regional['it'] = {clearText: 'Svuota', closeText: 'Chiudi',
 prevText: '&lt;Prec', nextText: 'Succ&gt;', currentText: 'Oggi',
 dayNames: ['Do','Lu','Ma','Me','Gio','Ve','Sa'],

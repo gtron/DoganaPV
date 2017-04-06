@@ -191,9 +191,11 @@ public class PopolaStalli extends VelocityCommand {
 				if ( carico.getId() != null ) {
 					registro.update(carico);
 				} else {
-					Long id = (Long) registro.create(carico);
+					Long id = Long.valueOf( registro.create(carico).toString() );
 					carico.setId( new Integer( id.intValue()  )  );
 				}
+				
+				carichi.put(s.getId(), carico);
 			}
 
 			s.setIdConsegnaAttuale(consegna.getId());
@@ -259,7 +261,7 @@ public class PopolaStalli extends VelocityCommand {
 		if ( sc != null ) {
 			sc.setValoreUnitarioDollari(sc.getValoreDollari().doubleValue() / sommaSecco);
 			sc.setValoreUnitarioTesTp(sc.getValoreTesTp().doubleValue() / sommaSecco);
-			sc.setValoreUnitarioEuro(sc.getValoreUnitarioDollari().doubleValue() / sc.getTassoEuroDollaro().doubleValue() );
+			sc.setValoreUnitarioEuro(sc.getValoreUnitarioDollari().doubleValue() / sc.getTassoEuroDollaro().doubleValue());
 		}
 
 		return sc;
@@ -267,11 +269,12 @@ public class PopolaStalli extends VelocityCommand {
 
 	private StalloConsegna getStalloConsegna(Stallo s) throws Exception {
 
-		StalloConsegna stalloConsegna = stalloConsegnaAdp.getByKeysIds( s.getId(), idConsegna);
+ 		StalloConsegna stalloConsegna = stalloConsegnaAdp.getByKeysIds( s.getId(), idConsegna);
 
 		if ( stalloConsegna == null ) {
 			stalloConsegna = stalloConsegnaAdp.getByKeysIds(StalloConsegnaAdapter.ID_STALLO_APERTURA, idConsegna);
-			stalloConsegna.setIdStallo(s.getId());
+			if ( stalloConsegna != null )
+				stalloConsegna.setIdStallo(s.getId());
 		}
 
 		if ( stalloConsegna == null ) {
@@ -282,7 +285,8 @@ public class PopolaStalli extends VelocityCommand {
 			stalloConsegna = scValoriUnitari.clone();
 			stalloConsegna.setIdStallo(s.getId());
 
-			stalloConsegnaAdp.create(stalloConsegna);
+			Object _id =   stalloConsegnaAdp.create(stalloConsegna);
+			stalloConsegna.setId(Integer.valueOf("" +_id));
 		}
 
 		stalloConsegna.setValoreUnitarioDollari(scValoriUnitari.getValoreUnitarioDollari());
