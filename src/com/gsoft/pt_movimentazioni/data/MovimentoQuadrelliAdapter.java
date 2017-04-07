@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Vector;
 
-import com.gsoft.doganapt.cmd.Login;
+//import com.gsoft.doganapt.cmd.Login;
 import com.gsoft.doganapt.data.Consegna;
 import com.gsoft.doganapt.data.Stallo;
 import com.gtsoft.utils.common.BeanAdapter2;
@@ -456,6 +456,8 @@ group by  cliente,  merce, `num consegna` , `num documento`, fornitore, destinaz
 		
 		sql.append(" GROUP BY cliente,  merce, `num consegna` , `num documento`, fornitore, destinazione");
 
+//		Login.debug(sql.toString() + " --- DATA:" + fromData);
+				
 		String key = FileBasedCacher.getCacheKey(sql);
 		if ( key != null && readFromCache )
 			return (ArrayList<MovimentoQuadrelli>) FileBasedCacher.get(key);
