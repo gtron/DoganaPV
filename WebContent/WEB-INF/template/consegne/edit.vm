@@ -435,11 +435,13 @@ Inserire la data del carico in ingresso :
 <input type="hidden" name="id" value="" />
 <input name="data" type="text" size="10" maxlength="10" id="dataOpenC" /><br />
 
+#if($obj.Iter.Regiva)
 <fieldset><legend>Valori</legend>
 Valore USD: <input type="text" name="valoreDollari" size="10" id="valoreDollari" />&nbsp;$<br /> 
 Tasso EUR/USD: <input type="text" name="tasso" size="5" id="tasso" /><br />
 Oneri Accessori:&nbsp;&nbsp;<input type="text" name="valoreTestp" size="10" id="valoreTestp" />&nbsp;&euro;
 </fieldset>
+#end
 
 <fieldset><legend>Documento di Ingresso</legend>
 Tipo: <select name="doc"><option value=""></option>
