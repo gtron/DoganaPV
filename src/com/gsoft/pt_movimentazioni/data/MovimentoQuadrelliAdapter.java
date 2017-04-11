@@ -19,8 +19,6 @@ import com.gtsoft.utils.data.Field;
 import com.gtsoft.utils.data.FieldSet;
 import com.gtsoft.utils.sql.IDatabase2;
 
-import gnu.trove.TLinkedList;
-
 @SuppressWarnings("unchecked")
 public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 
@@ -441,13 +439,17 @@ group by  cliente,  merce, `num consegna` , `num documento`, fornitore, destinaz
 
 	 */
 	
-	public ArrayList<MovimentoQuadrelli> getScarichiDaImportare( FormattedDate fromData, ArrayList<Stallo> stalliAttivi ) throws Exception {
+	public ArrayList<MovimentoQuadrelli> getMovimentiDaImportare( FormattedDate fromData, ArrayList<Stallo> stalliAttivi ) throws Exception {
 		
 		StringBuilder sql = new StringBuilder(70)
 		.append("SELECT distinct max( data )  as mindata ,  merce, cliente, fornitore , `num consegna` , `num documento` FROM ")
 		.append(getTable()).append(" WHERE ")
-		.append(" destinazione <> 7 AND fornitore IN ( ")
-		.append(getListaCodiciStalli(stalliAttivi))
+		.append(" destinazione <> 7 AND (")
+			.append("fornitore IN ( ")
+			.append(getListaCodiciStalli(stalliAttivi))
+			.append(") OR cliente IN ( ")
+			.append(getListaCodiciStalli(stalliAttivi))
+			.append(") ")
 		.append(") ");
 
 		if ( fromData != null ) {
