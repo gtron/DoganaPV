@@ -78,7 +78,7 @@ public class StalloHomepageHelper {
 		fromData.setTime(fromData.getTime() - ( 45L * 24 * 3600 * 1000 ) );
 
 		try {
-			ArrayList<MovimentoQuadrelli> movimentiDaImportare = qAdp.getScarichiDaImportare(fromData, stalli);
+			ArrayList<MovimentoQuadrelli> movimentiDaImportare = qAdp.getMovimentiDaImportare(fromData, stalli);
 
 			if ( movimentiDaImportare != null ) {
 //				Login.debug("fromData:" + fromData + " movimentiDaImportare.size: " + movimentiDaImportare.size());
@@ -91,8 +91,17 @@ public class StalloHomepageHelper {
 					m = null;
 
 //					Login.debug("---\nConsegna da importare: " + q.getConsegna() + " Data:" + q.getData().ymdString() );
+//					StringBuilder sb = new StringBuilder();
+//					
+//					sb.append(s);
+//					sb.append(s.getConsegna());
+//					sb.append(s.getConsegna().getNumero());
+//					sb.append(q);
+//					sb.append(q.getConsegna());
+					
 					try {
-						if ( s.getConsegna().getNumero().equals( Integer.valueOf( q.getConsegna()))) {
+						if ( s != null && s.getConsegna() != null && s.getConsegna().getNumero() != null && 
+								s.getConsegna().getNumero().equals( Integer.valueOf( q.getConsegna()))) {
 
 							m = findLastMovimentoRegistrato(s);
 							
@@ -107,7 +116,11 @@ public class StalloHomepageHelper {
 								cacheStalliDaImportare.put(s, q);
 								cacheLastMovimento.put(s, m);
 							}
-						}
+						} 
+//						else {
+//							Login.debug("---\nConsegna da importare: " + q.getConsegna() + " Stallo con altra o senza consegna:" + s );
+//							cacheStalliDaImportare.put(s, q);
+//						}
 					} catch (Exception ex) {
 						Login.debug(ex, this.getClass().getName());
 					}
