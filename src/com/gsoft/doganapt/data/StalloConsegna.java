@@ -235,6 +235,26 @@ public class StalloConsegna extends ModelBean2 implements Serializable, Cloneabl
 
 		setValoreUnitarioTesTp( getValoreTesTp().doubleValue() / sommaSeccoTotale );
 	}
+	
+	public void rettificaValoriUnitari(MovimentoIVA movIva) throws Exception {
+		
+		double nuovoPesoNetto = Math.round( valoreEuro / valoreUnitarioEuro ) + movIva.getSecco();
+		
+//		Double nuovoValoreTotaleEuro = valoreEuro + movIva.getValoreEuro();
+		Double nuovoValoreUnitarioEuro = valoreEuro / nuovoPesoNetto;
+		setValoreUnitarioEuro(nuovoValoreUnitarioEuro);
+
+		Double nuovoValoreUnitarioDollari = valoreDollari/ nuovoPesoNetto;
+		setValoreUnitarioDollari(nuovoValoreUnitarioDollari);
+		
+		Double nuovoValoreTotaleTestTp = valoreTesTp + movIva.getValoreTestp();
+		Double nuovoValoreUnitarioTestTp = nuovoValoreTotaleTestTp / nuovoPesoNetto;
+
+		setValoreTesTp(nuovoValoreTotaleTestTp);
+		setValoreUnitarioTesTp(nuovoValoreUnitarioTestTp);
+		
+	}
+	
 
 	@Override
 	public StalloConsegna clone() throws CloneNotSupportedException {
@@ -262,5 +282,6 @@ public class StalloConsegna extends ModelBean2 implements Serializable, Cloneabl
 				, PRECISIONE_EURO );
 
 	}
+	
 }
 
