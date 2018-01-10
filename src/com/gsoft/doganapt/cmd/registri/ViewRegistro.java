@@ -143,11 +143,12 @@ public class ViewRegistro extends VelocityCommand {
 			records=list.size();
 			ctx.put( "list" , list) ;
 		}
-		else
+		else {
 			if(rows!=null){
 				if(rows >=records)
 					page=1;
 			}
+		}
 			
 			ctx.put( "list" , adp 
 				.getRegistro( onlyRegistrati.booleanValue(), c ,

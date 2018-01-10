@@ -212,4 +212,25 @@ public class Login extends VelocityCommand {
 		System.out.println(new FormattedDate().toString() + " " + message);
 
 	}
+	
+	public static void debug(Exception ex, String prefix) {
+		StringBuilder trace = new StringBuilder(5);
+		int count=0;
+		for ( StackTraceElement t : ex.getStackTrace() ) {
+			trace.append("\n"+t.toString());
+			if( ++count > 15 ) {
+				break;
+			}
+		}
+		if ( prefix != null ) prefix = "["+prefix+"] ";
+		
+		debug(prefix + ex.getMessage() + trace);
+	}
+	
+	public static void debug(String msg) {
+		if ( logger != null )
+			logger.debug(msg);
+		else 
+			System.out.println(msg);
+	}
 }

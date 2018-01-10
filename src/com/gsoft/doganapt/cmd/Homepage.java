@@ -1,5 +1,8 @@
 package com.gsoft.doganapt.cmd;
 
+import java.util.ArrayList;
+import java.util.Vector;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -8,11 +11,18 @@ import org.apache.velocity.Template;
 import org.apache.velocity.context.Context;
 
 import com.gsoft.doganapt.data.Stallo;
+import com.gsoft.doganapt.data.StalloHomepageHelper;
 import com.gsoft.doganapt.data.adapters.ConsegnaAdapter;
 import com.gsoft.doganapt.data.adapters.IterAdapter;
 import com.gsoft.doganapt.data.adapters.MerceAdapter;
+import com.gsoft.doganapt.data.adapters.MovimentoDoganaleAdapter;
+import com.gsoft.doganapt.data.adapters.MovimentoIvaAdapter;
 import com.gsoft.doganapt.data.adapters.StalloAdapter;
+import com.gsoft.pt_movimentazioni.data.MovimentoQuadrelli;
+import com.gsoft.pt_movimentazioni.data.MovimentoQuadrelliAdapter;
+import com.gsoft.pt_movimentazioni.utils.PtMovimentazioniImporter;
 import com.gtsoft.utils.ManagerAliquoteIva;
+import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.http.VelocityCommand;
 import com.gtsoft.utils.http.servlet.GtServlet;
 
@@ -20,13 +30,6 @@ public class Homepage extends VelocityCommand {
 
 	protected static final String HOMEPAGE = "homepage.vm" ;
 	protected static String PRINT = "stalli/print.vm";
-
-	//	private static final String ID = "id" ;
-
-	protected int getIndex(int max) {
-		return (int) Math.round(( Math.random() * 10000 ) % ( max - 1 ) );
-	}
-
 
 	public Homepage ( GtServlet callerServlet) {
 		super(callerServlet);
@@ -36,99 +39,7 @@ public class Homepage extends VelocityCommand {
 	public VelocityCommand clone() {
 		return  new Homepage(callerServlet);
 	}
-
-	String[][] hombres = {
-			{"Gianluca", "0" ,"P" },
-			{"Daniele", "0" ,"P"},
-			{"Javi", "0" ,"P"},
-			{"Sam", "0" ,"P"},
-			{"Alex", "0" ,"P"},
-			{"Adam", "0" ,"P"},
-			{"Roman", "0" ,"P"},
-			{"Max", "0" ,"P"},
-			{"Isma", "0" ,"P"},
-			{"Luca", "0" ,"P"},
-			{"Aitor", "0" ,"P"}
-	};
-	String[][] hombres_2 = {
-			{"Ganador 1", "0" ,"P"},
-			{"Ganador 2", "0" ,"P"},
-			{"Ganador 3", "0" ,"P"},
-			{"Ganador 4", "0" ,"P"},
-			{"Ganador 5", "0" ,"P"},
-			{"6", "0" ,"P"}
-	};
-
-	String[][] hombres_3 = {
-			{"Ganador 1", "0" ,"P"},
-			{"Ganador 2", "0" ,"P"},
-			{"Ganador 3", "0" ,"P"},
-	};
-
-
-	String[][] mujeres = {
-			{"Maite", "0" ,"P"},
-			{"Chiara", "0" ,"P"},
-			{"Ilia", "0" ,"P"},
-			{"Neus", "0" ,"P"},
-			{"Julia", "0" ,"P"},
-			{"Elsa", "0" ,"P"},
-			{"Kathy", "0" ,"P"},
-			{"Ali", "0" ,"P"},
-			{"Georgina", "0" ,"P"}
-			//			,{"Meri", "0" }
-	};
-
-	String[][] mujeres_2 = {
-			{"Ganador 1", "0" ,"P"},
-			{"Ganador 2", "0" ,"P"},
-			{"Ganador 3", "0" ,"P"},
-			{"Ganador 4", "0" ,"P"},
-			{"5", "0" ,"P"}
-	};
-
-	String[][] mujeres_3 = {
-			{"Ganador 1", "0" ,"P"},
-			{"Ganador 2", "0" ,"P"},
-			{"Ganador 3", "0" ,"P"}
-	};
-
-	private String[] genera(String[][] in) {
-		// StringBuffer out = new StringBuffer();
-
-		int len = in.length;
-		String[] out = new String[len];
-
-		int i = 0 ;
-		int rand = getIndex(len) ;
-
-		for ( ; i <len ; i++  ) {
-			while ( in[rand][1] == "1" ) {
-				rand = getIndex(len);
-			}
-
-			out[i] = in[rand][0] ;
-
-			in[rand][1] = "1";
-		}
-		return out;
-	}
-
-	public Template exec_torneo(HttpServletRequest req, HttpServletResponse resp, Context ctx) throws Exception  {
-
-		ctx.put("H", genera(hombres));
-		ctx.put("H2", genera(hombres_2));
-		ctx.put("H3", genera(hombres_3));
-
-		ctx.put("M", genera(mujeres));
-		ctx.put("M2", genera(mujeres_2));
-		ctx.put("M3", genera(mujeres_3));
-
-
-		return null;
-	}
-
-
+	
 	@Override
 	public Template exec(HttpServletRequest req, HttpServletResponse resp, Context ctx) throws Exception  {
 
@@ -143,11 +54,58 @@ public class Homepage extends VelocityCommand {
 		if ( logged != Boolean.TRUE ) {
 			resp.sendRedirect(".main");
 		}
-
+		
+		FormattedDate now = new FormattedDate();
+		
+		FormattedDate selectedData = getDateParam("data", false);
+		
+		boolean hasSelectedData = false;
+		if ( selectedData != null && selectedData.after(now) ) {
+			selectedData = null;
+		}
+		
+		FormattedDate dataHead = selectedData;
+		if ( selectedData == null ) {
+			dataHead = now;
+		} else {
+			hasSelectedData = true;
+			selectedData = new FormattedDate(selectedData.ymdString() + " 23:59:59");
+		}
+		
+//		String iva = "2016-04-01";
+//		String dog = "2016-05-01";
+//		
+//		int c = iva.compareTo(dog);
+//		
+//		if ( c > 0 ) 
+//			Login.debug("aprile maggiore dog " + c );
+//		else if( c < 0 ) 
+//			Login.debug("dog maggiore di iva " + c );
+//		
+//		Login.debug( dataHead.ymdString() + " " + dataHead.ymdString().compareTo("2017-02-05") )
+		
+		ctx.put("data", selectedData);
+		ctx.put("dataHead", dataHead);
+		
 		ctx.put("isAdmin", s.getAttribute("admin") ) ;
 
-		ctx.put("stalli", Stallo.newAdapter().getAll("parco, numero") );
+		Vector<Stallo> stalli = Stallo.newAdapter().getAll(selectedData , "parco, numero");
+		ctx.put("stalli", stalli );
 
+//		Login.debug("Home" + ( isPrintOutput() ? " P " : " - " ) + ( hasSelectedData ? "hasSelectedData" : " NotSelectedData") );
+		if ( ! isPrintOutput() && ! hasSelectedData ) {
+			
+			MovimentoQuadrelliAdapter qAdp = new MovimentoQuadrelliAdapter(PtMovimentazioniImporter.getInstance().getAccessDB());
+			MovimentoDoganaleAdapter dogAdp = new MovimentoDoganaleAdapter() ;
+			MovimentoIvaAdapter ivaAdp = new MovimentoIvaAdapter() ;
+			
+			StalloHomepageHelper stalliHelper = new StalloHomepageHelper(stalli, qAdp, dogAdp, ivaAdp);
+			ctx.put("stalliHelper", stalliHelper );
+			
+//			Login.debug("stalliHelper:" + stalliHelper);
+			
+		}
+		
 		//		BeanAdapter2 adp = BeanAdapter2.newAdapter();
 		//		ctx.put( ContextKeys.LIST , adp.getAll() ) ;
 		//
@@ -162,10 +120,14 @@ public class Homepage extends VelocityCommand {
 
 	@Override
 	public String getTemplateName() {
-		if ( getBooleanParam("p") )
+		if ( isPrintOutput() )
 			return PRINT ;
 
 		return HOMEPAGE ;
+	}
+
+	private boolean isPrintOutput() {
+		return getBooleanParam("p");
 	}
 
 

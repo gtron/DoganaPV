@@ -142,14 +142,20 @@ Valore di un Kilogrammo di materiale : <input name="valoreunitario" size="12" va
 ##<fieldset><legend></legend>
 <table style="border: 1px solid gray;margin:0 auto;">
 <thead><tr>
-<th>&nbsp;Stalli&nbsp;</th>
+<th>&nbsp;Stallo&nbsp;</th>
 <th>&nbsp;Associato&nbsp;</th>
 <th>&nbsp;Immesso in LP&nbsp;</th>
 <th>&nbsp;Valore Totale &euro;&nbsp;</th>
 <th>&nbsp;Valore Totale $&nbsp;</th>
+<th>&nbsp;Valore TesTP &euro;&nbsp;</th>
 <th>&nbsp;Valore Unitario &euro;&nbsp;</th>
 <th>&nbsp;Valore Unitario $&nbsp;</th>
 </tr>
+#set($sumEuro = 0)
+#set($sumIva = 0)
+#set($sumTestp = 0)
+#set($sumDollari = 0)
+
 #foreach( $s in $stalliConsegna )
 #set($sc='')
 #set($sc=$obj.getStalloConsegna($s))
@@ -169,8 +175,14 @@ No
 #if ( $sc )
 <td align="right">$!tools.Number.format('#,##0.00',$!sc.ValoreEuro)</td>
 <td align="right">$!tools.Number.format('#,##0.00',$!sc.ValoreDollari)</td>
+<td align="right">$!tools.Number.format('#,##0.00',$!sc.ValoreTesTp)</td>
 <td align="right">$!tools.Number.format('#,##0.000000000000',$!sc.ValoreUnitarioEuro)</td>
 <td align="right">$!tools.Number.format('#,##0.000000000000',$!sc.ValoreUnitarioDollari)</td>
+##
+#set($sumEuro = $tools.Math.add( $sumEuro , $!sc.ValoreEuro ) )
+#set($sumIva = $tools.Math.add( $sumIva , $!sc.ValoreIva ) )
+#set($sumTestp = $tools.Math.add( $sumTestp , $!sc.ValoreTesTp ) )
+#set($sumDollari = $tools.Math.add( $sumDollari , $!sc.ValoreDollari ) )
 #else
 <td align="center">-</td>
 <td align="center">-</td>
@@ -178,10 +190,20 @@ No
 #end
 </tr> 
 #end
+##
+#if( $stalliConsegna.size() > 1 )
+<tr>
+<th colspan="3" align="right">Totale:&nbsp;</th>
+<th align="right">$!tools.Number.format('#,##0.00',$!sumEuro)</th>
+<th align="right">$!tools.Number.format('#,##0.00',$!sumDollari)</th>
+<th align="right">$!tools.Number.format('#,##0.00',$!sumTestp)</th>
+<td align="right">&nbsp;</td>
+<td align="right">&nbsp;</td>
+</tr>
+#end
 </table>
 ## </fieldset>
 #end
-
 
 #if( $false && $isAdmin && $obj.Id )
 #set($parco = "")
@@ -314,7 +336,7 @@ $("#dlg_ImportTo").dialog({ width:360,height:140,
 buttons:{Importa: function(){importTo(true);} , Annulla : function() { $("#dlg_ImportTo").dialogClose(); } } 
 });
 $("#dlg_ImportTo").dialogClose();
-$("#dlg_OpenC").dialog({ width:480,height:460,
+$("#dlg_OpenC").dialog({ width:520,height:500,
 buttons:{Apri: function(){OpenC(true);} ,Annulla : function() { $("#dlg_OpenC").dialogClose(); } } 
 });
 $("#dlg_OpenC").dialogClose();
@@ -413,7 +435,7 @@ Inserire la data del carico in ingresso :
 <input type="hidden" name="id" value="" />
 <input name="data" type="text" size="10" maxlength="10" id="dataOpenC" /><br />
 
-#if($hasIva && ! $im7)
+#if($obj.Iter.Regiva)
 <fieldset><legend>Valori</legend>
 Valore USD: <input type="text" name="valoreDollari" size="10" id="valoreDollari" />&nbsp;$<br /> 
 Tasso EUR/USD: <input type="text" name="tasso" size="5" id="tasso" /><br />

@@ -18,7 +18,7 @@ public class FileBasedCacher  {
 
 	private static String CACHE_PATH = "WEB-INF/qcache";
 
-	public static String getCachedKey(Object key_seed) {
+	public static String getCacheKey(Object key_seed) {
 
 		String key = key_seed.getClass() + "_" + key_seed.toString();
 

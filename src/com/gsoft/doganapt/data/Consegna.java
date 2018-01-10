@@ -17,8 +17,7 @@ import com.gsoft.doganapt.data.adapters.StalloConsegnaAdapter;
 import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.common.ModelBean2;
 import com.gtsoft.utils.sql.IDatabase2;
-
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial","unchecked"})
 public class Consegna extends ModelBean2 implements Serializable {
 
 	Integer id ;

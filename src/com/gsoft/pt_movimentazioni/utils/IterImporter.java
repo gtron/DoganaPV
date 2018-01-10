@@ -387,7 +387,6 @@ GROUP BY data, merce
 
 		m.setIsLocked(false);
 
-
 		m.setIsRettifica(isRettifica);
 		m.setUmido(q.getNetto());
 		if ( m.getUmido() < 0 ) {
@@ -398,14 +397,10 @@ GROUP BY data, merce
 
 		m.setIsScarico( isScarico );
 
-
-
 		m.setSecco( c.calcolaSecco(m.getUmido()) );
 		m.setData(q.getData()) ;
 		m.setIdMerce( c.getIdmerce() );
 		m.setIdConsegna( c.getId()) ;
-
-
 
 		Stallo s = null ;
 		if ( isScarico ) {
@@ -429,8 +424,7 @@ GROUP BY data, merce
 				}
 			}
 
-		}
-		else {
+		} else {
 			s = StalloAdapter.getByCodice((q.getCodiceCliente()), false) ;
 
 			if ( registro.isIva() ) {
