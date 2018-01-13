@@ -17,7 +17,7 @@ import com.gsoft.doganapt.data.adapters.StalloConsegnaAdapter;
 import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.common.ModelBean2;
 import com.gtsoft.utils.sql.IDatabase2;
-
+@SuppressWarnings({"serial","unchecked"})
 public class Consegna extends ModelBean2 implements Serializable {
 
 	Integer id ;
@@ -255,7 +255,7 @@ public class Consegna extends ModelBean2 implements Serializable {
 
 	public Documento getPrimoDocumento(final boolean iva) throws Exception {
 
-		final Vector v = getRegistro(iva, false, false) ;
+		final Vector<?> v = getRegistro(iva, false, false) ;
 		Documento d = null ;
 		if ( v != null && v.size() > 0 ) {
 			d = (( Movimento ) v.firstElement()).getDocumento();
@@ -264,11 +264,9 @@ public class Consegna extends ModelBean2 implements Serializable {
 		return d ;
 	}
 
-	@SuppressWarnings("unchecked")
 	public Documento getPrimoDocumento(final boolean iva, Stallo s) throws Exception {
 
 		final Vector<Movimento> v = getRegistro(iva, false, false) ;
-		Documento d = null ;
 		int idStallo = s.getId().intValue();
 		Stallo stalloMov = null;
 
@@ -293,38 +291,13 @@ public class Consegna extends ModelBean2 implements Serializable {
 			adp = new MovimentoDoganaleAdapter();
 		}
 
-		Vector list = adp.getByConsegna(true, id, s.getId(), "data" , null );
+		Vector<?> list = adp.getByConsegna(true, id, s.getId(), "data" , null );
 
 		for( Object o : list )
 			return ((Movimento) o).getDocumento();
 
 		return null ;
 	}
-
-	//	public Double getGiacenza(boolean iva , boolean secco ) throws Exception {
-	//
-	//		double sum = 0 ;
-	//		double val = 0;
-	//		Vector v = getRegistro(iva, false, false) ;
-	//		for ( Iterator i = v.iterator() ; i.hasNext() ; ) {
-	//
-	//			Movimento m = (Movimento) i.next();
-	//
-	//			if ( secco )
-	//				val = m.getSecco().doubleValue() ;
-	//			else
-	//				val = m.getUmido().doubleValue() ;
-	//
-	//			if ( m.isScarico ) {
-	//				sum -= val ;
-	//			}
-	//			else
-	//				sum += val ;
-	//		}
-	//
-	//		return sum ;
-	//	}
-
 
 	public ArrayList<Object> getStalli() throws Exception {
 
@@ -428,7 +401,7 @@ public class Consegna extends ModelBean2 implements Serializable {
 		else if ( iva != null && iva.size() > 0 ) {
 			dog = iva ;
 		}
-		
+
 		if ( minNumero != null && minNumero > 0 ) {
 			Movimento m;
 			Vector<Movimento> filtered = new Vector<Movimento>(13);
@@ -444,7 +417,7 @@ public class Consegna extends ModelBean2 implements Serializable {
 			return dog;
 	}
 
-	private class PartitarioSorter implements Comparator {
+	private class PartitarioSorter implements Comparator<Object> {
 
 		public int compare(final Object o1, final Object o2) {
 			final Movimento a = (Movimento) o1 ;
@@ -505,6 +478,16 @@ public class Consegna extends ModelBean2 implements Serializable {
 
 	public StalloConsegna getStalloConsegna(Stallo s) throws Exception {
 		return StalloConsegna.newAdapter().getByKeysIds(s.getId(), id);
+	}
+	
+	public StalloConsegna rettificaValoriUnitari(MovimentoIVA m) throws Exception {
+
+		StalloConsegna sc = getStalloConsegna(m.getStallo());
+		
+		sc.rettificaValoriUnitari(m);
+		
+		return sc;
+
 	}
 
 }

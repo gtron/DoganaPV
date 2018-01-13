@@ -97,11 +97,27 @@ height:120,buttons:{Si: function(){confirmedStampa();} , No : function() { $("#d
 });
 $("#dlg_Confirm").dialogClose();
 
+$("#dlg_Export").dialog({ width:400,
+height:200,buttons:{ Scarica: function(){ exportRegistro(); } , Annulla : function() { $("#dlg_Export").dialogClose(); } } 
+});
+$("#dlg_Export").dialogClose();
+
+var d=new Date().toJSON().slice(0,10).split('-');
+jQuery('#exportDal').calendar();
+jQuery('#exportDal').val(d[2]+'/'+d[1]+'/'+d[0]);
+jQuery('#exportAl').calendar();
+jQuery('#exportAl').val(d[2]+'/'+d[1]+'/'+d[0]);
+
+
 jQuery("#tablemovimenti").jqGrid({
 #if($iva)#set($regiva='iva=true&')#end
 url:'.registri?$!{regiva}json=true&records=$!records&idMerce='+ '' + '&inputNum= ' + $("#inputNum").val() + '&inputDal=' + $("#inputDal").val() + '&inputAl=' + $("#inputAl").val() + '&ndS='+new Date().getTime(),
 datatype: 'json', 
 height: 450,
+
+sortname: "numregistro",
+sortorder: "desc",
+
 #*
 
 subGrid: true,
@@ -274,10 +290,18 @@ if ( doconferma && doconferma ) {
 	if ( confirm(doconferma)  )	conferma = '&exec=1' ;
 	else return ;
 }
-
 location.href= servlet + '?cmd='+action+'&iva=' + iva + '&n='+n + conferma ;
 }
+
+function exportRegistro() {
+var iva = #if($isIva || $iva)'true'#else'false'#end ;
+var url = '.registri?iva=' + iva + '&confirm=1&cmd=export&inputDal=' + $("#exportDal").val() + '&inputAl=' + $("#exportAl").val();
+var link = document.getElementById('download'); link.target='_blank'; link.href = url; link.click();
+$('#dlg_Export').dialogClose();
+}
+
 function riordina() {
+alert('Funzione disabilitata'); return;
 var iva = #if($isIva || $iva)'1'#else'0'#end ;
 ##alert( '.registri?iva=' + iva + '&cmd=check&exec=1' );
 jQuery.get('.registri?iva=' + iva + '&cmd=check&exec=1', '', 
@@ -308,10 +332,11 @@ if ( d == 'true') location.href = location.href ; else alert( 'Si è verificato 
 <li style="border-right:2px solid #EEE;"><a href="#" onclick="deregistraMovimento(); return false;"><img src="$!images/action-ico-elimina.png" />De-Registra Movimento</a></li>
 #end
 <li style="border-right:2px solid #EEE;"><a href="#" onclick="editMovimento(); return false;"><img src="$!images/action-ico-modifica.png" />Modifica Movimento</a></li>
-<li><a href="#" onclick="riordina();return false;"><img src="$!images/action-ico-immetti.png" />Riordina Numerazione</a></li>
+<!-- li><a href="#" onclick="riordina();return false;"><img src="$!images/action-ico-immetti.png" />Riordina Numerazione</a></li -->
 <li><a href="#" onclick="stampaCopertina(); return false;"><img src="$!images/action-ico-stampa.png" />Copertina</a></li>
 <li><a href="#" onclick="$('#dlg_Prepara').dialogOpen(); return false;"><img src="$!images/action-ico-stampa.png" />Prepara Pagine</a></li>
-<li><a href="#" onclick="$('#dlg_Print').dialogOpen(); return false;"><img src="$!images/action-ico-stampa.png" />Stampa Registro</a></li>
+<li><a href="#" onclick="$('#dlg_Print').dialogOpen(); return false;"><img src="$!images/action-ico-stampa.png" />Stampa</a></li>
+<li><a href="#" onclick="$('#dlg_Export').dialogOpen(); return false;"><img width="22" src="$!images/tab-ico-importazione.png" />Esporta</a></li>
 </ul>
 </div>
 
@@ -324,6 +349,12 @@ a partire dal movimento numero <input type="text" id="fromMovimento" value="$!pr
 </div>
 <div id="dlg_Confirm" class="flora" style="text-align:center;">
 La stampa &egrave; stata completata correttamente ?
+</div>
+<div id="dlg_Export" class="flora" style="text-align:center;">
+Esportazione a file dei movimenti <br /><br />
+Dal <input type="text" name="inputDal" size="10" id="exportDal" value="" /><br />  
+al&nbsp;&nbsp;&nbsp;<input type="text" name="inputAl" size="10" id="exportAl" value="" />
+<a href="" download id="download" hidden></a>    
 </div>
 #parse('footer.vm')
 

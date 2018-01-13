@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
+import com.gsoft.doganapt.cmd.Login;
 import com.gsoft.doganapt.data.Consegna;
 import com.gsoft.doganapt.data.Documento;
 import com.gsoft.doganapt.data.Merce;
@@ -218,24 +219,69 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 
 		return list ;
 	}
+	
+	public Movimento getLast( final Consegna c , final Stallo stallo, final boolean onlyScarichi, final boolean onlyRegistered ) throws Exception {
+
+		final StringBuilder sql = new StringBuilder(70)
+		.append("SELECT " )
+		.append(getFieldsRegistro(null)) 
+		.append(" FROM ")
+		.append(getTable());
+
+		sql.append(" WHERE deleted = 0 AND idconsegna = ?  ");
+
+		if ( onlyScarichi ) {
+			sql.append(" AND isscarico = 1 ");
+		}
+
+		if ( stallo != null  ) {
+			sql.append(" AND idstallo = ? ");
+		}
+		
+		if ( onlyRegistered ) {
+			sql.append(" AND numregistro > 0 ") ;
+		}
+		
+		sql.append(" GROUP BY numregistro, data, isscarico , isrettifica")
+		   .append(" ORDER BY data DESC LIMIT 1 ");
+
+		Movimento m = null;
+		
+//		Login.debug("\nLast: " + sql + "\n idConsegna:" + c.getId() + " idStallo:" + stallo.getId() );
+		
+		final Connection conn = db.getConnection() ;
+		try {
+			final PreparedStatement s = conn.prepareStatement(sql.toString());
+			
+			s.setInt(1, c.getId().intValue()) ;
+			if ( stallo != null ) {
+				s.setInt(2, stallo.getId());
+			}
+			
+			final ResultSet rs = s.executeQuery() ;
+
+			if ( rs != null && rs.next() ) {
+				m = (Movimento) getFromRS(rs);
+			}
+		}
+		finally {
+			db.freeConnection(conn);
+		}
+
+		return m;
+	}
 
 	public FormattedDate getLastDate( final Consegna c , final ArrayList<Integer> idStalli, final boolean onlyScarichi ) throws Exception {
 		final StringBuilder sql = new StringBuilder(70)
 		.append("SELECT max(data) FROM ")
-		.append(getTable())
-
-		//			.append(" WHERE isscarico = ?")
-		;
+		.append(getTable());
 
 		sql.append(" WHERE deleted = 0 AND idconsegna = ?  ");
-
-
 
 		if ( onlyScarichi ) {
 			sql.append(" AND ")
 			.append(" isscarico = 1 ");
 		}
-
 
 		ArrayList<Object> stalli ;
 		if ( idStalli == null || idStalli.size() < 1 ) {
@@ -247,14 +293,13 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			for ( final Integer ids : idStalli ) {
 				stalli.add(StalloAdapter.get(ids));
 			}
-
 		}
 		if ( stalli != null && stalli.size() > 0 ) {
 
 			sql.append(" AND ");
 
 			sql.append(" idstallo in ( ");
-			for ( final Iterator i = stalli.iterator() ; i.hasNext() ;) {
+			for ( final Iterator<Object> i = stalli.iterator() ; i.hasNext() ;) {
 				sql.append( ((Stallo)i.next()).getId() ) ;
 
 				if ( i.hasNext() ) {
@@ -285,21 +330,19 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		finally {
 			db.freeConnection(conn);
 		}
-
 		return d;
 	}
 
-	public Vector getByStallo(final Integer id, final String order, final String limit ) throws Exception {
+	public Vector<Movimento> getByStallo(final Integer id, final String order, final String limit ) throws Exception {
 		return getByConsegna( false , null, id ,order, limit);
 	}
-	public Vector getByConsegna( final boolean onlyRegistered, final Integer idConsegna, final Integer idStallo, final String order, final String limit ) throws Exception {
+	public Vector<Movimento> getByConsegna( final boolean onlyRegistered, final Integer idConsegna, final Integer idStallo, final String order, final String limit ) throws Exception {
 		final StringBuilder sb = new StringBuilder(50);
 
 		sb.append(" deleted = 0 " );
 		if ( idConsegna != null ) {
 			sb.append("AND idconsegna =")
 			.append( idConsegna.toString() ) ;
-
 		}
 		if ( idStallo != null ) {
 			sb.append(" AND idstallo = ")
@@ -311,12 +354,10 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			//				sb.append(" AND ") ;
 			sb.append(" AND numregistro > 0 ") ;
 		}
-
 		return getWithWhere( sb.toString() ,order, limit);
 	}
 
 	public Vector getByNumeroRegistro(final Integer num ) throws Exception {
-
 		return getWithWhere( " deleted = 0 AND numregistro =" + num );
 	}
 
@@ -333,7 +374,6 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		try {
 			conn = db.getConnection() ;
 			db.executeNonQuery(sql.toString(), conn) ;
-
 		}
 		catch ( final Exception e ) {
 			throw e ;
@@ -341,7 +381,6 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		finally {
 			db.freeConnection(conn) ;
 		}
-
 	}
 
 	public void unregister( final Long numreg ) throws Exception {
@@ -358,7 +397,6 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			db.executeNonQuery(sql.toString(), conn) ;
 
 			shiftRegistro( true, new Integer( numreg.intValue() ), conn ) ;
-
 		}
 		catch ( final Exception e ) {
 			throw e ;
@@ -376,14 +414,12 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		.append(getTable())
 		.append(" set numregistro = numregistro ") ;
 
-
 		if ( down ) {
 			sql.append( " - 1 where deleted = 0 AND numregistro > ") ;
 		}
 		else {
 			sql.append( " + 1 where deleted = 0 AND numregistro >= ") ;
 		}
-
 		sql.append( from ) ;
 
 		db.executeNonQuery(sql.toString(), conn) ;
@@ -400,12 +436,12 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		try {
 
 			final PreparedStatement s = conn.prepareStatement(sql.toString()) ;
-			final Vector ids = getByStatment(s);
+			final Vector<Movimento> ids = getByStatment(s);
 
 			if ( ids != null && ids.size() > 0 ) {
 				list = new ArrayList<Merce>(ids.size());
-				for ( final Iterator i = ids.iterator(); i.hasNext() ; ) {
-					list.add( MerceAdapter.get( ((Movimento) i.next() ).getIdMerce() )  );
+				for ( final Iterator<Movimento> i = ids.iterator(); i.hasNext() ; ) {
+					list.add( MerceAdapter.get( i.next().getIdMerce() )  );
 				}
 			}
 		}
@@ -423,17 +459,14 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		final Connection conn = db.getConnection() ;
 		Vector<Integer> list = null ;
 		try {
-
 			final PreparedStatement s = conn.prepareStatement(sql.toString()) ;
 
 			final ResultSet rs = s.executeQuery() ;
-
 			list = new Vector<Integer>(rs.getFetchSize()) ;
 
 			while( rs.next() ) {
 				list.add( (Integer) rs.getObject(1) );
 			}
-
 		}
 		finally {
 			db.freeConnection(conn);
@@ -441,10 +474,10 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		return list ;
 	}
 
-	public Vector getRegistro( final Boolean soloRegistrati , final Consegna c ) throws Exception {
+	public Vector<Movimento> getRegistro( final Boolean soloRegistrati , final Consegna c ) throws Exception {
 		return getRegistro( false, soloRegistrati , c,null,null,null,null,null,null,null,null );
 	}
-	public Vector getRegistro( final Boolean soloRegistrati , final Consegna c,
+	public Vector<Movimento> getRegistro( final Boolean soloRegistrati , final Consegna c,
 			final Integer page,final Integer rows,final Hashtable<String,String> orderColumn,
 			final Integer numero,final FormattedDate dal,final FormattedDate al,final Integer idMerce,final Integer numConsegna ) throws Exception {
 
@@ -452,7 +485,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 				numero, dal, al,idMerce, numConsegna );
 
 	}
-	public Vector getRegistro( final Boolean ignoreNumRegistro , final Boolean soloRegistrati , final Consegna c,
+	public Vector<Movimento> getRegistro( final Boolean ignoreNumRegistro , final Boolean soloRegistrati , final Consegna c,
 			final Integer page,final Integer rows,final Hashtable<String,String> orderColumn,
 			final Integer numero,final FormattedDate dal,final FormattedDate al,final Integer idMerce,final Integer numConsegna ) throws Exception {
 
@@ -491,7 +524,6 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 						sql.append(" M ON M.id = C.idmerce ");
 						writeJoinMerce=false;
 					}
-
 				}
 			}
 		}
@@ -500,9 +532,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		}
 
 		if ( soloRegistrati ) {
-
 			sql.append(" AND numregistro > 0 ");
-
 			//			if ( c != null )
 			//				sql.append(" AND ");
 		}
@@ -523,9 +553,12 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			sql.append(" AND R.idmerce  = ").append(idMerce).append(" ");
 		}
 
-		if( dal != null && al!=null){
-			sql.append(" AND '").append(dal.fullString()).
-			append("' <= data AND '").append(al.fullString()).append("' >= data ");
+		if( dal != null ) { 
+			sql.append(" AND data >= '").append(dal.fullString()).append("' ");
+		}
+		
+		if( al!=null){
+			sql.append(" AND data <= '").append(al.fullString()).append("' ");
 		}
 		sql.append(" GROUP BY ");
 
@@ -566,14 +599,16 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			if( ! ignoreNumRegistro ) {
 				sql.append( " numregistro, ") ;
 			}
-
 			sql.append( "data, isrettifica, isscarico, idstallo " );
 		}
 
 		if(page!=null && rows!=null){
 			sql.append(" LIMIT ").append((page - 1) *  rows).append(",").append(rows);
+		} else if ( rows != null ) {
+			sql.append(" LIMIT ").append(rows);
 		}
-		Vector list = null ;
+		
+		Vector<Movimento> list = null ;
 
 		final Connection conn = db.getConnection() ;
 		try {
@@ -585,10 +620,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			}
 
 			list = getByStatment(s);
-
-
 		} catch (Exception e ) {
-
 			e.printStackTrace();
 		}
 		finally {
@@ -598,7 +630,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		return list ;
 	}
 
-	public Vector getDaStampare( final Integer from , final Integer num ) throws Exception {
+	public Vector<Movimento> getDaStampare( final Integer from , final Integer num ) throws Exception {
 
 		final StringBuilder sql = new StringBuilder(70)
 		.append("SELECT ")
@@ -619,7 +651,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		if( num!=null ){
 			sql.append(" LIMIT ").append(num);
 		}
-		Vector list = null ;
+		Vector<Movimento> list = null ;
 
 		final Connection conn = db.getConnection() ;
 		try {
@@ -670,7 +702,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 	/*
 	 * Tira fuori i movimenti da registrare raggruppandoli in base anche all'iter
 	 */
-	public Vector getDaRegistrare2( final Consegna c , final FormattedDate data ) throws Exception {
+	public Vector<Movimento> getDaRegistrare2( final Consegna c , final FormattedDate data ) throws Exception {
 
 		/*
 		 * 
@@ -707,7 +739,7 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 				" group by case when i.singolicarichi = 1 then r.id else r.data end , r.idconsegna, r.isscarico , r.isrettifica")
 				.append(" order by data, isrettifica, idstallo" );
 
-		Vector list = null ;
+		Vector<Movimento> list = null ;
 
 		final Connection conn = db.getConnection() ;
 		try {
@@ -734,7 +766,13 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 		return list ;
 	}
 
-	public Vector getDaRegistrare( final Integer idConsegna , final FormattedDate data ) throws Exception {
+	public Vector<Movimento> getDaRegistrare( final Integer idConsegna , final FormattedDate data ) throws Exception {
+		return getDaRegistrare( idConsegna , data, null);
+	}
+	public Vector<Movimento> getDaRegistrareByIdStallo(final Integer idStallo) throws Exception {
+		return getDaRegistrare( null, null, idStallo);
+	}
+	public Vector<Movimento> getDaRegistrare( final Integer idConsegna , final FormattedDate data, final Integer idStallo ) throws Exception {
 
 		final StringBuilder sql = new StringBuilder(70)
 		.append("SELECT * FROM ")
@@ -745,6 +783,10 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 		if( idConsegna != null ) {
 			sql.append(" AND idconsegna = ? ");
 		}
+		
+		if( idStallo != null ) {
+			sql.append(" AND idstallo = ? ");
+		}
 
 		if( data != null ) {
 			sql.append("AND data = ? ");
@@ -753,7 +795,7 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 
 		sql.append( " order by data, isrettifica, isscarico, idstallo" );
 
-		Vector list = null ;
+		Vector<Movimento> list = null ;
 
 		final Connection conn = db.getConnection() ;
 		try {
@@ -764,12 +806,16 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 			if( idConsegna != null ) {
 				s.setInt(pos++, idConsegna.intValue()) ;
 			}
+			
+			if( idStallo != null ) {
+				s.setInt(pos++, idStallo.intValue()) ;
+			}
 
 			if( data != null ) {
 				s.setDate(pos++, new Date(data.getTime()) ) ;
 			}
 
-			list = getByStatment(s);
+			list = (Vector<Movimento>) getByStatment(s);
 
 
 		}
@@ -780,13 +826,13 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 		return list ;
 	}
 
-	public Vector getPartitario( final Consegna c ) throws Exception {
+	public Vector<Movimento> getPartitario( final Consegna c ) throws Exception {
 
 		final String sql = "SELECT id, idmerce, idconsegna, data, idstallo, cast(isscarico as binary ) as isscarico, isrettifica, secco, umido, numregistro, doctype, docnum, docdate, docpvtype, docpvnum, docpvdate, note, posdoganale, locked, 0 , 0 " +
 				" FROM where deleted = 0 AND idconsegna = ? union all select * from registroiva where idconsegna = ? order by idstallo, data ";
 
 
-		Vector list = null ;
+		Vector<Movimento> list = null ;
 
 		final Connection conn = db.getConnection() ;
 		try {
@@ -844,13 +890,10 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 				+ " AND isrettifica = '" + (rettifica ? "1":"0") + "'"
 				+ " AND isscarico = '" + (scarico ? "1":"0") + "'"
 				) ;
-
 	}
 
 	public Vector getByData( final Integer idConsegna , final FormattedDate d ) throws Exception {
-
 		return getWithWhere(" deleted = 0 AND idconsegna = " + idConsegna.toString() + " AND data = '" + d.ymdString() + "'" ) ;
-
 	}
 
 	public final static Integer ID_STALLO_CARICO_APERTURA = Integer.valueOf(0);
@@ -882,7 +925,6 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 				out.put(idStallo, m);
 			}
 		}
-
 		return out;
 	}
 
@@ -936,14 +978,14 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 	 */
 	public synchronized boolean checkIntegrity( final boolean doFix ) throws Exception {
 
-		final Vector list = getRegistro( true , true , null,null,null,null,null,null,null,null,null );
+		final Vector<Movimento> list = getRegistro( true , true , null,null,null,null,null,null,null,null,null );
 
 		Movimento m ;
 		int currNum = 0 ;
 
-		Iterator i = list.iterator() ;
+		Iterator<Movimento> i = list.iterator() ;
 		while ( i.hasNext()  ) {
-			m = (Movimento) i.next() ;
+			m = i.next() ;
 
 			if ( ! m.getIsLocked() ) {
 				break ;
@@ -963,24 +1005,17 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 
 		try {
 			while ( i.hasNext() ) {
-				m = (Movimento) i.next() ;
-
+				m = i.next() ;
 
 				currNum ++;
 
 				if ( doFix ) {
-
 					final Integer num = new Integer( currNum ) ;
 
 					//				String ids = getIdsFromNumRegistro( m ) ;
-
-
-
-
 					//					shiftRegistro( false, num , conn  ) ;
 
 					updateNumRegistro(m , num, conn);
-
 				}
 				else if ( m.getNumRegistro().intValue() != currNum  ) {
 					ret = false ;
@@ -1028,6 +1063,31 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 
 	public boolean isIva() {
 		return false;
+	}
+	
+	public Integer getIdConsegnaInStalloAllaData(Integer idStallo, FormattedDate data) throws Exception {
+
+		Integer idC = null;
+		
+		final String sql = 
+				" SELECT distinct c.idconsegna FROM " + getTable() + " r inner join " + ConsegnaAdapter.getStaticTable() + " c using(idconsegna) \n " +
+				" WHERE r.data < '" + data.ymdString() + " 23:59:59' and ( datachiusura > '" + data.ymdString() + "' or datachiusura is null )  \n "
+						+ " AND r.idStallo = " + idStallo + " order by r.data desc, r.id desc " ;
+
+		final Connection conn = db.getConnection() ;
+		try {
+
+			Vector<?> x = executeScalarQuery(sql);
+			
+			if ( ! x.isEmpty() ) {
+				idC = (Integer) x.firstElement();
+			}
+		}
+		finally {
+			db.freeConnection(conn);
+		}
+
+		return idC ;
 	}
 
 	//	private String getIdsFromNumRegistro( Movimento m ) throws Exception {

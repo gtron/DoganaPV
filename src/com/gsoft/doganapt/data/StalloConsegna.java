@@ -218,7 +218,7 @@ public class StalloConsegna extends ModelBean2 implements Serializable, Cloneabl
 		if ( valoreDollari == null || valoreDollari < 1 )
 			throw new Exception("Valore in USD non specificato!");
 
-		if ( valoreTesTp == null || valoreTesTp < 1 )
+		if ( valoreTesTp == null ) // Permettiamo che il valore TesTp sia 0 o negativo
 			throw new Exception("Valore del TesTP non specificato!");
 
 		if ( sommaSeccoTotale < 1 )
@@ -235,11 +235,32 @@ public class StalloConsegna extends ModelBean2 implements Serializable, Cloneabl
 
 		setValoreUnitarioTesTp( getValoreTesTp().doubleValue() / sommaSeccoTotale );
 	}
+	
+	public void rettificaValoriUnitari(MovimentoIVA movIva) throws Exception {
+		
+		double nuovoPesoNetto = Math.round( valoreEuro / valoreUnitarioEuro ) + movIva.getSecco();
+		
+//		Double nuovoValoreTotaleEuro = valoreEuro + movIva.getValoreEuro();
+		Double nuovoValoreUnitarioEuro = valoreEuro / nuovoPesoNetto;
+		setValoreUnitarioEuro(nuovoValoreUnitarioEuro);
+
+		Double nuovoValoreUnitarioDollari = valoreDollari/ nuovoPesoNetto;
+		setValoreUnitarioDollari(nuovoValoreUnitarioDollari);
+		
+		Double nuovoValoreTotaleTestTp = valoreTesTp + movIva.getValoreTestp();
+		Double nuovoValoreUnitarioTestTp = nuovoValoreTotaleTestTp / nuovoPesoNetto;
+
+		setValoreTesTp(nuovoValoreTotaleTestTp);
+		setValoreUnitarioTesTp(nuovoValoreUnitarioTestTp);
+		
+	}
+	
 
 	@Override
 	public StalloConsegna clone() throws CloneNotSupportedException {
-
-		return (StalloConsegna) super.clone();
+		StalloConsegna sc = (StalloConsegna) super.clone();
+		sc.setId(null);
+		return sc;
 	}
 
 	public static final double getValoreArrotondato(double val , int precisione ) {
@@ -261,5 +282,6 @@ public class StalloConsegna extends ModelBean2 implements Serializable, Cloneabl
 				, PRECISIONE_EURO );
 
 	}
+	
 }
 

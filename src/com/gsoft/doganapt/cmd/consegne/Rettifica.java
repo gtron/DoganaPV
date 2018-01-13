@@ -56,7 +56,7 @@ public class Rettifica extends VelocityCommand {
 			if ( consegna != null ) {
 				if ( consegna.getIter().getHasrettifica()  ) {
 
-					initRegistroPrimoCarico();
+					initRegistroCorrispondenteAlPrimoCarico();
 
 					if ( getBooleanParam(Strings.EXEC) ) {
 						doRettifica();
@@ -98,7 +98,7 @@ public class Rettifica extends VelocityCommand {
 		Movimento mov = null;
 		Movimento movCarico = null ;
 
-		final ArrayList<Movimento> toCreate = new ArrayList<Movimento>(idStalli.size());
+		final ArrayList<Movimento> movimentiDaRegistrare = new ArrayList<Movimento>(idStalli.size());
 
 		for (final Integer integer : idStalli) {
 
@@ -120,22 +120,6 @@ public class Rettifica extends VelocityCommand {
 					&&
 					( Math.abs(rettificaSecco) + Math.abs(rettificaUmido)) > 0 ) {
 
-
-				// Ora non c'è + bisogno di fare l'update
-				// del movimento di carico perchè viene lasciato inalterato dal popola stalli
-				if ( false && Math.abs(rettificaUmido) > 0 ) {
-
-					final Vector<?> list = registro.getByConsegna(false, consegna.getId(), idStallo , "isscarico asc, id asc" , null ) ;
-					if ( list != null && list.size() > 0 ) {
-						movCarico = (Movimento) list.firstElement() ;
-					}
-
-					movCarico.setUmido( movCarico.getUmido().doubleValue() - rettificaUmido ) ;
-					movCarico.setSecco( consegna.calcolaSecco(movCarico.getUmido()) );
-
-					registro.update(movCarico);
-				}
-
 				if ( movCarico == null ) {
 					final Vector<?> list = registro.getByConsegna(false, consegna.getId(), null , null , null ) ;
 					if ( list != null && list.size() > 0 ) {
@@ -143,23 +127,15 @@ public class Rettifica extends VelocityCommand {
 					}
 				}
 
-				mov = registro.newMovimento();
-
-				mov.setId(null);
-				mov.setNumRegistro(null);
+				mov = getNewMovimentoRettificaPeso();
+				
+				mov.setDocumento(doc);
+				mov.setDocumentoPV(docPV);
+				mov.setIdMerce(movCarico.getIdMerce());
 				mov.setData(dataRettifica);
 				mov.setUmido( rettificaUmido ) ;
 				mov.setSecco( rettificaSecco );
 				mov.setIdStallo(idStallo);
-				mov.setIdConsegna(consegna.getId());
-				mov.setIdMerce(movCarico.getIdMerce());
-				mov.setIsScarico(Boolean.FALSE);
-				mov.setIsRettifica(Boolean.TRUE);
-				mov.setIsLocked(Boolean.FALSE);
-				mov.setDocumento(doc);
-				mov.setDocumentoPV(docPV);
-
-				mov.setNote(MovimentoAdapter.NOTE_RETTIFICA_PESO);
 
 				if (debug) {
 					System.out.printf("Stallo: %d , Umido: %f , Secco %f \n",  idStallo , rettificaUmido, rettificaSecco );
@@ -169,13 +145,6 @@ public class Rettifica extends VelocityCommand {
 
 					MovimentoIVA movIva = (MovimentoIVA) mov;
 
-					//					try {
-					//						// consegna.updateValore( (MovimentoIVA) mov);
-					//					}
-					//					catch ( final Exception e ){
-					//						((MovimentoIVA) mov).setValoreDollari(0.0);
-					//						((MovimentoIVA) mov).setValoreEuro(0.0);
-					//					}
 					rettificaOneri = new Double( getParam("rettificaOneri", true) ).doubleValue();
 					movIva.setValoreTestp( rettificaOneri );
 					movIva.setValoreEuro( rettificaOneri  );
@@ -192,24 +161,30 @@ public class Rettifica extends VelocityCommand {
 					}
 
 				}
-				toCreate.add(mov);
 
+				movimentiDaRegistrare.add(mov);
 
 			} else
 				throw new Exception("Errore: Lo stallo " + s.getParco() + " " + s.getNumero() +
 						" non è assegnato alla Consegna elaborata!<br> Effettuare il popola stalli prima della rettifica.");
-
-
-
-
 		}
 
-		for( final Movimento m : toCreate) {
+		for( final Movimento m : movimentiDaRegistrare) {
 			if ( m != null ) {
-				registro.create(m);
 
+				StalloConsegna sc = null;
+				if ( isIva ) {
+					sc = consegna.rettificaValoriUnitari( (MovimentoIVA) m);
+				}
+
+				registro.create(m);
+				
+				if ( sc != null ) {
+					StalloConsegna.newAdapter().update(sc);
+				}
+				
 				if (debug) {
-					System.out.println("Created Stallo:" + idStallo);
+					System.out.println("Rettificato Stallo:" + idStallo);
 				}
 			}
 		}
@@ -222,9 +197,26 @@ public class Rettifica extends VelocityCommand {
 
 		response.sendRedirect(".consegne?id=" + consegna.getId() );
 	}
+	
+
+	private Movimento getNewMovimentoRettificaPeso() {
+		
+		Movimento mov = registro.newMovimento();
+
+		mov.setId(null);
+		mov.setIdConsegna(consegna.getId());
+		mov.setIsScarico(Boolean.FALSE);
+		mov.setIsRettifica(Boolean.TRUE);
+		mov.setIsLocked(Boolean.FALSE);
+		mov.setNumRegistro(null);
+		
+		mov.setNote(MovimentoAdapter.NOTE_RETTIFICA_PESO);
+		
+		return mov;
+	}
 
 
-	private MovimentoAdapter initRegistroPrimoCarico() {
+	private MovimentoAdapter initRegistroCorrispondenteAlPrimoCarico() {
 		registro = consegna.getIter().getImporter(
 				new MovimentoDoganaleAdapter(),
 				new MovimentoIvaAdapter(), null ).getRegistroPrimoCarico();

@@ -5,6 +5,7 @@ TABLE { border: 0 none ; color : #000 ; font-size: 1em ; }
 .cNumero {width:3em;}
 ## .onepage { page-break-after: always ; page-break-inside : avoid;   }
 </style>
+#if($dataHead)<h1>Giacenze al $dataHead.dmyString() #if( ! $!data ) $dataHead.getHours():$dataHead.getMinutes()#end</h1>#end
 #set($oldParco = "")
 #foreach( $s in $stalli ) 
 #if($oldParco != $s.Parco)
@@ -43,17 +44,25 @@ TABLE { border: 0 none ; color : #000 ; font-size: 1em ; }
 #if( "$!im7.Tipo" == "IM4")#set( $im7 = '' )#end
 <td width="60" class="documento">$!im7.toString().replaceAll('IM7', '')&nbsp;</td>
 <td width="60" class="documento">$!im4.toString().replaceAll('IM4', '')&nbsp;</td>
-#if ( $c.Iter.Id == 1 && ! $s.HasLiberaPratica  )
+#*<td>
+Dog:$!s.getGiacenzaDoganale(false)<br>
+Iva:$!s.getGiacenzaIva(false)<br>
+iter Has IVA:$!s.Consegna.Iter.Regiva<br>
+<br>
+</td>*#
+#if( ! $!s.Consegna.Iter.Regiva )
 <td width="60" class="r">$tools.Number.format($!s.getGiacenzaDoganale(false))&nbsp;</td>
 <td width="60" class="r">$tools.Number.format($!s.getGiacenzaDoganale(true))&nbsp;</td>
-
-#elseif ( $c.Iter.Id != 4 )
+#else
+#set( $giacenzaUmidoIVA=0)
+#set( $giacenzaUmidoIVA=$!s.getGiacenzaIva(false) )
+#if( "$giacenzaUmidoIVA" != "0.0" )
 <td width="60" class="r">$tools.Number.format($!s.getGiacenzaIva(false))&nbsp;</td>
-<td width="60" class="r">$tools.Number.format($!s.getGiacenzaIva(true))&nbsp;</td>	
-
+<td width="60" class="r">$tools.Number.format($!s.getGiacenzaIva(true))&nbsp;</td>
 #else
 <td width="60" class="r">$tools.Number.format($!s.getGiacenzaDoganale(false))&nbsp;</td>
 <td width="60" class="r">$tools.Number.format($!s.getGiacenzaDoganale(true))&nbsp;</td>
+#end
 #end
 
 

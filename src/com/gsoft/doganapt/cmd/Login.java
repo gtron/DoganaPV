@@ -38,6 +38,40 @@ public class Login extends VelocityCommand {
 
 		Utente utente = Utente.newAdapter().getUtente( username, pwd );
 
+		/*
+		+               IDatabase2 db = getDatabase();
+		+               Connection c = null;
+		+               DbConnectionBroker b = db.getBroker();
+		+
+		+               try {
+		+                       c = db.getConnection();
+		+                       if ( b.getAge(c) > 10) {
+		+                               System.out.println("Connessione VECCHIA ! ");
+		+                               b.freeConnection(c);
+		+                       }
+		+                       String m = c.getCatalog();
+		+               } catch ( Exception e ) {
+		+
+		+                       e.printStackTrace();
+		+
+		+                       try {
+		+
+		+                               if ( b != null) {
+		+                                       b.destroy(500);
+		+
+		+                                       c = b.getConnection();
+		+                                       System.out.println("Connessione " +
+		+                                                       ((! db.getConnection().isClosed())? "CHIUSA":"APERT
+		+                                                       "! ");
+		+                               }
+		+
+		+
+		+                       } catch ( Exception e1 ) {
+		+                               e1.printStackTrace();
+		+                       }
+		+               }
+		+                */
+
 		if ( isLoginValido(utente)) {
 
 			if ( isLogged(req) ) {
@@ -177,5 +211,26 @@ public class Login extends VelocityCommand {
 		}
 		System.out.println(new FormattedDate().toString() + " " + message);
 
+	}
+	
+	public static void debug(Exception ex, String prefix) {
+		StringBuilder trace = new StringBuilder(5);
+		int count=0;
+		for ( StackTraceElement t : ex.getStackTrace() ) {
+			trace.append("\n"+t.toString());
+			if( ++count > 15 ) {
+				break;
+			}
+		}
+		if ( prefix != null ) prefix = "["+prefix+"] ";
+		
+		debug(prefix + ex.getMessage() + trace);
+	}
+	
+	public static void debug(String msg) {
+		if ( logger != null )
+			logger.debug(msg);
+		else 
+			System.out.println(msg);
 	}
 }

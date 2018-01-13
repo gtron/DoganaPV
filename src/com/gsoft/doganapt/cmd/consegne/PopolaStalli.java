@@ -73,39 +73,6 @@ public class PopolaStalli extends VelocityCommand {
 			}
 
 
-			/*
-			 * OLD
-
-				if ( c.getIter().getHasrettifica()  ) {
-					if ( getBooleanParam(Strings.EXEC) ) {
-						doPopola(c);
-
-					}
-					//				else if ( c.isPesoFinalePortoCarico() ) {
-					//					doPFPC(c,quadAdp);
-					//					response.sendRedirect(".consegne?id=" + c.getId());
-					//				}
-					else {
-						showRettifica(c, quadAdp,  ctx);
-					}
-				}
-				else {
-					final ArrayList<String> codiciStalli = quadAdp.getCodiciStalli(c, null);
-					final StalloAdapter sAdp = Stallo.newAdapter();
-					Stallo s = null ;
-					for (final String string : codiciStalli) {
-						s = StalloAdapter.getByCodice(string, false);
-
-						if ( s != null ) {
-							s.setIdConsegnaAttuale(c.getId()) ;
-
-							sAdp.update(s);
-						}
-					}
-				}
-			}
-			 */
-
 		} catch ( final Exception e) {
 			ctx.put("err" ,  e );
 		}
@@ -191,9 +158,11 @@ public class PopolaStalli extends VelocityCommand {
 				if ( carico.getId() != null ) {
 					registro.update(carico);
 				} else {
-					Long id = (Long) registro.create(carico);
+					Long id = Long.valueOf( registro.create(carico).toString() );
 					carico.setId( new Integer( id.intValue()  )  );
 				}
+				
+				carichi.put(s.getId(), carico);
 			}
 
 			s.setIdConsegnaAttuale(consegna.getId());
@@ -228,18 +197,12 @@ public class PopolaStalli extends VelocityCommand {
 			for ( final Stallo s : stalli ) {
 
 				stalloConsegna = getStalloConsegna(s);
-
 				stalloConsegna.setIdStallo(s.getId());
-
 				carico = carichi.get(s.getId());
 
 				if ( carico != null ) {
 					stalloConsegna.initValori(carico.getSecco());
 				}
-				// se non ho il carico non inizializzo i valori ... non mi serve a nulla no?
-				//				else {
-				//					stalloConsegna.initValori(seccoRestante);
-				//				}
 
 				stalloConsegnaAdp.update(stalloConsegna);
 			}
@@ -259,7 +222,7 @@ public class PopolaStalli extends VelocityCommand {
 		if ( sc != null ) {
 			sc.setValoreUnitarioDollari(sc.getValoreDollari().doubleValue() / sommaSecco);
 			sc.setValoreUnitarioTesTp(sc.getValoreTesTp().doubleValue() / sommaSecco);
-			sc.setValoreUnitarioEuro(sc.getValoreUnitarioDollari().doubleValue() / sc.getTassoEuroDollaro().doubleValue() );
+			sc.setValoreUnitarioEuro(sc.getValoreUnitarioDollari().doubleValue() / sc.getTassoEuroDollaro().doubleValue());
 		}
 
 		return sc;
@@ -267,11 +230,12 @@ public class PopolaStalli extends VelocityCommand {
 
 	private StalloConsegna getStalloConsegna(Stallo s) throws Exception {
 
-		StalloConsegna stalloConsegna = stalloConsegnaAdp.getByKeysIds( s.getId(), idConsegna);
+ 		StalloConsegna stalloConsegna = stalloConsegnaAdp.getByKeysIds( s.getId(), idConsegna);
 
 		if ( stalloConsegna == null ) {
 			stalloConsegna = stalloConsegnaAdp.getByKeysIds(StalloConsegnaAdapter.ID_STALLO_APERTURA, idConsegna);
-			stalloConsegna.setIdStallo(s.getId());
+			if ( stalloConsegna != null )
+				stalloConsegna.setIdStallo(s.getId());
 		}
 
 		if ( stalloConsegna == null ) {
@@ -282,7 +246,8 @@ public class PopolaStalli extends VelocityCommand {
 			stalloConsegna = scValoriUnitari.clone();
 			stalloConsegna.setIdStallo(s.getId());
 
-			stalloConsegnaAdp.create(stalloConsegna);
+			Object _id =   stalloConsegnaAdp.create(stalloConsegna);
+			stalloConsegna.setId(Integer.valueOf("" +_id));
 		}
 
 		stalloConsegna.setValoreUnitarioDollari(scValoriUnitari.getValoreUnitarioDollari());
@@ -317,7 +282,7 @@ public class PopolaStalli extends VelocityCommand {
 					ConsegnaAdapter.assegnaStalloAConsegna(consegna, s);
 				}
 
-				listMov = quadAdp.get(false, null , s);
+				listMov = (Vector<MovimentoQuadrelli>) quadAdp.get(false, null , s);
 
 				sommaUmido = 0 ;
 
