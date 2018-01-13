@@ -73,39 +73,6 @@ public class PopolaStalli extends VelocityCommand {
 			}
 
 
-			/*
-			 * OLD
-
-				if ( c.getIter().getHasrettifica()  ) {
-					if ( getBooleanParam(Strings.EXEC) ) {
-						doPopola(c);
-
-					}
-					//				else if ( c.isPesoFinalePortoCarico() ) {
-					//					doPFPC(c,quadAdp);
-					//					response.sendRedirect(".consegne?id=" + c.getId());
-					//				}
-					else {
-						showRettifica(c, quadAdp,  ctx);
-					}
-				}
-				else {
-					final ArrayList<String> codiciStalli = quadAdp.getCodiciStalli(c, null);
-					final StalloAdapter sAdp = Stallo.newAdapter();
-					Stallo s = null ;
-					for (final String string : codiciStalli) {
-						s = StalloAdapter.getByCodice(string, false);
-
-						if ( s != null ) {
-							s.setIdConsegnaAttuale(c.getId()) ;
-
-							sAdp.update(s);
-						}
-					}
-				}
-			}
-			 */
-
 		} catch ( final Exception e) {
 			ctx.put("err" ,  e );
 		}
@@ -230,18 +197,12 @@ public class PopolaStalli extends VelocityCommand {
 			for ( final Stallo s : stalli ) {
 
 				stalloConsegna = getStalloConsegna(s);
-
 				stalloConsegna.setIdStallo(s.getId());
-
 				carico = carichi.get(s.getId());
 
 				if ( carico != null ) {
 					stalloConsegna.initValori(carico.getSecco());
 				}
-				// se non ho il carico non inizializzo i valori ... non mi serve a nulla no?
-				//				else {
-				//					stalloConsegna.initValori(seccoRestante);
-				//				}
 
 				stalloConsegnaAdp.update(stalloConsegna);
 			}

@@ -264,7 +264,6 @@ public class Consegna extends ModelBean2 implements Serializable {
 		return d ;
 	}
 
-	@SuppressWarnings("unchecked")
 	public Documento getPrimoDocumento(final boolean iva, Stallo s) throws Exception {
 
 		final Vector<Movimento> v = getRegistro(iva, false, false) ;

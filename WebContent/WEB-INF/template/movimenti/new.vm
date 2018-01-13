@@ -19,7 +19,7 @@ jQuery('.data').calendar();
 function calcolaSecco(btn) {
 var f = btn.form;
 var umido, secco ;
-var tasso = $obj.Stallo.Consegna.TassoUmidita ;
+var tasso = #if( $!obj.Consegna.TassoUmidita ) $!obj.Consegna.TassoUmidita #else 0 #end ;
 
 try {
 umido = 1 * f.umido.value.replace('\.','').replace(',','.') ;
@@ -34,8 +34,6 @@ catch (e) { alert ( 'Errore  : ' + e.message) ; }
 Nuovo Movimento del Registro #if($isIva)IVA#else Doganale#end
 </h2>
 #set( $m = $obj )
-
-
 
 <form action="?" method="post" id="mainForm">
 <input type="hidden" name="cmd" value="newmovimento" />

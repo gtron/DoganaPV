@@ -218,7 +218,7 @@ public class StalloConsegna extends ModelBean2 implements Serializable, Cloneabl
 		if ( valoreDollari == null || valoreDollari < 1 )
 			throw new Exception("Valore in USD non specificato!");
 
-		if ( valoreTesTp == null || valoreTesTp < 1 )
+		if ( valoreTesTp == null ) // Permettiamo che il valore TesTp sia 0 o negativo
 			throw new Exception("Valore del TesTP non specificato!");
 
 		if ( sommaSeccoTotale < 1 )
