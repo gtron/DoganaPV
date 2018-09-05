@@ -63,9 +63,7 @@ if (typeof(jsPrintSetup) != 'undefined') {
 }
 }
 </script>
-
 </head>
-
 <body>
 
 <div id="containTestata">

@@ -4,11 +4,8 @@
 #set( $addJs = ['/js/jquery.jqgrid/jquery.jqGrid.js','/js/jquery.ui/ui.calendar.js','/js/jquery.ui/ui.dimensions.js','/js/jquery.ui/ui.mouse.js','/js/jquery.ui/ui.draggable.js','/js/jquery.ui/ui.resizable.js','/js/jquery.ui/ui.dialog.js'])
 #parse('header.vm')
 
-
 <script type="text/javascript">
-
 $('document').ready( function() {
-
 popUpCal.regional['it'] = {clearText: 'Svuota', closeText: 'Chiudi',
 	prevText: '&lt;Prec', nextText: 'Succ&gt;', currentText: 'Oggi',
 	dayNames: ['Do','Lu','Ma','Me','Gio','Ve','Sa'],
@@ -17,7 +14,6 @@ monthNames: ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
 popUpCal.setDefaults(popUpCal.regional['it']);
    
 $("#data").calendar();
-
 });
 
 </script>
@@ -37,7 +33,6 @@ $("#data").calendar();
 <li><a href=".merci"><img src="$!images/action-ico-registra.png" />Merci </a></li>
 #end
 <li><a href=".main?cmd=recover"><img src="$!images/tab-ico-importazione.png"  height="24" />Backups</a></li>
-<!--li><a href="#" onclick="$('#dlg_Print').dialogOpen(); return false;"><img src="$!images/action-ico-registra.png" />Stampa</a></li -->
 <li><a href="#" onclick="doPrint(false); return false;"><img src="$!images/action-ico-registra.png" />Stampa</a></li>
 <li><a href=".main" ><img src="$!images/action-ico-elimina.png" />Esci</a></li>
 </ul>
@@ -49,10 +44,4 @@ $("#data").calendar();
 #parse('stalli/print.vm')
 </div>
 
-
-#*<div id="dlg_Print" class="flora" style="text-align:center;">
-Stampa <input type="text" id="numPaginePrint" value="2" size="3" /> pagine <br />
-a partire dal movimento numero <input type="text" id="fromMovimento" value="$!proxNumDaStampare" size="3"  />
-</div>
-*#
 #parse('footer.vm')
