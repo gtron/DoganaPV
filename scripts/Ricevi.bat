@@ -1,5 +1,8 @@
 @rem  *************** CLIENT RICEZIONE Movimentazioni PINO ***********************
-
+@REM  *************** 
+@REM  Da chiamare con un'attività pianificata ogni 5 minuti  
+@REM  via startRicevi.bat per poter avere il log
+@REM  *************** 
 @echo ************************************************************
 DATE /t
 TIME /t
