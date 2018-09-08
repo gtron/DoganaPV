@@ -9,16 +9,16 @@ TIME /t
 
 @rem echo Connecting remote drive ...
 
-if exist s:\ net use s: /DELETE /yes
+if exist w:\ net use w: /DELETE /yes
 
-net use s: \\itpvssrv005\movimentazioni
+net use w: \\itpvssrv005\movimentazioni
 
 @rem echo Checking file ...
 
 @echo off
 
 for %%a in ( c:\pesi\stor_db03.mdb ) do set tf1=%%~ta
-for %%a in ( s:\stor_db03.mdb ) do set tf2=%%~ta
+for %%a in ( w:\stor_db03.mdb ) do set tf2=%%~ta
 
 @rem echo Local File Time: %tf1% - Remote File Time: %tf2%
 
@@ -30,11 +30,11 @@ for %%a in ( s:\stor_db03.mdb ) do set tf2=%%~ta
 
 wget -O - "http://ITPVSWKS25002/DoganaPV/.main?cmd=lockMdb&lock=1"
 
-copy s:\anagrafiche.mdb c:\pesi\anagrafiche.mdb /y
-copy s:\stor_db03.mdb c:\pesi\stor_db03.mdb /y
+copy w:\anagrafiche.mdb c:\pesi\anagrafiche.mdb /y
+copy w:\stor_db03.mdb c:\pesi\stor_db03.mdb /y
 
 wget -O - "http://ITPVSWKS25002/DoganaPV/.main?cmd=lockMdb&lock=0"
 
 
 :end
-net use s: /DELETE /yes
+net use w: /DELETE /yes
