@@ -1,32 +1,29 @@
 @rem  *************** CLIENT RICEZIONE Movimentazioni PINO ***********************
-@REM  *************** 
-@REM  Da chiamare con un'attività pianificata ogni 5 minuti  
-@REM
+
+@echo ************************************************************
 DATE /t
 TIME /t
-@rem  ***************
 
-@echo Connecting remote drive ...
+@rem echo Connecting remote drive ...
 
-net use s: /DELETE
+if exist s:\ net use s: /DELETE /yes
+
 net use s: \\itpvssrv005\movimentazioni
 
-@echo Checking file ...
+@rem echo Checking file ...
 
-@for %%a in ( c:\pesi\stor_db03.mdb ) do set tf1=%%~ta
+@echo off
 
-@for %%a in ( s:\stor_db03.mdb ) do set tf2=%%~ta
+for %%a in ( c:\pesi\stor_db03.mdb ) do set tf1=%%~ta
+for %%a in ( s:\stor_db03.mdb ) do set tf2=%%~ta
 
-@echo.
-@echo Local File Time: %tf1% - Remote File Time: %tf2%
-@echo.
+@rem echo Local File Time: %tf1% - Remote File Time: %tf2%
 
 @if "%tf1%" equ "%tf2%" echo Nothing to do && goto :end
 
-
 @c:
 @cd \Users\dogadmin\Desktop
-
+@echo on
 
 wget -O - "http://ITPVSWKS25002/DoganaPV/.main?cmd=lockMdb&lock=1"
 
@@ -37,4 +34,4 @@ wget -O - "http://ITPVSWKS25002/DoganaPV/.main?cmd=lockMdb&lock=0"
 
 
 :end
-net use s: /DELETE
+net use s: /DELETE /yes
