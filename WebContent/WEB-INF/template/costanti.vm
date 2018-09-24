@@ -1,4 +1,4 @@
-#set( $versione = '1.4.0' )
+#set( $versione = '1.4.1' )
 #set( $wwwRoot = '/DoganaPV')
 #set($images = "$wwwRoot/images")
 #set( $dateFormat = 'dd/MM/yyyy')
@@ -10,6 +10,9 @@
 
 Changelog
 
+1.4.1 Settembre 2018
+  - Sync template con versione attiva su PV
+  - Aggiunti script di gestione e backup
 1.4.0 Gennaio 2018
   - La rettifica aggiorna i valori unitari nello stalloConsegna
   - Possibilità di aprire una consegna con valore 0 di testTp
