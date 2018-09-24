@@ -98,9 +98,6 @@ subgrid_table_id = subgrid_id+"_t"; jQuery("#"+subgrid_table_id).GridDestroy();
 
 
 *#
-sortname: "data",
-sortorder: "desc",
-
 colNames:['N.','Data','Cons.','Part.' , 'Documento', 'Merce','umido<br />IN','umido<br />OUT','secco<BR >IN','secco<BR />OUT'
 #if($iva) ,'&euro;','$'#end ],
 colModel:[

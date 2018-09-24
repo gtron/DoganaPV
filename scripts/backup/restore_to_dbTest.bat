@@ -1,0 +1,1 @@
+"C:\Program Files\MySQL\MySQL Server 5.7\bin\mysql.exe" -u mag_test -pm4gtest mag_test < C:\Backups\Database\last.sql	
