@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -64,12 +63,11 @@ public class Export extends ViewRegistro {
 		if ( al != null ) {
 			al = new FormattedDate( al.ymdString() + " 23:59:59" );
 		}
-		
 
 		MovimentoAdapter adp = ( isRegistroIva ? 
 				new MovimentoIvaAdapter() : new MovimentoDoganaleAdapter() ) ;
 		
-		Vector vector = adp.getRegistro( true, null , null, MAX_ROWS, null, null, dal, al, null, null );
+		Vector<Movimento> vector = adp.getRegistro( true, null , null, MAX_ROWS, null, null, dal, al, null, null );
 		
 //		ctx.put( "list" , vector);
 		Login.logAction("Exporting registry " + registro + " - from: " + dal + " to: " + al, request);
@@ -89,8 +87,6 @@ public class Export extends ViewRegistro {
 			writeAsExcel(resp, vector, isRegistroIva);
 			
 		}
-		
-		
 		return null ;
 	}
 	
@@ -115,7 +111,6 @@ public class Export extends ViewRegistro {
 		
 		int col = 0 ;
 		
-		
 		headerRow.createCell(col++).setCellValue("Num. Registro");
 		headerRow.createCell(col++).setCellValue("Data");
 		headerRow.createCell(col++).setCellValue("Num. Consegna");
@@ -131,8 +126,6 @@ public class Export extends ViewRegistro {
 	    if(isIva) {
 	    	headerRow.createCell(col++).setCellValue("Valore");
 	    }
-	    
-	    
 
 		Row dataRow;
 		Movimento m;
@@ -186,7 +179,6 @@ public class Export extends ViewRegistro {
 		for ( int x = 0 ; x < col ; x++ ) {
 			sheet.autoSizeColumn(x);
 		}
-		
 
 //		String outputDirPath = "D:/PersonList.xls";
 //		FileOutputStream fileOut = new FileOutputStream(outputDirPath);
