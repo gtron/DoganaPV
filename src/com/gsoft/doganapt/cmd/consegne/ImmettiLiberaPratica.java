@@ -185,7 +185,6 @@ public class ImmettiLiberaPratica extends VelocityCommand {
 
 		registroOut = iterImporter.getRegistroOutPerILP() ;
 
-		@SuppressWarnings("unchecked")
 		Vector<Movimento> list = registroOut.getByConsegna(
 				false, idConsegna, s.getId(), null , null );
 

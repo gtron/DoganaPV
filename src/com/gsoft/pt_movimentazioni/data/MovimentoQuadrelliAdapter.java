@@ -496,6 +496,34 @@ group by  cliente,  merce, `num consegna` , `num documento`, fornitore, destinaz
 		return list ;
 	}
 	
+	public ArrayList<String> getMovimentiSenzaData( ) throws Exception {
+		
+		StringBuilder sql = new StringBuilder(70)
+		.append("SELECT ID, data as mindata ,  merce, cliente, fornitore , `num consegna` , `num documento` FROM ")
+		.append(getTable()).append(" WHERE ")
+		.append(" destinazione <> 7 AND data IS NULL ");
+		
+		Connection conn = db.getConnection();
+		ArrayList<String> list = null ;
+		try {
+			
+			PreparedStatement s = conn.prepareStatement(sql.toString()) ;
+
+			ResultSet rs = s.executeQuery();
+			if ( rs != null ) {
+				list = new ArrayList<String>(3);
+				while (rs.next()) {
+					list.add( rs.getString(1) );
+				}
+			}
+		}
+		finally {
+			db.freeConnection(conn) ;
+		}
+		
+		return list ;
+	}
+	
 	private StringBuilder getListaCodiciStalli(ArrayList<Stallo> stalliAttivi) {
 		StringBuilder sb = new StringBuilder();
 		boolean first = true;
