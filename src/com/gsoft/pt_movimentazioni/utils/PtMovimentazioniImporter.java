@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
 
+import com.gsoft.doganapt.cmd.Login;
 import com.gsoft.doganapt.data.Consegna;
 import com.gsoft.doganapt.data.adapters.MovimentoDoganaleAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoIvaAdapter;
@@ -20,6 +21,8 @@ public class PtMovimentazioniImporter {
 	AccessDB adb = null ;
 	
 	static boolean locked = false;
+	static ArrayList<String> movimentiSenzaData = null;
+	
 	private static PtMovimentazioniImporter instance = null ;
 	
 	public static PtMovimentazioniImporter getInstance(){
@@ -44,6 +47,24 @@ public class PtMovimentazioniImporter {
 		locked = b ;
 	}
 	
+	public static boolean hasMovimentiSenzaData() throws Exception{
+		return ( null != movimentiSenzaData && movimentiSenzaData.size() > 0 );
+	}
+	
+	public static ArrayList<String> getMovimentiSenzaData() throws Exception {
+		return getMovimentiSenzaData(false);
+	}
+	
+	public static ArrayList<String> getMovimentiSenzaData(boolean forceCheck) throws Exception {
+		
+		if ( forceCheck ) {
+			PtMovimentazioniImporter i = PtMovimentazioniImporter.getInstance();
+			i.checkMovimentiSenzaData();
+		}
+		
+		return movimentiSenzaData;
+	}
+		
 	PtMovimentazioniImporter() {
 		
 		ivaAdp = new MovimentoIvaAdapter() ;
@@ -59,11 +80,24 @@ public class PtMovimentazioniImporter {
 			try {
 				freeInstance();
 			} catch (Exception e) {
+				Login.debug(e, "DBQuadrelli" );
 				e.printStackTrace();
 			}
 		}
 		
 		quadAdp = new MovimentoQuadrelliAdapter(getAccessDB()) ;
+	}
+	
+	public ArrayList<String> checkMovimentiSenzaData() {
+		
+		try {
+			movimentiSenzaData = new MovimentoQuadrelliAdapter(getAccessDB()).getMovimentiSenzaData();
+		} catch (Exception e) {
+			movimentiSenzaData = new ArrayList<String>(1);
+			Login.debug(e, "PTImporter");
+		}
+		
+		return movimentiSenzaData;
 	}
 	
 	public AccessDB getAccessDB() {
@@ -100,5 +134,4 @@ public class PtMovimentazioniImporter {
 		importer.importTo(c, to, idStalli);
 			
 	}
-
 }

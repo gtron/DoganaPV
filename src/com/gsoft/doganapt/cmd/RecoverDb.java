@@ -56,22 +56,16 @@ public class RecoverDb extends VelocityCommand {
 	}
 
 	protected void showRecover() {
-
 		Vector<PuntoRipristinoDb> list = getRecoverableSnapshots();
-
 		ctx.put(ContextKeys.LIST, list );
-
-
 	}
 
 	private Vector<PuntoRipristinoDb> getRecoverableSnapshots() {
 
-		HashMap<String, PuntoRipristinoDb> list = new  HashMap<String,PuntoRipristinoDb>() ;
+		HashMap<String, PuntoRipristinoDb> list = new HashMap<String,PuntoRipristinoDb>() ;
 
 		String dir = ConfigManager.getProperty("backups.path") ;
-
 		File f =  new File ( dir ) ;
-
 		FormattedDate backupDay = null ;
 
 		ctx.put("dir", dir);
@@ -83,8 +77,6 @@ public class RecoverDb extends VelocityCommand {
 				public boolean accept(File f) {
 					return f.isFile() ; }
 			});
-
-
 
 			File curr = null ;
 			String filename , fn ;
@@ -142,13 +134,21 @@ public class RecoverDb extends VelocityCommand {
 					String comment = " - " ;
 					String line = null ;
 					if ( curr.length() > 0 ) {
+						BufferedReader fr = null; 
 						try {
-							BufferedReader fr = new BufferedReader( new FileReader ( curr ) ) ;
+							fr = new BufferedReader( new FileReader ( curr ) ) ;
 							while ( ((line = fr.readLine()) != null) ) {
 								comment += line;
 							}
 						}
 						catch ( Exception e ) { comment = " N/A " ; }
+						finally {
+							if (fr != null) {
+								try {
+									fr.close();
+								} catch (IOException e) { }
+							}
+						}
 					}
 					else {
 						comment = filename.substring( filename.indexOf('_',20) +1  , filename.lastIndexOf('.')) ;
@@ -190,16 +190,11 @@ public class RecoverDb extends VelocityCommand {
 
 		if ( f.exists() ) {
 
-			String s ;
-
 			Login.logAction("Recovering DB from backup: " + f.getAbsolutePath() , request);
 			System.out.println(mysqlCmd);
 
 			try {
 				Process p = Runtime.getRuntime().exec( mysqlCmd );
-
-				BufferedReader stdError = new BufferedReader(new
-						InputStreamReader(p.getErrorStream()));
 
 				String out = "" ;
 				String outError = "" ;
@@ -224,25 +219,19 @@ public class RecoverDb extends VelocityCommand {
 				}
 				ctx.put( "outError", outError);
 
-
 			}
 			catch(IOException e1) {}
 			catch(InterruptedException e2) {}
 
-
 			Homepage.purgeCaches();
-
 		}
 		else {
 			ctx.put(ContextKeys.ERROR, "Il file " + f + " non esiste!");
 		}
-
 	}
 
 	@Override
 	public String getTemplateName() {
 		return "recoverdb.vm" ;
 	}
-
-
 }

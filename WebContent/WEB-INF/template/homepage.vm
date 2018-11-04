@@ -19,6 +19,16 @@ $("#data").calendar();
 </script>
 
 <div class="view">
+### Messaggio di Errore: movimenti senza stalli nel db Quadrelli
+#if ( $!movimentiSenzaData )
+<div style="border:1px solid red;widht:100%;background:#FF8;color:red;text-align:center">
+<br><b>&nbsp;ATTENZIONE !</b> Il Database Quadrelli contiene movimenti senza data! <br>
+Alcuni stalli potrebbero non venire importati correttamente.<br>
+ID Movimenti: #foreach( $m if $!movimentiSenzaData)$m #end<br><br>
+</div>
+#end
+## Todo: gestire come $warn nell header.vm magari aggiungendo il nome del template nella exception
+
 #parse('stalli/table.vm')
 
 ##<iframe name="stp" src=".main?p=1" width="10" height="10" style="visibility:hidden;position:absolute;"></iframe>
