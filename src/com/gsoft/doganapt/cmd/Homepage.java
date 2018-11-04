@@ -1,6 +1,5 @@
 package com.gsoft.doganapt.cmd;
 
-import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,7 +17,6 @@ import com.gsoft.doganapt.data.adapters.MerceAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoDoganaleAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoIvaAdapter;
 import com.gsoft.doganapt.data.adapters.StalloAdapter;
-import com.gsoft.pt_movimentazioni.data.MovimentoQuadrelli;
 import com.gsoft.pt_movimentazioni.data.MovimentoQuadrelliAdapter;
 import com.gsoft.pt_movimentazioni.utils.PtMovimentazioniImporter;
 import com.gtsoft.utils.ManagerAliquoteIva;
@@ -93,27 +91,21 @@ public class Homepage extends VelocityCommand {
 		ctx.put("stalli", stalli );
 
 //		Login.debug("Home" + ( isPrintOutput() ? " P " : " - " ) + ( hasSelectedData ? "hasSelectedData" : " NotSelectedData") );
-		if ( ! isPrintOutput() && ! hasSelectedData ) {
+		if ( ! isPrintOutput() ) {
 			
-			MovimentoQuadrelliAdapter qAdp = new MovimentoQuadrelliAdapter(PtMovimentazioniImporter.getInstance().getAccessDB());
-			MovimentoDoganaleAdapter dogAdp = new MovimentoDoganaleAdapter() ;
-			MovimentoIvaAdapter ivaAdp = new MovimentoIvaAdapter() ;
+			if ( ! hasSelectedData ) {
+				MovimentoQuadrelliAdapter qAdp = new MovimentoQuadrelliAdapter(PtMovimentazioniImporter.getInstance().getAccessDB());
+				MovimentoDoganaleAdapter dogAdp = new MovimentoDoganaleAdapter() ;
+				MovimentoIvaAdapter ivaAdp = new MovimentoIvaAdapter() ;
+				StalloHomepageHelper stalliHelper = new StalloHomepageHelper(stalli, qAdp, dogAdp, ivaAdp);
+				ctx.put("stalliHelper", stalliHelper );
+			}
 			
-			StalloHomepageHelper stalliHelper = new StalloHomepageHelper(stalli, qAdp, dogAdp, ivaAdp);
-			ctx.put("stalliHelper", stalliHelper );
-			
-//			Login.debug("stalliHelper:" + stalliHelper);
-			
+			if ( PtMovimentazioniImporter.hasMovimentiSenzaData() ) {
+				ctx.put("movimentiSenzaData", PtMovimentazioniImporter.getMovimentiSenzaData() );
+			}
 		}
 		
-		//		BeanAdapter2 adp = BeanAdapter2.newAdapter();
-		//		ctx.put( ContextKeys.LIST , adp.getAll() ) ;
-		//
-		//		Integer selectedId = getParameter.getInt(ID, req, false);
-		//
-		//		if ( selectedId != null ) {
-		//			ctx.put( ContextKeys.OBJECT , adp.getByKey(selectedId) ) ;
-		//		}
 		return null;
 	}
 
