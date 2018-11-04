@@ -1,4 +1,4 @@
-#set( $versione = '1.4.2' )
+#set( $versione = '1.4.2.1' )
 #set( $wwwRoot = '/DoganaPV')
 #set($images = "$wwwRoot/images")
 #set( $dateFormat = 'dd/MM/yyyy')
@@ -10,7 +10,10 @@
 
 Changelog
 
-1.4.2 Settembre 2018
+1.4.2.1 Ottobre 2018
+  - Corretto changelog
+  - Aggiunto jar della versione
+1.4.2 Ottobre 2018
   - Aggiunta gestione del caso della presenza di movimenti senza data in Quadrelli 
 1.4.1 Settembre 2018
   - Sync template con versione attiva su PV
