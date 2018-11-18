@@ -12,6 +12,7 @@ import org.apache.velocity.Template;
 import org.apache.velocity.context.Context;
 
 import com.gsoft.doganapt.data.Utente;
+import com.gtsoft.utils.ActiveDirectory;
 import com.gtsoft.utils.common.ConfigManager;
 import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.http.VelocityCommand;
@@ -36,7 +37,8 @@ public class Login extends VelocityCommand {
 		String username = getParam("user", false);
 		String pwd  = getParam("pwd", false);
 
-		Utente utente = Utente.newAdapter().getUtente( username, pwd );
+		
+		Utente utente = getUtente(username, pwd);
 
 		/*
 		+               IDatabase2 db = getDatabase();
@@ -88,7 +90,7 @@ public class Login extends VelocityCommand {
 			u.setActive(true);
 			u.setId(0);
 			u.setUsername("__admin__");
-			u.setLevel(0);
+			u.setLevel(Utente.Levels.SUPER_ADMIN);
 
 			setUtenteLoggato(u);
 			resp.sendRedirect(".main?cmd=home");
@@ -110,6 +112,21 @@ public class Login extends VelocityCommand {
 		Homepage.purgeCaches();
 
 		return null;
+	}
+
+	private Utente getUtente(String username, String pwd) throws Exception {
+		
+		Utente utente = null;
+		
+		if ( null != username && null != pwd ) {
+			if ( ActiveDirectory.checkPassword(username, pwd) ) {
+				utente = Utente.newAdapter().getByUsername(username);
+			}  else {
+				utente = Utente.newAdapter().getUtente(username, pwd);
+			}
+		}
+		
+		return utente;
 	}
 
 	private boolean isLoginValido(Utente utente) {

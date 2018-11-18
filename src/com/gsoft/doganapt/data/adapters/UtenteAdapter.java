@@ -159,20 +159,44 @@ public class UtenteAdapter extends BeanAdapter2 {
 
 	public Utente getUtente(String username, String pwd) {
 
-		if ( username == null || pwd == null )
+		if ( pwd == null )
+			return null;
+
+		pwd = pwd.trim();
+
+		if ( pwd.length() < 2 )
+			return null;
+
+		Utente u = getByUsername(username);
+		
+		try {
+			
+			if ( u == null || ! calcolaPass(pwd).equals( u.getPassword() ) )
+				return null;
+			
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+			return null;
+		}
+
+		return u;
+
+	}
+	
+	public Utente getByUsername(String username) {
+
+		if ( username == null )
 			return null;
 
 		username = username.trim();
-		pwd = pwd.trim();
 
-		if ( username.length() < 2 || pwd.length() < 2 )
+		if ( username.length() < 2)
 			return null;
 
 		try {
 
 			String sql = "SELECT * FROM " + getTable() + " WHERE " +
 					getTableFieldName( getField(Fields.USERNAME) ) + " = ? AND " +
-					getTableFieldName( getField(Fields.PASSWORD) ) + " = ? AND " +
 					getTableFieldName( getField(Fields.ACTIVE) ) + " > 0 ";
 
 			if ( db == null )
@@ -181,7 +205,6 @@ public class UtenteAdapter extends BeanAdapter2 {
 			PreparedStatement stm = db.getConnection().prepareStatement(sql);
 
 			stm.setString(1, username );
-			stm.setString(2, calcolaPass(pwd));
 
 			Vector<?> v = getByStatment(stm);
 
@@ -195,6 +218,7 @@ public class UtenteAdapter extends BeanAdapter2 {
 		return null;
 
 	}
+	
 
 	public static interface Fields {
 
