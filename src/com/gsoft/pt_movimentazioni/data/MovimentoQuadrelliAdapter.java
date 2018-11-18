@@ -28,14 +28,14 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 	public MovimentoQuadrelliAdapter() {
 		super();
 
-		readFromCache  = new Boolean(ConfigManager.getProperty("movimentazioni.readFromCache")) ;
-		writeCache  = new Boolean(ConfigManager.getProperty("movimentazioni.writeCache")) ;
+		readFromCache  = Boolean.parseBoolean(ConfigManager.getProperty("movimentazioni.readFromCache")) ;
+		writeCache  = Boolean.parseBoolean(ConfigManager.getProperty("movimentazioni.writeCache")) ;
 	}
 	public MovimentoQuadrelliAdapter( IDatabase2 db ) {
 		super( db );
 
-		readFromCache  = new Boolean(ConfigManager.getProperty("movimentazioni.readFromCache")) ;
-		writeCache  = new Boolean(ConfigManager.getProperty("movimentazioni.writeCache")) ;
+		readFromCache  = Boolean.parseBoolean(ConfigManager.getProperty("movimentazioni.readFromCache")) ;
+		writeCache  = Boolean.parseBoolean(ConfigManager.getProperty("movimentazioni.writeCache")) ;
 	}
 
 	@Override

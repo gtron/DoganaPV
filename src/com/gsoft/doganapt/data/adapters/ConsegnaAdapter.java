@@ -19,8 +19,8 @@ import com.gtsoft.utils.sql.IDatabase2;
 
 public class ConsegnaAdapter extends BeanAdapter2 {
 
-	static private Boolean readFromCache = false;
-	static private Boolean writeCache = false;
+//	static private Boolean readFromCache = false;
+//	static private Boolean writeCache = false;
 
 	public ConsegnaAdapter() {
 		super();
@@ -288,8 +288,8 @@ public class ConsegnaAdapter extends BeanAdapter2 {
 		s.setIdConsegnaPrenotata(null);
 		s.setImmessoInLiberaPratica(Boolean.FALSE) ;
 
-		s.setAttuale( new Double(0) );
-		s.setCaricato( new Double(0) );
+		s.setAttuale( Double.valueOf(0) );
+		s.setCaricato( Double.valueOf(0) );
 
 		StalloAdapter sAdp = new StalloAdapter();
 		sAdp.update(s);
