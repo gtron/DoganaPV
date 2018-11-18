@@ -10,6 +10,10 @@
 
 Changelog
 
+Novembre 2018
+  - New Feature - login tramite Active Directory
+  - New Feature - Check presenza di movimenti senza data in Quadrelli 
+
 1.4.2.1 Ottobre 2018
   - Corretto changelog
   - Aggiunto jar della versione
