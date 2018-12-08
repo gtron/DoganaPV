@@ -48,7 +48,8 @@ public class PtMovimentazioniImporter {
 	}
 	
 	public static boolean hasMovimentiSenzaData() throws Exception{
-		return ( null != movimentiSenzaData && movimentiSenzaData.size() > 0 );
+		ArrayList<String> list = getMovimentiSenzaData(false);
+		return ( list != null && list.size() > 0 ) ;
 	}
 	
 	public static ArrayList<String> getMovimentiSenzaData() throws Exception {
@@ -57,7 +58,7 @@ public class PtMovimentazioniImporter {
 	
 	public static ArrayList<String> getMovimentiSenzaData(boolean forceCheck) throws Exception {
 		
-		if ( forceCheck ) {
+		if ( forceCheck || null == movimentiSenzaData ) {
 			PtMovimentazioniImporter i = PtMovimentazioniImporter.getInstance();
 			i.checkMovimentiSenzaData();
 		}
