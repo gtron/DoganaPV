@@ -1,3 +1,4 @@
+@page { size: landscape; }
 HTML {}
 BODY {
 font : 14pt Arial ;
@@ -9,7 +10,7 @@ height: 190mm;
 }
 .page { position: relative; width:100%;  page-break-inside:avoid;}
 .nomeReg { text-align:center; }
-.num { position: absolute ; top : 0mm; right:10mm;}
+.num { position: absolute ; top : 10mm; right:10mm;}
 
 .pb {page-break-before: always ;}
 

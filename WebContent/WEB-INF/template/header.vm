@@ -21,43 +21,11 @@
 #end#end
 
 <script type="text/javascript">
-function doPrint(landscape) {
-if (typeof(jsPrintSetup) != 'undefined') {
-
-   // set portrait orientation
-   if ( landscape )
- 	  jsPrintSetup.setOption('orientation', jsPrintSetup.kLandscapeOrientation);
-   else 
-   	  jsPrintSetup.setOption('orientation', jsPrintSetup.kPortraitOrientation);
-   // set top margins in millimeters
-   jsPrintSetup.setOption('marginTop', 10);
-   jsPrintSetup.setOption('marginBottom', 10);
-   jsPrintSetup.setOption('marginLeft', 10);
-   jsPrintSetup.setOption('marginRight', 10);
-   // set page header
-   jsPrintSetup.setOption('headerStrLeft', '');
-   jsPrintSetup.setOption('headerStrCenter', '');
-   jsPrintSetup.setOption('headerStrRight', ''); // &PT');
-   // set empty page footer
-   jsPrintSetup.setOption('footerStrLeft', '');
-   jsPrintSetup.setOption('footerStrCenter', '');
-   jsPrintSetup.setOption('footerStrRight', '');
-   // clears user preferences always silent print value
-   // to enable using 'printSilent' option
-   jsPrintSetup.clearSilentPrint();
-   // Suppress print dialog (for this context only)
-//    jsPrintSetup.setOption('printSilent', 1);
-   // Do Print 
-   // When print is submitted it is executed asynchronous and
-   // script flow continues after print independently of completetion of print process! 
-   jsPrintSetup.print();
-   // next commands
-} else {
-	if ( confirm('Per poter stampare 衮ecessario installare un plugin di Firefox. Lo si vuole installare adesso?') )
-		window.open( 'http://downloads.mozdev.org/jsprintsetup/jsprintsetup-0.9.2.xpi' );
-	else 
-		window.print();
-}
+function doPrint(landscape) { 
+	var s = document.createElement('style');
+	s.innerHTML = '@page{size:'+(landscape?'landscape':'portrait')+'}'
+	document.head.appendChild(s);
+	window.print();
 }
 </script>
 </head>
