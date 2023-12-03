@@ -8,7 +8,7 @@
 
 <link rel="stylesheet" type="text/css" href="$wwwRoot/style/main_print.css" media="print" />
 #if( $!addCssPrint )#foreach( $j in $addCssPrint )
-<link rel="stylesheet" type="text/css" href="#if(!$j.startsWith('http:'))$wwwRoot#end$j"  media="print"/>
+<link rel="stylesheet" type="text/css" href="#if(!$j.startsWith('http'))$wwwRoot#end$j"  media="print"/>
 #end#end
 
 #if( $!addCss )#foreach( $j in $addCss )
@@ -17,11 +17,8 @@
 
 <script type="text/javascript" src="$wwwRoot/js/jquery.js"></script>
 #if( $!addJs )#foreach( $j in $addJs )
-<script type="text/javascript" src="#if(!$j.startsWith('http:'))$wwwRoot#end$j"></script>
+<script type="text/javascript" src="#if(!$j.startsWith('http'))$wwwRoot#end$j"></script>
 #end#end
-#*
-<link media="screen" href="$wwwRoot/style/main_v2.css" type="text/css" rel="stylesheet" />
-<link media="print" href="$wwwRoot/style/printer.css" type="text/css" rel="stylesheet" />*#
 
 <script type="text/javascript">
 function doPrint(landscape) {
@@ -75,7 +72,7 @@ if (typeof(jsPrintSetup) != 'undefined') {
 </div></div>
 
 <div id="container"><div id="corpo">
-<br />
+<br class="noprint"/>
 #if( $msg )<div id="message">$msg</div>#end
 #if( $error )<div id="message">$error.Message<br /><br /></div>#end
 
