@@ -1,9 +1,35 @@
-db:
-  image: mysql:5.6
-  ports:
-    - 3306:3306
-  environment:
-   MYSQL_ROOT_PASSWORD: root
-  volumes:
-    - ./mysqlData:/var/lib/mysql
-    - ./mysqlInitSql:/docker-entrypoint-initdb.d
+services:
+  db:
+    image: mysql:5.6
+    ports:
+      - 3306:3306
+    links:
+      - sql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      
+    volumes:
+      - ./mysqlData:/var/lib/mysql
+      - ./mysqlInitSql:/docker-entrypoint-initdb.d
+
+  tomcat:
+    image: tomcat:9-jre17
+    ports:
+      - 8080:8080
+      - 8000:8000
+    volumes:
+      - ./webapps:/usr/local/tomcat/webapps
+      - ./webapps/ROOT:/usr/local/tomcat/webapps/ROOT
+
+  sql:
+    #image: mcr.microsoft.com/mssql/server:2019-latest
+    #image: mcr.microsoft.com/mssql/server:2019-CU14-ubuntu-20.04
+    # image: microsoft/mssql-server-linux
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+      - 1433:1433
+    environment:
+      SA_PASSWORD: "Password123"
+      ACCEPT_EULA: "Y"
+    volumes:
+      - ./sqlData:/var/opt/mssql/data
