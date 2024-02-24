@@ -19,7 +19,6 @@ import com.gsoft.doganapt.cmd.registri.ViewRegistro;
 import com.gsoft.framework.TooledServlet;
 //import com.gtsoft.utils.LogManager;
 
-@SuppressWarnings("serial")
 public class RegistriServlet extends TooledServlet {
 
 	public RegistriServlet() {

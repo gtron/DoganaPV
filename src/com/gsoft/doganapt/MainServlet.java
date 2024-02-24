@@ -10,7 +10,6 @@ import com.gsoft.doganapt.cmd.ViewStallo;
 import com.gsoft.doganapt.cmd.consegne.ResetImmissioneLPStallo;
 import com.gsoft.framework.TooledServlet;
 
-@SuppressWarnings("serial")
 public class MainServlet extends TooledServlet {
 
 	public MainServlet() {

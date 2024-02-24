@@ -46,10 +46,10 @@ public class PtMerciImporter {
 		
 //		adp.clearTable() ;
 		
-		Merce m  = null ;
+		// Merce m  = null ;
 		Merce mQ = null ;
 		
-		for ( Iterator iQ = listQ.iterator() ; iQ.hasNext() ; ) {
+		for ( Iterator<Object> iQ = listQ.iterator() ; iQ.hasNext() ; ) {
 			mQ = (Merce) iQ.next() ;
 			
 //			m = MerceAdapter.get(id)

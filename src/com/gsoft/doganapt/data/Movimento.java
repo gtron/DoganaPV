@@ -247,7 +247,7 @@ public abstract class Movimento extends ModelBean2 {
 			tipo += 10 ;
 		}
 
-		return new Integer(tipo);
+		return Integer.valueOf(tipo);
 	}
 
 	public void aggiungi(Movimento m) {

@@ -357,7 +357,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 		return getWithWhere( sb.toString() ,order, limit);
 	}
 
-	public Vector getByNumeroRegistro(final Integer num ) throws Exception {
+	public Vector<?> getByNumeroRegistro(final Integer num ) throws Exception {
 		return getWithWhere( " deleted = 0 AND numregistro =" + num );
 	}
 
@@ -396,7 +396,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			conn = db.getConnection() ;
 			db.executeNonQuery(sql.toString(), conn) ;
 
-			shiftRegistro( true, new Integer( numreg.intValue() ), conn ) ;
+			shiftRegistro( true, Integer.valueOf( numreg.intValue() ), conn ) ;
 		}
 		catch ( final Exception e ) {
 			throw e ;
@@ -688,7 +688,7 @@ public abstract class MovimentoAdapter extends BeanAdapter2 {
 			s.setInt(1, from.intValue()) ;
 			s.setInt(2, to.intValue()) ;
 
-			ret = new Integer( s.executeUpdate() );
+			ret = Integer.valueOf( s.executeUpdate() );
 
 
 		}
@@ -772,6 +772,7 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 	public Vector<Movimento> getDaRegistrareByIdStallo(final Integer idStallo) throws Exception {
 		return getDaRegistrare( null, null, idStallo);
 	}
+	@SuppressWarnings("unchecked")
 	public Vector<Movimento> getDaRegistrare( final Integer idConsegna , final FormattedDate data, final Integer idStallo ) throws Exception {
 
 		final StringBuilder sql = new StringBuilder(70)
@@ -883,7 +884,7 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 		return list ;
 	}
 
-	public Vector getGroup(  final Integer idConsegna , final FormattedDate d , final boolean scarico, final boolean rettifica) throws Exception {
+	public Vector<?> getGroup(  final Integer idConsegna , final FormattedDate d , final boolean scarico, final boolean rettifica) throws Exception {
 
 		return getWithWhere(" deleted = 0 AND idconsegna = " + idConsegna.toString()
 				+ " AND data = '" + d.ymdString() + "'"
@@ -892,14 +893,13 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 				) ;
 	}
 
-	public Vector getByData( final Integer idConsegna , final FormattedDate d ) throws Exception {
+	public Vector<?> getByData( final Integer idConsegna , final FormattedDate d ) throws Exception {
 		return getWithWhere(" deleted = 0 AND idconsegna = " + idConsegna.toString() + " AND data = '" + d.ymdString() + "'" ) ;
 	}
 
 	public final static Integer ID_STALLO_CARICO_APERTURA = Integer.valueOf(0);
 	public static final String NOTE_RETTIFICA_PESO = "Rettifica Peso";
 
-	@SuppressWarnings("unchecked")
 	public Map<Integer, Movimento> getCarichiInizialiPerStallo(final Consegna consegna) throws Exception {
 
 		/*
@@ -1010,7 +1010,7 @@ WHERE  numregistro is null GROUP BY case when i.singolicarichi = 1 then r.id els
 				currNum ++;
 
 				if ( doFix ) {
-					final Integer num = new Integer( currNum ) ;
+					final Integer num = Integer.valueOf( currNum ) ;
 
 					//				String ids = getIdsFromNumRegistro( m ) ;
 					//					shiftRegistro( false, num , conn  ) ;

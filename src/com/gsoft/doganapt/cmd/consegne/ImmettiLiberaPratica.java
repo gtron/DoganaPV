@@ -47,7 +47,7 @@ public class ImmettiLiberaPratica extends VelocityCommand {
 
 	Double valoreDollari = null;
 	Double tassoCambio = null;
-	Double sommaSeccoTotale = new Double(0);
+	Double sommaSeccoTotale = Double.valueOf(0);
 	Double valoreTestp = null;
 	StalloConsegna stalloConsegnaValoriUnitari = null ;
 

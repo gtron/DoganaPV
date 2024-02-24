@@ -19,7 +19,7 @@ import com.gtsoft.utils.http.servlet.GtServlet;
 
 public class Stampa extends VelocityCommand {
 
-	private final static Integer ROWS_PER_PAGE = new Integer(15);
+	private final static Integer ROWS_PER_PAGE = Integer.valueOf(15);
 
 	public Stampa ( GtServlet callerServlet) {
 		super(callerServlet);
@@ -38,7 +38,7 @@ public class Stampa extends VelocityCommand {
 		if ( num == null ) {
 			num = ROWS_PER_PAGE ;
 		} else {
-			num = new Integer( ROWS_PER_PAGE.intValue() * num.intValue() ) ;
+			num = Integer.valueOf( ROWS_PER_PAGE.intValue() * num.intValue() ) ;
 		}
 
 		Integer from = getIntParam("f", false);
@@ -54,7 +54,7 @@ public class Stampa extends VelocityCommand {
 			adapter.confermaStampa(from, to);
 		}
 		else  {
-			Vector list = adapter.getDaStampare(from, num) ;
+			Vector<?> list = adapter.getDaStampare(from, num) ;
 
 			ctx.put("list", list );
 		}

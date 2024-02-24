@@ -120,7 +120,6 @@ public class Stallo extends ModelBean2 implements Cloneable {
 		
 		Integer idConsegna = idConsegnaAttuale;
 		
-		@SuppressWarnings("unchecked")
 		Vector<Movimento> v = registro.getByConsegna(true, idConsegna, id, null, null );
 
 		Movimento giacenza = Movimento.getMovimentoRisultante(v, getDataRiferimento());
@@ -149,7 +148,6 @@ public class Stallo extends ModelBean2 implements Cloneable {
 
 		Movimento mov = registro.newMovimento();
 
-		@SuppressWarnings("unchecked")
 		Vector<Movimento> v = registro.getByConsegna(true, consegna.getId() , id, null, null );
 
 		for (Movimento m : v) {
@@ -189,7 +187,7 @@ public class Stallo extends ModelBean2 implements Cloneable {
 				amount = m.getUmido() ;
 			}
 
-			attuale = new Double( attuale.doubleValue() + amount ) ;
+			attuale = Double.valueOf( attuale.doubleValue() + amount ) ;
 		}
 
 		if ( update ) {
@@ -206,7 +204,7 @@ public class Stallo extends ModelBean2 implements Cloneable {
 				amount = m.getUmido() ;
 			}
 
-			caricato = new Double( caricato.doubleValue() + amount ) ;
+			caricato = Double.valueOf( caricato.doubleValue() + amount ) ;
 		}
 
 		if ( update ) {

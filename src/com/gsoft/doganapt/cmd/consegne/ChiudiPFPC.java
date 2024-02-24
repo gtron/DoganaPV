@@ -59,7 +59,7 @@ public class ChiudiPFPC extends VelocityCommand {
 			}
 
 			if (  giacenza != null && giacenza.intValue() != 0 ) {
-				Vector v = consegna.getRegistro(true, false, true );
+				Vector<?> v = consegna.getRegistro(true, false, true );
 
 				MovimentoIVA m = (MovimentoIVA) v.lastElement() ;
 
@@ -129,7 +129,7 @@ public class ChiudiPFPC extends VelocityCommand {
 			}
 
 			if (  giacenza != null && giacenza.intValue() != 0 ) {
-				Vector v = c.getRegistro(true, false, true );
+				Vector<?> v = c.getRegistro(true, false, true );
 
 				Movimento m = (Movimento) v.lastElement() ;
 
@@ -140,10 +140,10 @@ public class ChiudiPFPC extends VelocityCommand {
 					m.setSecco(0d);
 				}
 
-				m.setUmido( new Double( m.getUmido().doubleValue() + giacenza.doubleValue()  ) );
+				m.setUmido( Double.valueOf( m.getUmido().doubleValue() + giacenza.doubleValue()  ) );
 
 				if ( giacenzaSecco != null ) {
-					m.setSecco( new Double( m.getSecco().doubleValue() + giacenzaSecco.doubleValue()  ) );
+					m.setSecco( Double.valueOf( m.getSecco().doubleValue() + giacenzaSecco.doubleValue()  ) );
 				}
 
 				new MovimentoIvaAdapter().update(m);

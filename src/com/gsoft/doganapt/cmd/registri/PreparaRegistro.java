@@ -15,7 +15,7 @@ import com.gtsoft.utils.http.servlet.GtServlet;
 
 public class PreparaRegistro extends VelocityCommand {
 	
-//	private final static Integer ROWS_PER_PAGE = new Integer(20);
+//	private final static Integer ROWS_PER_PAGE = Integer.valueOf(20);
 	
 	public PreparaRegistro ( GtServlet callerServlet) {
 		super(callerServlet);
@@ -32,7 +32,7 @@ public class PreparaRegistro extends VelocityCommand {
 		
 		for ( int i = from.intValue() ; i <= t  ; i++  ) {
 		
-			list.add( new Integer ( i )) ;
+			list.add( Integer.valueOf ( i )) ;
 			
 		}
 		ctx.put("list", list );

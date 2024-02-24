@@ -26,7 +26,6 @@ import com.gsoft.doganapt.cmd.movimenti.NuovoMovimento;
 import com.gsoft.framework.TooledServlet;
 //import com.gtsoft.utils.LogManager;
 
-@SuppressWarnings("serial")
 public class ConsegneServlet extends TooledServlet {
 
 	public ConsegneServlet() {

@@ -421,8 +421,10 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 			if ( key != null && writeCache ) {
 				FileBasedCacher.set(key, list);
 			}
+		} catch ( Exception e ) {
+			System.out.println("ERROR getDateDaImportare");
+			e.printStackTrace();
 		}
-
 		finally {
 			db.freeConnection(conn) ;
 		}

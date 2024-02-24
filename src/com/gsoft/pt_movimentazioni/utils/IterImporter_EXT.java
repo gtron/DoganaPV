@@ -85,7 +85,7 @@ public class IterImporter_EXT extends IterImporter {
 		//		FormattedDate data = quadAdp.getMinDataCarico(c) ;
 		//		FormattedDate lastData = data ;
 
-		Vector list = null ;
+		Vector<?> list = null ;
 
 		// fetch dei movimenti
 		for (Object element : c.getStalli()) {
@@ -139,11 +139,11 @@ public class IterImporter_EXT extends IterImporter {
 
 					if ( scartoUmido > 0 ) {
 						rettifica.setIsScarico( true ) ;
-						rettifica.setUmido( new Double(scartoUmido) ) ;
+						rettifica.setUmido( Double.valueOf(scartoUmido) ) ;
 					}
 					else {
 						rettifica.setIsScarico( false ) ;
-						rettifica.setUmido( new Double( -1 * scartoUmido) ) ;
+						rettifica.setUmido( Double.valueOf( -1 * scartoUmido) ) ;
 					}
 					rettifica.setSecco( c.calcolaSecco(rettifica.getUmido()) );
 
@@ -209,7 +209,7 @@ public class IterImporter_EXT extends IterImporter {
 	//		m.setIsRettifica( true );
 	//
 	//		m.setData(data) ;
-	//		m.setIdMerce( new Integer(c.getIdmerce()));
+	//		m.setIdMerce( Integer.valueOf(c.getIdmerce()));
 	//		m.setIdConsegna(c.getId());
 	//		m.setStallo( s );
 	//

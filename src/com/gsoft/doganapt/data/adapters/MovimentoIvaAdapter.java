@@ -151,7 +151,7 @@ public class MovimentoIvaAdapter extends MovimentoAdapter {
 		.append(" WHERE deleted = 0 ")
 		;
 
-		Integer d = new Integer( 1 ) ;
+		Integer d = Integer.valueOf( 1 ) ;
 		Connection conn = db.getConnection() ;
 		try {
 			PreparedStatement s = conn.prepareStatement(sql.toString()) ;
@@ -161,7 +161,7 @@ public class MovimentoIvaAdapter extends MovimentoAdapter {
 			if ( rs != null && rs.next() ) {
 				String str = rs.getString(1);
 				if ( str != null ) {
-					d = new Integer( Integer.parseInt(str) + 1 );
+					d = Integer.valueOf( Integer.parseInt(str) + 1 );
 				}
 			}
 		}

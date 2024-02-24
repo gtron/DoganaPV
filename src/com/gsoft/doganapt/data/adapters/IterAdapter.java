@@ -113,10 +113,10 @@ public class IterAdapter extends BeanAdapter2 {
 		super.update(o);
 		cache.remove(((Iter)o).getId());
 	}
-	public Vector getAll(String orderby) throws Exception {
-		Vector list = super.getAll(orderby);
+	public Vector<?> getAll(String orderby) throws Exception {
+		Vector<?> list = super.getAll(orderby);
 		Iter a = null ;
-		for( Iterator i = list.iterator(); i.hasNext(); ) {
+		for( Iterator<?> i = list.iterator(); i.hasNext(); ) {
 			a = (Iter) i.next();
 			cache.put(a.getId(), a);
 		}
@@ -145,6 +145,7 @@ public class IterAdapter extends BeanAdapter2 {
 	public static void clearCache() {
 		cache.clear();
 	}
+	@SuppressWarnings("unchecked")
 	public static ArrayList<Object> getAllCached() throws Exception {
 		if ( cache.size() < 1 ) {
 			Iter.newAdapter().getAll("id");

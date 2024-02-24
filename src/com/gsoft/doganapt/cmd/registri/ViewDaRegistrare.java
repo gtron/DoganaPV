@@ -63,7 +63,7 @@ public class ViewDaRegistrare extends VelocityCommand {
 		 * percio' serve una nuova funzione per tirarli fuori e una nuova funzione x registrarli !!!
 		 * 
 		 */
-		Boolean onlyNonRegistrati = Boolean.TRUE;
+		// Boolean onlyNonRegistrati = Boolean.TRUE;
 		
 		Boolean isRegistroIva = getBooleanParam(TIPO_REGISTRO_IVA, false);
 		if ( isRegistroIva == null )
@@ -98,7 +98,8 @@ public class ViewDaRegistrare extends VelocityCommand {
 		HttpSession session=request.getSession(false);
 		if ( session == null ) return null ; 
 		
-		Hashtable<String, String> hashOrder=(Hashtable<String, String>)session.getAttribute(HASHORDER);
+		@SuppressWarnings("unchecked")
+		Hashtable<String, String> hashOrder= (Hashtable<String, String>) session.getAttribute(HASHORDER);
 		if(hashOrder==null){
 			 hashOrder=new Hashtable<String, String>();
 			 session.setAttribute(HASHORDER, hashOrder);
