@@ -54,8 +54,8 @@ public class BackupDb extends VelocityCommand {
 		try {
 			Process p = Runtime.getRuntime().exec( mysqlCmd );
 
-			BufferedReader stdError = new BufferedReader(new
-					InputStreamReader(p.getErrorStream()));
+			/* BufferedReader stdError = new BufferedReader(new
+					InputStreamReader(p.getErrorStream())); */
 
 			String out = "" ;
 			String outError = "" ;

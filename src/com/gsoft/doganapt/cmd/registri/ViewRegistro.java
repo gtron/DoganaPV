@@ -92,7 +92,8 @@ public class ViewRegistro extends VelocityCommand {
 		HttpSession session=request.getSession(false);
 		if ( session == null ) return null ; 
 		
-		Hashtable<String, String> hashOrder=(Hashtable<String, String>)session.getAttribute(HASHORDER);
+		@SuppressWarnings("unchecked")
+		Hashtable<String, String> hashOrder= (Hashtable<String, String>)session.getAttribute(HASHORDER);
 		if(hashOrder==null){
 			 hashOrder=new Hashtable<String, String>();
 			 session.setAttribute(HASHORDER, hashOrder);
@@ -138,7 +139,7 @@ public class ViewRegistro extends VelocityCommand {
 		
 		if(records==null){
 			session.setAttribute(HASHORDER, new Hashtable<String, String>());
-			Vector list=adp 
+			Vector<?> list=adp 
 			.getRegistro( onlyRegistrati.booleanValue(),c);
 			records=list.size();
 			ctx.put( "list" , list) ;

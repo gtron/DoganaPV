@@ -2,6 +2,7 @@ package com.gsoft.doganapt.data;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Vector;
@@ -46,8 +47,8 @@ public class Consegna extends ModelBean2 implements Serializable {
 	ArrayList<Object> stalli = null ;
 	ArrayList<Object> stalliRegistrati = null ;
 
-	Vector registroIva = null;
-	Vector registroDoganale = null ;
+	Vector<?> registroIva = null;
+	Vector<?> registroDoganale = null ;
 
 	Merce merce = null ;
 	Iter iter = null ;
@@ -217,7 +218,7 @@ public class Consegna extends ModelBean2 implements Serializable {
 
 		if ( valUnitario  != null &&  m.getSecco() == null ) {
 
-			valore = new Double(
+			valore = Double.valueOf(
 					Math.round( 100000000 * m.getSecco().doubleValue() * valUnitario.doubleValue() ) / 100000000
 					) ;
 
@@ -237,14 +238,14 @@ public class Consegna extends ModelBean2 implements Serializable {
 
 		if ( tassoUmidita.doubleValue() >= 100 ) {
 			System.out.println("Tasso di umidità non valido ( >= 100 )");
-			tassoUmidita = new Double(0);
+			tassoUmidita = Double.valueOf(0);
 		}
 
 		this.tassoUmidita = tassoUmidita / 100 ;
 	}
 	public Double calcolaSecco( final Double umido ) {
 		if ( umido != null)
-			return new Double(
+			return Double.valueOf(
 					Math.round(
 							umido.doubleValue() *
 							Math.round(  100000000 - 100000000 * tassoUmidita.doubleValue() ) / 100000000  ) );
@@ -266,7 +267,7 @@ public class Consegna extends ModelBean2 implements Serializable {
 
 	public Documento getPrimoDocumento(final boolean iva, Stallo s) throws Exception {
 
-		final Vector<Movimento> v = getRegistro(iva, false, false) ;
+		final Vector<Movimento> v = (Vector<Movimento>) getRegistro(iva, false, false) ;
 		int idStallo = s.getId().intValue();
 		Stallo stalloMov = null;
 
@@ -342,14 +343,14 @@ public class Consegna extends ModelBean2 implements Serializable {
 		return new ConsegnaAdapter(db) ;
 	}
 
-	public Vector getRegistroIva( final boolean soloRegistrati ) throws Exception {
+	public Vector<?> getRegistroIva( final boolean soloRegistrati ) throws Exception {
 		return getRegistro( true,  soloRegistrati , true);
 	}
-	public Vector getRegistroDoganale( final boolean soloRegistrati ) throws Exception {
+	public Vector<?> getRegistroDoganale( final boolean soloRegistrati ) throws Exception {
 		return getRegistro( false, soloRegistrati , true);
 	}
 
-	public Vector getRegistro(final boolean iva,  final boolean soloRegistrati , final boolean dontcache) throws Exception {
+	public Vector<?> getRegistro(final boolean iva,  final boolean soloRegistrati , final boolean dontcache) throws Exception {
 		MovimentoAdapter adp = null ;
 
 		if ( dontcache || registroIva == null || registroDoganale == null) {
@@ -389,12 +390,12 @@ public class Consegna extends ModelBean2 implements Serializable {
 
 	public Vector<?> getPartitario(Integer idStallo, Integer minNumero) throws Exception {
 
-		Vector<?> dog = new MovimentoDoganaleAdapter().getByConsegna(true, id, idStallo, "idstallo, data" , null );
-		final Vector iva = new MovimentoIvaAdapter().getByConsegna(true, id, idStallo, "idstallo, data" , null );
+		Vector<Movimento> dog = new MovimentoDoganaleAdapter().getByConsegna(true, id, idStallo, "idstallo, data" , null );
+		final Vector<Movimento> iva = new MovimentoIvaAdapter().getByConsegna(true, id, idStallo, "idstallo, data" , null );
 
 		if ( dog != null && dog.size() >  0 ) {
 			if ( iva != null && iva.size() > 0 ) {
-				dog.addAll(iva);
+				dog.addAll((Collection<Movimento>) iva);
 				Collections.sort(dog, new PartitarioSorter());
 			}
 		}

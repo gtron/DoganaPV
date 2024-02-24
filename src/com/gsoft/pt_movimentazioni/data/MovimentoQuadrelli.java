@@ -128,7 +128,7 @@ public class MovimentoQuadrelli implements Serializable {
 	}
 
 	public void setNetto(final String netto) {
-		this.netto= new Double( netto ).doubleValue();
+		this.netto= Double.valueOf( netto ).doubleValue();
 	}
 
 	/**
@@ -178,7 +178,7 @@ public class MovimentoQuadrelli implements Serializable {
 	public void setNumeroCataste(final Integer numeroCataste) {
 		this.numeroCataste=numeroCataste;
 		if ( this.numeroCataste == null ) {
-			this.numeroCataste = new Integer(0);
+			this.numeroCataste = Integer.valueOf(0);
 		}
 
 	}
@@ -200,10 +200,10 @@ public class MovimentoQuadrelli implements Serializable {
 	}
 	public void setNumeroProgressivo( final String numeroProgressivo) {
 		try {
-			this.numeroProgressivo = new Double( numeroProgressivo );
+			this.numeroProgressivo = Double.valueOf( numeroProgressivo );
 		}
 		catch (final Exception e ) {
-			this.numeroProgressivo = new Double(0) ;
+			this.numeroProgressivo = Double.valueOf(0) ;
 		}
 	}
 	/**
@@ -222,7 +222,7 @@ public class MovimentoQuadrelli implements Serializable {
 	}
 	public void setPesoFattura( final String p ) {
 		try {
-			pesoFattura = new Integer( p );
+			pesoFattura = Integer.valueOf( p );
 		}
 		catch (final Exception e ) {
 			pesoFattura = null ;
@@ -246,7 +246,7 @@ public class MovimentoQuadrelli implements Serializable {
 	}
 	public void setPesoPartenza( final String p ) {
 		try {
-			pesoPartenza = new Integer( p );
+			pesoPartenza = Integer.valueOf( p );
 		}
 		catch (final Exception e ) {
 			pesoPartenza = null ;
@@ -367,7 +367,7 @@ public class MovimentoQuadrelli implements Serializable {
 		return new MovimentoQuadrelliAdapter(db) ;
 	}
 
-	public static Integer DESTINAZIONE_RETTIFICA = new Integer(8);
+	public static Integer DESTINAZIONE_RETTIFICA = Integer.valueOf(8);
 	public static String DESTINAZIONE_RETTIFICA_STRING = "8";
 
 }

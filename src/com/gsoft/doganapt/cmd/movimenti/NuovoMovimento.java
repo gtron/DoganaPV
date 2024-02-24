@@ -128,8 +128,8 @@ public class NuovoMovimento extends VelocityCommand {
 				}
 
 
-				m.setUmido(new Double(u));
-				m.setSecco(new Double(s));
+				m.setUmido(Double.valueOf(u));
+				m.setSecco(Double.valueOf(s));
 
 				adp.update(m);
 

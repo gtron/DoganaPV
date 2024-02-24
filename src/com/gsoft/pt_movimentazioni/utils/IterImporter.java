@@ -114,8 +114,8 @@ GROUP BY data, merce
 				s.setIdConsegnaPrenotata(null);
 				s.setImmessoInLiberaPratica(Boolean.FALSE) ;
 
-				s.setAttuale( new Double(0) );
-				s.setCaricato( new Double(0) );
+				s.setAttuale( Double.valueOf(0) );
+				s.setCaricato( Double.valueOf(0) );
 
 				stalliCoinvolti.put(s.getId(), s);
 			}
@@ -209,11 +209,11 @@ GROUP BY data, merce
 
 					if ( scartoUmido > 0 ) {
 						rettifica.setIsScarico( true ) ;
-						rettifica.setUmido( new Double(scartoUmido) ) ;
+						rettifica.setUmido( Double.valueOf(scartoUmido) ) ;
 					}
 					else {
 						rettifica.setIsScarico( false ) ;
-						rettifica.setUmido( new Double( -1 * scartoUmido) ) ;
+						rettifica.setUmido( Double.valueOf( -1 * scartoUmido) ) ;
 					}
 					rettifica.setSecco( c.calcolaSecco(rettifica.getUmido()) );
 
@@ -325,12 +325,12 @@ GROUP BY data, merce
 	 * @throws Exception
 	 */
 	protected void innerImport( final boolean isScarichi , final Consegna c, final Stallo s , final FormattedDate giorno , final MovimentoAdapter registro ) throws Exception {
-		final Vector listCarichi = quadAdp.get(isScarichi, giorno, s ) ;
+		final Vector<?> listCarichi = quadAdp.get(isScarichi, giorno, s ) ;
 
 		Movimento m = null ;
 		//		double sommaPesoUmido = 0 ;
 		if ( listCarichi != null ) {
-			for ( final Iterator i = listCarichi.iterator() ; i.hasNext();) {
+			for ( final Iterator<?> i = listCarichi.iterator() ; i.hasNext();) {
 
 				m = getMovimento(isScarichi, (MovimentoQuadrelli) i.next(), c , registro ) ;
 				m.setSecco(c.calcolaSecco(m.getUmido()));

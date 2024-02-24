@@ -21,7 +21,7 @@ public class PrintConsegna extends VelocityCommand {
 
 	private static final String PAGINA_PRECEDENTE = "paginaPrecedente";
 	private static final String MIN_NUM_REGISTRO = "minNumRegistro";
-	private static final String IDSTALLO = "idStallo";
+//	private static final String IDSTALLO = "idStallo";
 
 	protected static String TEMPLATE = "consegne/print.vm";
 	private static String ID = "id";

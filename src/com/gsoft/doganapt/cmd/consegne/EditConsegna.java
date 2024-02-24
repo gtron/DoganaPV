@@ -1,9 +1,6 @@
 package com.gsoft.doganapt.cmd.consegne;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,7 +38,7 @@ public class EditConsegna extends BeanEditor {
 			ctx.put("isAdmin", s.getAttribute("admin") ) ;
 		}
 
-		Collection stalli = StalloAdapter.getAllCached();
+		Collection<?> stalli = StalloAdapter.getAllCached();
 		ctx.put("merci" ,  MerceAdapter.getAllCached());
 		ctx.put("iters" ,  IterAdapter.getAllCached());
 		ctx.put("stalli" ,  stalli);
@@ -112,7 +109,7 @@ public class EditConsegna extends BeanEditor {
 		return t ;
 	}
 
-	private void aggiornaStalli(Consegna c , Collection stalli ) throws Exception {
+	/* private void aggiornaStalli(Consegna c , Collection<?> stalli ) throws Exception {
 
 		ArrayList<Integer> idStalliAssegnati = getIntParams("stalli", 0);
 		//		ArrayList<Integer> idStalliPrenotati = getIntParams("stalliprenotati", 1);
@@ -121,7 +118,7 @@ public class EditConsegna extends BeanEditor {
 		if ( idStalliAssegnati != null ) {
 			HashMap<Integer,Stallo> toUpdate = new HashMap<Integer,Stallo>(3);
 
-			for ( Iterator i = stalli.iterator() ; i.hasNext() ; ){
+			for ( Iterator<?> i = stalli.iterator() ; i.hasNext() ; ){
 				s = ( Stallo ) i.next() ;
 
 				if ( c.isAperta() ) {
@@ -162,7 +159,7 @@ public class EditConsegna extends BeanEditor {
 				adp.update(ss);
 			}
 		}
-	}
+	} */
 
 	@Override
 	public VelocityCommand clone() {

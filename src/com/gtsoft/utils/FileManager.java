@@ -50,9 +50,11 @@ public class FileManager {
 	}
 
 	protected static void copyFile(java.io.File destination, java.io.File source) throws Exception {
+		java.io.FileInputStream inStream=null;
+		java.io.FileOutputStream outStream=null;
 		try {
-			java.io.FileInputStream inStream=new java.io.FileInputStream(source);
-			java.io.FileOutputStream outStream=new java.io.FileOutputStream(destination);
+			inStream=new java.io.FileInputStream(source);
+			outStream=new java.io.FileOutputStream(destination);
 
 			int len;
 			byte[] buf=new byte[2048];
@@ -62,6 +64,13 @@ public class FileManager {
 			}
 		} catch (Exception e) {
 			throw new Exception("Can't copy file "+source+" -> "+destination+".",e);
+		} finally {
+			try {
+				if (inStream!=null) inStream.close();
+				if (outStream!=null) outStream.close();
+			} catch (Exception e) {
+				throw new Exception("Can't close file "+source+" -> "+destination+".",e);
+			}
 		}
 	}
 
@@ -104,8 +113,8 @@ public class FileManager {
 		return null ;
 	}
 
-	public static Vector listFiles( String dir ) {
-		Vector list = new Vector() ;
+	public static Vector<File> listFiles( String dir ) {
+		Vector<File> list = new Vector<File>() ;
 		File f =  new File ( dir ) ;
 
 		if ( f.isDirectory() ) {
@@ -124,8 +133,8 @@ public class FileManager {
 		return list;
 	}
 
-	public static Vector listDirs( String parent ) {
-		Vector list = new Vector() ;
+	public static Vector<String> listDirs( String parent ) {
+		Vector<String> list = new Vector<String>() ;
 		File f =  new File ( parent ) ;
 
 		if ( f.isDirectory() ) {
@@ -145,8 +154,8 @@ public class FileManager {
 	}
 
 
-	public static HashMap listBackups( String dir ) {
-		HashMap list = new HashMap() ;
+	public static HashMap<FormattedDate, HashMap<String, String>> listBackups( String dir ) {
+		HashMap<FormattedDate, HashMap<String, String>> list = new HashMap<FormattedDate, HashMap<String, String>>() ;
 		File f =  new File ( dir ) ;
 
 
@@ -161,7 +170,7 @@ public class FileManager {
 			});
 
 			File curr = null ;
-			HashMap day = null ;
+			HashMap<String, String> day = null ;
 			String filename = null ;
 
 			for (File backupFile : backupFiles) {
@@ -177,10 +186,10 @@ public class FileManager {
 
 
 				if ( list.containsKey(backupDay) ) {
-					day = (HashMap) list.get(backupDay) ;
+					day = (HashMap<String, String>) list.get(backupDay) ;
 				}
 				else {
-					day = new HashMap(3);
+					day = new HashMap<String, String>(3);
 					list.put( backupDay, day ) ;
 				}
 
@@ -193,13 +202,22 @@ public class FileManager {
 					String comment = " - " ;
 					String line = null ;
 					if ( curr.length() > 0 ) {
+						BufferedReader fr = null;
 						try {
-							BufferedReader fr = new BufferedReader( new FileReader ( curr ) ) ;
+							fr = new BufferedReader( new FileReader ( curr ) ) ;
 							while ( ((line = fr.readLine()) != null) ) {
 								comment += line;
 							}
 						}
 						catch ( Exception e ) { comment = " N/A " ; }
+						finally {
+							if(fr != null)
+								try {
+									fr.close();
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+						}
 					}
 					else {
 						comment = filename.substring( filename.indexOf('_',20) +1  , filename.lastIndexOf('.')) ;

@@ -33,8 +33,8 @@ public class ActiveDirectory {
 			
 			return checkUser(username);
 			
-		} catch (NamingException e) {
-			System.out.println("Error ActiveDirectory : " + e.getMessage());
+		} catch (Exception e) {
+			System.out.println("Error with ActiveDirectory : " + e.getMessage());
 			e.printStackTrace();
 		}
 		

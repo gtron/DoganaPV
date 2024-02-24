@@ -142,7 +142,7 @@ public class TravasaStallo extends VelocityCommand {
 	}
 
 	void doSvuotamento() throws Exception, IOException, SQLException {
-		@SuppressWarnings("unchecked")
+		
 		Vector<Movimento> list = adp.getByConsegna(false, consegna.getId(), stalloOrigine.getId(), "id DESC LIMIT 1" , "");
 
 		if ( list != null && ! list.isEmpty() ) {
@@ -194,7 +194,7 @@ public class TravasaStallo extends VelocityCommand {
 		return m ;
 	}
 
-	private Movimento newMovimento_old( Stallo s , Movimento scarico) throws Exception {
+	/* private Movimento newMovimento_old( Stallo s , Movimento scarico) throws Exception {
 
 		Movimento m = adp.newMovimento() ;
 
@@ -229,7 +229,7 @@ public class TravasaStallo extends VelocityCommand {
 		m.setIsRettifica(Boolean.FALSE);
 
 		return m ;
-	}
+	} */
 
 	public void initAdapter(Stallo s)  {
 		if ( adp == null ) {

@@ -96,7 +96,7 @@ public class UtenteAdapter extends BeanAdapter2 {
 		fields.add( Fields.EMAIL, Field.Type.STRING , (fill)? o.getEmail() : null  );
 		fields.add( Fields.CDATE, Field.Type.DATE , (fill)? o.getCDate() : null  );
 		fields.add( Fields.ACTIVE, Field.Type.INTEGER , (fill)?
-				( o.isActive() ? new Integer(1) : new Integer(0) ) : null  );
+				( o.isActive() ? Integer.valueOf(1) : Integer.valueOf(0) ) : null  );
 
 		fields.get(Fields.LIVELLO).setMandatory(Boolean.TRUE);
 		fields.get(Fields.PASSWORD).setMandatory(Boolean.TRUE);

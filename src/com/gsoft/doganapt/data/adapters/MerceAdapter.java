@@ -125,10 +125,10 @@ public class MerceAdapter extends BeanAdapter2 {
 		clearCache();
 	}
 	@Override
-	public Vector getAll(String orderby) throws Exception {
-		Vector list = super.getAll(orderby);
+	public Vector<?> getAll(String orderby) throws Exception {
+		Vector<?> list = super.getAll(orderby);
 		Merce a = null ;
-		for( Iterator i = list.iterator(); i.hasNext(); ) {
+		for( Iterator<?> i = list.iterator(); i.hasNext(); ) {
 			a = (Merce) i.next();
 			cache.put(a.getId(), a);
 		}
@@ -173,6 +173,7 @@ public class MerceAdapter extends BeanAdapter2 {
 	public static void clearCache() {
 		cache.clear();
 	}
+	@SuppressWarnings("unchecked")
 	public static ArrayList<Object> getAllCached() throws Exception {
 		if ( cache.size() < 1 ) {
 			Merce.newAdapter().getAll("nome");
@@ -194,7 +195,7 @@ public class MerceAdapter extends BeanAdapter2 {
 		Merce m = null ;
 		Vector<Integer> ids = adp.getIdMerci();
 
-		for( Iterator i = cache.values().iterator() ; i.hasNext() ; ) {
+		for( Iterator<?> i = cache.values().iterator() ; i.hasNext() ; ) {
 			m = (Merce)i.next();
 			for (Integer integer : ids) {
 				if ( integer.equals(m.getId())  ) {

@@ -32,12 +32,12 @@ public class DeregistraMovimento extends VelocityCommand {
 			
 			Integer num = getIntParam("n", true);
 			
-			Vector list = adapter.getByNumeroRegistro(num) ;
+			Vector<?> list = adapter.getByNumeroRegistro(num) ;
 			
 			Movimento m = null ;
 //			Consegna c = null ;
 			
-			for ( Iterator i = list.iterator() ; i.hasNext(); ) {
+			for ( Iterator<?> i = list.iterator() ; i.hasNext(); ) {
 				
 				m = (Movimento) i.next() ;
 //				c = m.getConsegna();
@@ -91,7 +91,7 @@ public class DeregistraMovimento extends VelocityCommand {
 //		Integer newNum  ;
 //		try {
 //			newNum = adapter.getNextNumRegistro();
-//			m.setNumRegistro( new Long(newNum ) );
+//			m.setNumRegistro( Long.valueOf(newNum ) );
 //			adapter.update(m);
 //		}
 //		catch (Exception e ) {

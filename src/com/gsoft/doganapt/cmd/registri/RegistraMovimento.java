@@ -82,7 +82,7 @@ public class RegistraMovimento extends VelocityCommand {
 		Integer newNum  ;
 		try {
 			newNum = adapter.getNextNumRegistro();
-			m.setNumRegistro( new Long(newNum ) );
+			m.setNumRegistro( Long.valueOf(newNum ) );
 			adapter.update(m);
 		}
 		catch (Exception e ) {
@@ -98,7 +98,7 @@ public class RegistraMovimento extends VelocityCommand {
 
 		Integer newNum = null ;
 		Movimento m = null ;
-		Vector movimenti = null ;
+		Vector<?> movimenti = null ;
 
 		FormattedDate oldData = null ;
 		Boolean oldScarico = null;
@@ -112,7 +112,7 @@ public class RegistraMovimento extends VelocityCommand {
 
 
 			if ( movimenti != null ) {
-				for ( Iterator im = movimenti.iterator() ; im.hasNext(); ) {
+				for ( Iterator<?> im = movimenti.iterator() ; im.hasNext(); ) {
 
 					m = (Movimento) im.next();
 
@@ -134,7 +134,7 @@ public class RegistraMovimento extends VelocityCommand {
 					oldRettifica = m.getIsRettifica();
 
 
-					m.setNumRegistro( new Long(newNum ) );
+					m.setNumRegistro( Long.valueOf(newNum ) );
 					adapter.update(m);
 
 
@@ -170,7 +170,7 @@ public class RegistraMovimento extends VelocityCommand {
 					oldData = m.getData() ;
 				}
 				else {
-					m.setNumRegistro( new Long(newNum ) );
+					m.setNumRegistro( Long.valueOf(newNum ) );
 					adapter.update(m);
 				}
 

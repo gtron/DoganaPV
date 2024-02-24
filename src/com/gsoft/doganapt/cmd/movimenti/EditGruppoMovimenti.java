@@ -149,8 +149,8 @@ public class EditGruppoMovimenti extends BeanEditor {
 								getDoubleParam("v1_" + m.getId() , false ) )  ;
 					}
 
-					m.setUmido(new Double(u));
-					m.setSecco(new Double(s));
+					m.setUmido(Double.valueOf(u));
+					m.setSecco(Double.valueOf(s));
 
 					Login.logAction("Modifica movimento " + m.getId(), req);
 					adp.update(m);

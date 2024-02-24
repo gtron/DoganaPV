@@ -42,10 +42,10 @@ public class LogManager {
 			}
 			ServletContext sc = config.getServletContext();
 
-			if (log4jLocation == null) {
-				System.err.println("*** No log4j-properties-location init param, so initializing log4j with BasicConfigurator");
-				BasicConfigurator.configure();
-			} else {
+			// if (log4jLocation == null) {
+			// 	System.err.println("*** No log4j-properties-location init param, so initializing log4j with BasicConfigurator");
+			// 	BasicConfigurator.configure();
+			// } else {
 				String webAppPath = sc.getRealPath("/");
 				String log4jProp = webAppPath + log4jLocation;
 				File f = new File(log4jProp);
@@ -56,7 +56,7 @@ public class LogManager {
 					System.err.println("*** " + log4jProp + " file not found, so initializing log4j with BasicConfigurator");
 					BasicConfigurator.configure();
 				}
-			}
+			// }
 
 		} catch (Exception e) {
 			logFile = null;

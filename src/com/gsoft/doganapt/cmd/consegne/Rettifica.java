@@ -105,15 +105,15 @@ public class Rettifica extends VelocityCommand {
 			s = StalloAdapter.get(integer);
 			idStallo = s.getId();
 
-			rettificaUmido = new Double(
-					new Double( getParam("u0_" + idStallo , true) ).doubleValue()
+			rettificaUmido = Double.valueOf(
+					Double.valueOf( getParam("u0_" + idStallo , true) ).doubleValue()
 					-
-					new Double( getParam("u1_" + idStallo , true) ).doubleValue() ) ;
+					Double.valueOf( getParam("u1_" + idStallo , true) ).doubleValue() ) ;
 
-			rettificaSecco = new Double(
-					new Double( getParam("s0_" + idStallo , true) ).doubleValue()
+			rettificaSecco = Double.valueOf(
+					Double.valueOf( getParam("s0_" + idStallo , true) ).doubleValue()
 					-
-					new Double( getParam("s1_" + idStallo , true) ).doubleValue() ) ;
+					Double.valueOf( getParam("s1_" + idStallo , true) ).doubleValue() ) ;
 
 
 			if ( consegna.getId().equals(s.getIdConsegnaAttuale())
@@ -145,7 +145,7 @@ public class Rettifica extends VelocityCommand {
 
 					MovimentoIVA movIva = (MovimentoIVA) mov;
 
-					rettificaOneri = new Double( getParam("rettificaOneri", true) ).doubleValue();
+					rettificaOneri = Double.valueOf( getParam("rettificaOneri", true) ).doubleValue();
 					movIva.setValoreTestp( rettificaOneri );
 					movIva.setValoreEuro( rettificaOneri  );
 
@@ -191,7 +191,7 @@ public class Rettifica extends VelocityCommand {
 
 		final String umiditaNuova = getParam("umidita", false) ;
 		if ( umiditaNuova != null ) {
-			consegna.setTassoUmidita(new Double( umiditaNuova )) ;
+			consegna.setTassoUmidita(Double.valueOf( umiditaNuova )) ;
 			Consegna.newAdapter().update(consegna);
 		}
 

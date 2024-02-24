@@ -142,14 +142,14 @@ public class StalloConsegna extends ModelBean2 implements Serializable, Cloneabl
 			tassoEuroDollaro = null ;
 			return;
 		}
-		tassoEuroDollaro = new Double( tasso / PRECISIONE_TASSO_CAMBIO );
+		tassoEuroDollaro = Double.valueOf( tasso / PRECISIONE_TASSO_CAMBIO );
 	}
 	public void setTassoEuroDollaroDB(Long tasso) {
 		if ( tasso == null ) {
 			tassoEuroDollaro = null ;
 			return;
 		}
-		tassoEuroDollaro = new Double( 1.0d * tasso / PRECISIONE_TASSO_CAMBIO );
+		tassoEuroDollaro = Double.valueOf( 1.0d * tasso / PRECISIONE_TASSO_CAMBIO );
 	}
 	public Integer getTassoEuroDollaroDB() {
 		if (tassoEuroDollaro == null ) return null;
