@@ -51,7 +51,7 @@ public class Rettifica extends VelocityCommand {
 			ctx.put( ContextKeys.OBJECT , consegna ) ;
 
 			quadAdp = new MovimentoQuadrelliAdapter(
-					PtMovimentazioniImporter.getInstance().getAccessDB());
+					PtMovimentazioniImporter.getInstance().getSQLServerDB());
 
 			if ( consegna != null ) {
 				if ( consegna.getIter().getHasrettifica()  ) {

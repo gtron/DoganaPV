@@ -79,7 +79,7 @@ public class ApriConsegna extends VelocityCommand {
 
 		if ( consegna != null && getBooleanParam(Strings.EXEC) ) {
 
-			MovimentoQuadrelliAdapter qAdp = new MovimentoQuadrelliAdapter(PtMovimentazioniImporter.getInstance().getAccessDB());
+			MovimentoQuadrelliAdapter qAdp = new MovimentoQuadrelliAdapter(PtMovimentazioniImporter.getInstance().getSQLServerDB());
 			ArrayList<String> codiciStalli = qAdp.getCodiciStalli(consegna, data);
 
 			Stallo s = null ;

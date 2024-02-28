@@ -9,16 +9,15 @@ import com.gsoft.doganapt.data.Consegna;
 import com.gsoft.doganapt.data.adapters.MovimentoDoganaleAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoIvaAdapter;
 import com.gsoft.pt_movimentazioni.data.MovimentoQuadrelliAdapter;
-import com.gtsoft.utils.common.ConfigManager;
+import com.gtsoft.utils.SQLServerDB;
 import com.gtsoft.utils.common.FormattedDate;
-import com.gtsoft.utils.sql.AccessDB;
 
 public class PtMovimentazioniImporter {
 
 	MovimentoIvaAdapter ivaAdp = null ;
 	MovimentoDoganaleAdapter dogAdp = null ;
 	MovimentoQuadrelliAdapter quadAdp = null ;
-	AccessDB adb = null ;
+	SQLServerDB adb = null ;
 	
 	static boolean locked = false;
 	static ArrayList<String> movimentiSenzaData = null;
@@ -86,13 +85,13 @@ public class PtMovimentazioniImporter {
 			}
 		}
 		
-		quadAdp = new MovimentoQuadrelliAdapter(getAccessDB()) ;
+		quadAdp = new MovimentoQuadrelliAdapter(getSQLServerDB()) ;
 	}
 	
 	public ArrayList<String> checkMovimentiSenzaData() {
 		
 		try {
-			movimentiSenzaData = new MovimentoQuadrelliAdapter(getAccessDB()).getMovimentiSenzaData();
+			movimentiSenzaData = new MovimentoQuadrelliAdapter(getSQLServerDB()).getMovimentiSenzaData();
 		} catch (Exception e) {
 			movimentiSenzaData = new ArrayList<String>(1);
 			Login.debug(e, "PTImporter");
@@ -101,22 +100,22 @@ public class PtMovimentazioniImporter {
 		return movimentiSenzaData;
 	}
 	
-	public AccessDB getAccessDB() {
-		if ( adb == null ) {
-			String fileMovimentazioni = ConfigManager.getProperty("movimentazioni.filename") ;
-			adb = new AccessDB(fileMovimentazioni) ;
+	public SQLServerDB getSQLServerDB() {
+		
+		if ( adb == null ) {			
+			adb = new SQLServerDB() ;
 		}
 		return adb;
 	}
 	
 	public synchronized void importTo( FormattedDate to ) throws Exception {
 		
-		Vector consegne = Consegna.newAdapter().getNonChiuse();
+		Vector<?> consegne = Consegna.newAdapter().getNonChiuse();
 		
 		Consegna c ;
 		IterImporter importer ;
 		// Per tutte le consegne ... 
-		for ( Iterator i = consegne.iterator(); i.hasNext() ; ) {
+		for ( Iterator<?> i = consegne.iterator(); i.hasNext() ; ) {
 			c = (Consegna) i.next();
 			
 			importer = c.getIter().getImporter(dogAdp,ivaAdp, quadAdp);

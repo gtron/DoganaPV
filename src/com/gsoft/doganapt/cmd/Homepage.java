@@ -94,7 +94,7 @@ public class Homepage extends VelocityCommand {
 		if ( ! isPrintOutput() ) {
 			
 			if ( ! hasSelectedData ) {
-				MovimentoQuadrelliAdapter qAdp = new MovimentoQuadrelliAdapter(PtMovimentazioniImporter.getInstance().getAccessDB());
+				MovimentoQuadrelliAdapter qAdp = new MovimentoQuadrelliAdapter(PtMovimentazioniImporter.getInstance().getSQLServerDB());
 				MovimentoDoganaleAdapter dogAdp = new MovimentoDoganaleAdapter() ;
 				MovimentoIvaAdapter ivaAdp = new MovimentoIvaAdapter() ;
 				StalloHomepageHelper stalliHelper = new StalloHomepageHelper(stalli, qAdp, dogAdp, ivaAdp);

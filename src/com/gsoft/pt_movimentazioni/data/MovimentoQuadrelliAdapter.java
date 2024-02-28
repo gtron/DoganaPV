@@ -58,7 +58,7 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 		fields.add( Fields.CLIENTE, Field.Type.STRING , (fill)? o.getCodiceCliente() : null );
 		fields.add( Fields.FORNITORE, Field.Type.STRING , (fill)? o.getCodiceFornitore() : null );
 		fields.add( Fields.VETTORE, Field.Type.STRING , (fill)? o.getCodiceVettore() : null );
-		fields.add( Fields.DESTINAZIONE, Field.Type.STRING , (fill)? o.getDestinazione() : null );
+		// fields.add( Fields.DESTINAZIONE, Field.Type.STRING , (fill)? o.getDestinazione() : null );
 		fields.add( Fields.DESCRIZIONE, Field.Type.STRING , (fill)? o.getDescrizione() : null );
 		fields.add( Fields.MERCE, Field.Type.STRING , (fill)? o.getCodiceMerce() : null );
 		fields.add( Fields.NAVE, Field.Type.STRING , (fill)? o.getCodiceNave() : null );
@@ -107,7 +107,7 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 		o.setCodiceCliente( (String) fields.get( Fields.CLIENTE).getValue() );
 		o.setCodiceFornitore( (String) fields.get( Fields.FORNITORE).getValue() );
 		o.setVettore( (String) fields.get( Fields.VETTORE).getValue() );
-		o.setDestinazione( (Integer) fields.get( Fields.DESTINAZIONE).getValue() );
+		// o.setDestinazione( (Integer) fields.get( Fields.DESTINAZIONE).getValue() );
 		o.setDescrizione( (String) fields.get( Fields.DESCRIZIONE).getValue() );
 		o.setMerce( (String) fields.get( Fields.MERCE).getValue() );
 		o.setNave( (Integer) fields.get( Fields.NAVE).getValue() );
@@ -133,7 +133,7 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 		public static final int CLIENTE = 5;
 		public static final int FORNITORE = 6;
 		public static final int VETTORE = 7;
-		public static final int DESTINAZIONE = 8;
+		// public static final int DESTINAZIONE = 8;
 		public static final int DESCRIZIONE = 9;
 		public static final int MERCE = 10;
 		public static final int NAVE = 11;
@@ -149,13 +149,16 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 		static final int FIELDSCOUNT = 20;
 	}
 
-	private static final String TABLE = "`ARCHIVIO CORRETTO`" ;
+	private static final String TABLE = "Pesate" ;
 	private static final String[] fieldNames = {
-		"DataPesatura","Data","Ora","Numero Progressivo","PesoNetto","Cliente","Fornitore",
-		"Vettore","Destinazione","Descrizione","Merce","Nave","Num Consegna",
-		"Num Documento","Peso Fattura","numero cataste","Peso Partenza",
+		"DataPesatura","Data","Ora","NumeroProgressivo","Netto","Id_Cliente","Id_Fornitore",
+		"Id_Vettore",
+		"Destinazione", /// REMOVED
+		"Descrizione","Id_Materiale","Id_Nave","NumConsegna",
+		"NumDocumento","PesoFattura","NumeroCataste","PesoPartenza",
 		"Data_Em_Form","Note", "mindata"
 	};
+	
 	@Override
 	public int getFieldsCount() {
 		return Fields.FIELDSCOUNT ;
@@ -233,6 +236,8 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 
 		Connection cn = db.getConnection();
 
+		System.out.println("getting SQL:" + sql);
+		
 		try {
 			PreparedStatement stmt = cn.prepareStatement(sql);
 			Vector<?> res = getByStatment(stmt);
@@ -250,6 +255,8 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 		}
 
 	}
+	
+
 
 	//	public MovimentoQuadrelli getLast(boolean scarico, Consegna c ) throws Exception {
 	//		StringBuilder sql = new StringBuilder(70)
@@ -286,9 +293,9 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 		ArrayList<String> codici = null;
 
 		StringBuilder sql = new StringBuilder(70)
-		.append("SELECT cliente FROM ")
+		.append("SELECT Id_Cliente FROM ")
 		.append(getTable())
-		.append(" WHERE `num consegna` = ? AND merce = ? ");
+		.append(" WHERE NumConsegna = ? AND Id_Materiale = ? ");
 
 		if ( data != null ) {
 			if ( c.getIdIter() == 4 ) {
@@ -299,7 +306,7 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 
 		}
 
-		sql.append(" group by cliente, data order by data desc" ) ;
+		sql.append(" group by Id_Cliente, Data order by Data desc" ) ;
 
 		String key = FileBasedCacher.getCacheKey(sql);
 
@@ -354,26 +361,32 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 	
 	public ArrayList<FormattedDate> getDateDaImportare( Consegna c , FormattedDate fromData ) throws Exception {
 		StringBuilder sql = new StringBuilder(70)
-		.append("SELECT distinct min(data) FROM ")
-		.append(getTable());
+		.append("SELECT distinct min(DataPesatura) FROM ")
+		.append(getTable())
+		;
 		if ( c != null || fromData != null ) {
 			sql.append(" where ");
 		}
 		if( c != null ) {
-			sql.append(" `num consegna` = ? ");
+			sql.append(" NumConsegna = ? ");
 		}
-		sql.append(" group by  data , merce, `num consegna`  ");
+		sql.append(" group by  data , Id_Materiale, NumConsegna ");
 
 		if ( fromData != null ) {
 			sql.append(" having min(data) > ? ");
 		}
 
 		String key = FileBasedCacher.getCacheKey(sql);
+		
+		System.out.println( "getDateDaImportare key " + key + " SQL: " + sql );
 
 		if ( key != null && readFromCache )
 			return (ArrayList<FormattedDate>) FileBasedCacher.get(key);
 
 		Connection conn = db.getConnection();
+		
+		System.out.println( "conn " + conn );
+		
 
 		ArrayList<FormattedDate> list = null ;
 		try {
@@ -399,6 +412,8 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 			//			if ( fromData != null )
 			//				s.setDate(n++, new Date( fromData.getTime() ) ) ;
 			//			 s.executeQuery() ;
+			
+			System.out.println("sQL: " + sql.toString());
 
 			PreparedStatement s = conn.prepareStatement(sql.toString()) ;
 
@@ -430,35 +445,28 @@ public class MovimentoQuadrelliAdapter extends BeanAdapter2 {
 		}
 		return list ;
 	}
-	
-	/*
-	 * 
-	 * select  distinct min( data )  as mindata ,  merce, cliente, fornitore , `num consegna` , `num documento`
- from `archivio corretto` where  
-destinazione <> 7 and len(cliente) < 4 and len(fornitore) < 4 and
-data > #2016-12-17# and data <= #2016-12-19#
-group by  cliente,  merce, `num consegna` , `num documento`, fornitore, destinazione
 
-	 */
 	
 	public ArrayList<MovimentoQuadrelli> getMovimentiDaImportare( FormattedDate fromData, ArrayList<Stallo> stalliAttivi ) throws Exception {
 		
 		StringBuilder sql = new StringBuilder(70)
-		.append("SELECT distinct max( data )  as mindata ,  merce, cliente, fornitore , `num consegna` , `num documento` FROM ")
+		.append("SELECT distinct max( data )  as mindata ,  id_materiale, Id_Cliente, Id_Fornitore , NumConsegna , NumDocumento FROM ")
 		.append(getTable()).append(" WHERE ")
-		.append(" destinazione <> 7 AND (")
-			.append("fornitore IN ( ")
+		// .append(" destinazione <> 7 AND (")
+			.append("Id_Fornitore IN ( ")
 			.append(getListaCodiciStalli(stalliAttivi))
-			.append(") OR cliente IN ( ")
+			.append(") OR Id_Cliente IN ( ")
 			.append(getListaCodiciStalli(stalliAttivi))
 			.append(") ")
-		.append(") ");
+		// .append(") ")
+			;
 
 		if ( fromData != null ) {
 			sql.append(" AND data > ? ");
 		}
 		
-		sql.append(" GROUP BY cliente,  merce, `num consegna` , `num documento`, fornitore, destinazione");
+		// sql.append(" GROUP BY Id_Cliente,  merce, NumConsegna , NumDocumento, Id_Fornitore, destinazione");
+		sql.append(" GROUP BY Id_Cliente,  id_materiale, NumConsegna , NumDocumento, Id_Fornitore");
 
 //		Login.debug(sql.toString() + " --- DATA:" + fromData);
 				
@@ -501,9 +509,10 @@ group by  cliente,  merce, `num consegna` , `num documento`, fornitore, destinaz
 	public ArrayList<String> getMovimentiSenzaData( ) throws Exception {
 		
 		StringBuilder sql = new StringBuilder(70)
-		.append("SELECT ID, data as mindata ,  merce, cliente, fornitore , `num consegna` , `num documento` FROM ")
+		.append("SELECT data as mindata ,  id_materiale, Id_Cliente, Id_Fornitore , NumConsegna , NumDocumento FROM ")
 		.append(getTable()).append(" WHERE ")
-		.append(" destinazione <> 7 AND data IS NULL ");
+		// .append(" destinazione <> 7 AND data IS NULL ");
+		.append(" data IS NULL ");
 		
 		Connection conn = db.getConnection();
 		ArrayList<String> list = null ;
