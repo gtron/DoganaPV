@@ -6,14 +6,14 @@ import java.util.Vector;
 import com.gsoft.doganapt.data.Merce;
 import com.gsoft.doganapt.data.adapters.MerceAdapter;
 import com.gsoft.pt_movimentazioni.data.MerceQuadrelliAdapter;
+import com.gtsoft.utils.AccessDb2024;
 import com.gtsoft.utils.common.ConfigManager;
-import com.gtsoft.utils.sql.AccessDB;
 
 public class PtMerciImporter {
 
 	MerceAdapter adp = null ;
 	MerceQuadrelliAdapter quadAdp = null ;
-	AccessDB adb = null ;
+	AccessDb2024 adb = null ;
 	
 	private static PtMerciImporter instance = null ;
 	
@@ -29,14 +29,14 @@ public class PtMerciImporter {
 		
 		String f = ConfigManager.getProperty("anagrafiche.filename") ;
 		if ( f != null ) {
-			adb = new AccessDB(f,"sa", "QuaBil") ;
+			adb = new AccessDb2024(f,null,null); // "sa", "QuaBil") ;
 			
 			quadAdp = new MerceQuadrelliAdapter(adb) ;
 			adp = new MerceAdapter() ;
 		}
 	}
 	
-	public AccessDB getAccessDB() {
+	public AccessDb2024 getAccessDB() {
 		return adb;
 	}
 	

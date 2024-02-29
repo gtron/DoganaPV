@@ -9,6 +9,7 @@ import com.gsoft.doganapt.data.Consegna;
 import com.gsoft.doganapt.data.adapters.MovimentoDoganaleAdapter;
 import com.gsoft.doganapt.data.adapters.MovimentoIvaAdapter;
 import com.gsoft.pt_movimentazioni.data.MovimentoQuadrelliAdapter;
+import com.gtsoft.utils.AccessDb2024;
 import com.gtsoft.utils.common.ConfigManager;
 import com.gtsoft.utils.common.FormattedDate;
 import com.gtsoft.utils.sql.AccessDB;
@@ -18,7 +19,7 @@ public class PtMovimentazioniImporter {
 	MovimentoIvaAdapter ivaAdp = null ;
 	MovimentoDoganaleAdapter dogAdp = null ;
 	MovimentoQuadrelliAdapter quadAdp = null ;
-	AccessDB adb = null ;
+	AccessDb2024 adb = null ;
 	
 	static boolean locked = false;
 	static ArrayList<String> movimentiSenzaData = null;
@@ -101,10 +102,10 @@ public class PtMovimentazioniImporter {
 		return movimentiSenzaData;
 	}
 	
-	public AccessDB getAccessDB() {
+	public AccessDb2024 getAccessDB() {
 		if ( adb == null ) {
 			String fileMovimentazioni = ConfigManager.getProperty("movimentazioni.filename") ;
-			adb = new AccessDB(fileMovimentazioni) ;
+			adb = new AccessDb2024(fileMovimentazioni) ;
 		}
 		return adb;
 	}
